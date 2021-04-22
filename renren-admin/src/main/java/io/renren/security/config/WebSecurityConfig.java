@@ -34,6 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(new LoginAuthenticationProvider(userDetailsService));
         auth.userDetailsService(userDetailsService);
     }
 
@@ -49,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
-            .addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
+//            .addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin()
             .loginPage("/login")
             .loginProcessingUrl("/login")

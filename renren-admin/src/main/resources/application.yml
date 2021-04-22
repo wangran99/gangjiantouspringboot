@@ -66,3 +66,8 @@ mybatis-plus:
     cache-enabled: false
     call-setters-on-nulls: true
     jdbc-type-for-null: 'null'
+#welink开放平台申请的we码、轻应用对应的clientId，clientSecret。
+welink:
+  openapi:
+    client-id: 20201231090249131839037
+    client-secret: a19af76f-6a53-43fe-a5b9-0ab8273318f5
