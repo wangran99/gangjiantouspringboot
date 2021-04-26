@@ -7,8 +7,8 @@
  */
 package io.renren.security.service;
 
+
 import com.github.wangran99.welink.api.client.openapi.OpenAPI;
-import com.github.wangran99.welink.api.client.openapi.model.AuthRes;
 import com.github.wangran99.welink.api.client.openapi.model.TenantInfoRes;
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import io.renren.common.exception.ErrorCode;
@@ -22,6 +22,7 @@ import io.renren.modules.sys.enums.UserStatusEnum;
 import io.renren.modules.sys.service.SysMenuService;
 import io.renren.security.user.UserDetail;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,15 +49,14 @@ public class RenUserDetailsServiceImpl implements UserDetailsService {
     private SysMenuService sysMenuService;
     private SysRoleDataScopeDao sysRoleDataScopeDao;
 
-    private AuthRes authRes;
     private OpenAPI openAPI;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         HttpServletRequest httpServletRequest= HttpContextUtils.getHttpServletRequest();
         Map<String, String> map = HttpContextUtils.getParameterMap(httpServletRequest);
-        TenantInfoRes tenantInfoRes = openAPI.getTenantInfo(authRes.getAccess_token());
+        TenantInfoRes tenantInfoRes = openAPI.getTenantInfo();
         String userId="wangran@49c415a8500";
-        UserBasicInfoRes userBasicInfoRes=openAPI.getUserInfoById(authRes.getAccess_token(), userId);
+        UserBasicInfoRes userBasicInfoRes=openAPI.getUserInfoById( userId);
 //        SysUserEntity userEntity = sysUserDao.getByUsername(username);
 //        if(userEntity == null) {
 //            throw new RenException(ErrorCode.ACCOUNT_NOT_EXIST);
