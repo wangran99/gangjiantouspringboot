@@ -14,13 +14,13 @@ CREATE TABLE `user`
 (
     `user_id`        VARCHAR(50)  NOT NULL COMMENT '用户id',
     `user_name_cn`   VARCHAR(20)  NOT NULL COMMENT '姓名',
-    `sex`            VARCHAR(1)  DEFAULT NULL COMMENT '性别',
+    `sex`            VARCHAR(1)  DEFAULT NULL COMMENT '性别.M:男，F：女，其他：未知',
     `mobile_number`  VARCHAR(20)  NOT NULL COMMENT '手机号',
     `main_dept_code` VARCHAR(20) DEFAULT NULL COMMENT '主管部门',
     `user_email`     VARCHAR(50)  NOT NULL COMMENT '电子邮件',
     `avatar`         VARCHAR(300) NOT NULL COMMENT '头像url',
     `position`       VARCHAR(50)  NOT NULL COMMENT '职位',
-    `is_admin`       TINYINT      NOT NULL COMMENT '是否是企业管理员',
+#     `is_admin`       TINYINT      NOT NULL COMMENT '是否是企业管理员',
     PRIMARY KEY (`user_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户表';

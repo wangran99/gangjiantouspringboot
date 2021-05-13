@@ -23,190 +23,103 @@ api[0].list.push({
     desc: '用户退出(删除token)',
 });
 api.push({
-    alias: 'CipherController',
+    alias: 'DepartmentController',
     order: '2',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
+    link: '&lt;p&gt;部门表_前端控制器&lt;/p&gt;',
+    desc: '&lt;p&gt;部门表 前端控制器&lt;/p&gt;',
     list: []
 })
 api.push({
-    alias: 'LoginUserController',
+    alias: 'RoleController',
     order: '3',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
+    link: '&lt;p&gt;角色定义表_前端控制器&lt;/p&gt;',
+    desc: '&lt;p&gt;角色定义表 前端控制器&lt;/p&gt;',
     list: []
 })
-api.push({
-    alias: 'QrtzBlobTriggersController',
+api[2].list.push({
+    order: '1',
+    desc: '获取所有定义的角色',
+});
+api[2].list.push({
+    order: '2',
+    desc: '增加新角色',
+});
+api[2].list.push({
+    order: '3',
+    desc: '修改角色',
+});
+api[2].list.push({
     order: '4',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'QrtzCalendarsController',
-    order: '5',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'QrtzCronTriggersController',
-    order: '6',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'QrtzFiredTriggersController',
-    order: '7',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'QrtzJobDetailsController',
-    order: '8',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'QrtzLocksController',
-    order: '9',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'QrtzPausedTriggerGrpsController',
-    order: '10',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'QrtzSchedulerStateController',
-    order: '11',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'QrtzSimpleTriggersController',
-    order: '12',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'QrtzSimpropTriggersController',
-    order: '13',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'QrtzTriggersController',
-    order: '14',
-    link: '&lt;p&gt;_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt; 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'SysAlarmWhitelistController',
-    order: '15',
-    link: '&lt;p&gt;告警白名单_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt;告警白名单 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'SysDictDataController',
-    order: '16',
-    link: '&lt;p&gt;字典数据表_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt;字典数据表 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'SysDictTypeController',
-    order: '17',
-    link: '&lt;p&gt;字典类型表_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt;字典类型表 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'SysExceptionMessageController',
-    order: '18',
-    link: '&lt;p&gt;异常信息管理_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt;异常信息管理 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'SysJobController',
-    order: '19',
-    link: '&lt;p&gt;定时任务调度表_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt;定时任务调度表 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'SysJobLogController',
-    order: '20',
-    link: '&lt;p&gt;定时任务调度日志表_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt;定时任务调度日志表 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'SysLoginInfoController',
-    order: '21',
-    link: '&lt;p&gt;系统访问记录_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt;系统访问记录 前端控制器&lt;/p&gt;',
-    list: []
-})
-api.push({
-    alias: 'SysOperLogController',
-    order: '22',
-    link: '&lt;p&gt;操作日志记录_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt;操作日志记录 前端控制器&lt;/p&gt;',
-    list: []
-})
+    desc: '删除角色',
+});
 api.push({
     alias: 'TestController',
-    order: '23',
+    order: '4',
     link: '测试服务是否正常启动',
     desc: '测试服务是否正常启动',
     list: []
 })
-api[22].list.push({
+api[3].list.push({
     order: '1',
     desc: '测试返回字符串',
 });
-api[22].list.push({
+api[3].list.push({
     order: '2',
     desc: '测试后台welink调用是否成功',
 });
-api[22].list.push({
+api[3].list.push({
     order: '3',
     desc: '测试数据库读取是否正常',
 });
-api[22].list.push({
+api[3].list.push({
     order: '4',
     desc: '',
 });
-api[22].list.push({
+api[3].list.push({
     order: '5',
     desc: '',
 });
-api[22].list.push({
+api[3].list.push({
     order: '6',
     desc: '',
 });
-api[22].list.push({
+api[3].list.push({
     order: '7',
     desc: '',
 });
 api.push({
+    alias: 'UserController',
+    order: '5',
+    link: '&lt;p&gt;用户表_前端控制器&lt;/p&gt;',
+    desc: '&lt;p&gt;用户表 前端控制器&lt;/p&gt;',
+    list: []
+})
+api.push({
+    alias: 'UserRoleController',
+    order: '6',
+    link: '&lt;p&gt;用户角色表_前端控制器&lt;/p&gt;',
+    desc: '&lt;p&gt;用户角色表 前端控制器&lt;/p&gt;',
+    list: []
+})
+api[5].list.push({
+    order: '1',
+    desc: '获取用户角色列表',
+});
+api[5].list.push({
+    order: '2',
+    desc: '绑定用户部门和角色',
+});
+api[5].list.push({
+    order: '3',
+    desc: '修改用户角色',
+});
+api[5].list.push({
+    order: '4',
+    desc: '删除用户某个角色',
+});
+api.push({
     alias: 'dict',
-    order: '24',
+    order: '7',
     link: 'dict_list',
     desc: '数据字典',
     list: []
