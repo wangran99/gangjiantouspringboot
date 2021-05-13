@@ -2,11 +2,9 @@ package com.chinasoft.gangjiantou.controller;
 
 //import com.chinasoft.example.service.ILoginUserService;
 import com.chinasoft.gangjiantou.annotation.RequestLimit;
-import com.chinasoft.gangjiantou.mapper.LoginUserMapper;
 import com.chinasoft.gangjiantou.redis.RedisService;
-import com.chinasoft.gangjiantou.service.ILoginUserService;
+//import com.chinasoft.gangjiantou.service.ILoginUserService;
 import com.github.wangran99.welink.api.client.openapi.OpenAPI;
-import com.github.wangran99.welink.api.client.openapi.model.AuthRes;
 import com.github.wangran99.welink.api.client.openapi.model.TenantInfoRes;
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +24,6 @@ public class TestController {
     @Autowired
     OpenAPI openAPI;
 
-    @Autowired
-    LoginUserMapper loginUserMapper;
-
-    @Autowired
-    ILoginUserService iLoginUserService;
 
     @Autowired
     RedisService redisService;
@@ -62,8 +55,8 @@ public class TestController {
      */
     @GetMapping("time")
     public Object time(){
-       return loginUserMapper.selectList(null);
-//        return null;
+//       return loginUserMapper.selectList(null);
+        return null;
     }
 
     @GetMapping("null")
