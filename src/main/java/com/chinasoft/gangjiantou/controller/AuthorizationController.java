@@ -48,9 +48,6 @@ public class AuthorizationController {
     String redirectUri;
 
     @Autowired
-    AuthRes authRes;
-
-    @Autowired
     private RedisService redisService;
 
     @Autowired
@@ -69,9 +66,9 @@ public class AuthorizationController {
     @GetMapping(value = "/wecode")
     public UserBasicInfoRes wecodeAuthorization(String authCode, HttpServletResponse response) {
         //获取用户id和租户id
-        UserIdInfo userInfo = openAPI.getUserBasicIdInfo(authRes.getAccess_token(), authCode);
+        UserIdInfo userInfo = openAPI.getUserBasicIdInfo( authCode);
         //获取个人信息。
-        UserBasicInfoRes userBasicInfoRes = openAPI.getUserInfoById(authRes.getAccess_token(), userInfo.getUserId());
+        UserBasicInfoRes userBasicInfoRes = openAPI.getUserInfoById( userInfo.getUserId());
         redisService.saveUserInfo(authCode, userBasicInfoRes);
         response.setHeader(Constants.AUTH_CODE, authCode);
         return userBasicInfoRes;
@@ -103,7 +100,7 @@ public class AuthorizationController {
 //            else    //从pc端的welink访问鉴权
 //                url = url.substring(0, url.lastIndexOf("/"));
         log.info("url::::::::" + url);
-        JsticketsRes jsticketsRes = openAPI.jsAuth(authRes.getAccess_token());
+        JsticketsRes jsticketsRes = openAPI.jsAuth();
         log.error("jsticket:" + jsticketsRes.getJstickets());
         Date date = new Date();
         long time = date.getTime() / 1000;
@@ -159,8 +156,8 @@ public class AuthorizationController {
         log.info("magegerauth userinfo:" + userIdInfo);
 
         //根据租户token，获取用户信息和管理员权限
-        UserBasicInfoRes userBasicInfo = openAPI.getUserInfoById(authRes.getAccess_token(), userIdInfo.getUserId());
-        IsAdminRes isAdminRes = openAPI.isAdminAndRoles(authRes.getAccess_token(), userIdInfo.getUserId());
+        UserBasicInfoRes userBasicInfo = openAPI.getUserInfoById(userIdInfo.getUserId());
+        IsAdminRes isAdminRes = openAPI.isAdminAndRoles( userIdInfo.getUserId());
         userBasicInfo.setIsAdminRes(isAdminRes);
         redisService.saveUserInfo(code, userBasicInfo);
         response.setHeader(Constants.AUTH_CODE, code);
