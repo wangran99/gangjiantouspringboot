@@ -30,96 +30,115 @@ api.push({
     list: []
 })
 api.push({
-    alias: 'RoleController',
+    alias: 'FileController',
     order: '3',
-    link: '&lt;p&gt;角色定义表_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt;角色定义表 前端控制器&lt;/p&gt;',
+    link: '&lt;p&gt;上传文件_前端控制器&lt;/p&gt;',
+    desc: '&lt;p&gt;上传文件 前端控制器&lt;/p&gt;',
     list: []
 })
 api[2].list.push({
     order: '1',
+    desc: '多个文件上传',
+});
+api.push({
+    alias: 'RoleController',
+    order: '4',
+    link: '&lt;p&gt;角色定义表_前端控制器&lt;/p&gt;',
+    desc: '&lt;p&gt;角色定义表 前端控制器&lt;/p&gt;',
+    list: []
+})
+api[3].list.push({
+    order: '1',
     desc: '获取所有定义的角色',
 });
-api[2].list.push({
+api[3].list.push({
     order: '2',
     desc: '增加新角色',
 });
-api[2].list.push({
+api[3].list.push({
     order: '3',
     desc: '修改角色',
 });
-api[2].list.push({
+api[3].list.push({
     order: '4',
     desc: '删除角色',
 });
 api.push({
     alias: 'TestController',
-    order: '4',
+    order: '5',
     link: '测试服务是否正常启动',
     desc: '测试服务是否正常启动',
     list: []
 })
-api[3].list.push({
+api[4].list.push({
     order: '1',
     desc: '测试返回字符串',
 });
-api[3].list.push({
+api[4].list.push({
     order: '2',
     desc: '测试后台welink调用是否成功',
 });
-api[3].list.push({
+api[4].list.push({
     order: '3',
     desc: '测试数据库读取是否正常',
 });
-api[3].list.push({
+api[4].list.push({
     order: '4',
     desc: '',
 });
-api[3].list.push({
+api[4].list.push({
     order: '5',
     desc: '',
 });
-api[3].list.push({
+api[4].list.push({
     order: '6',
     desc: '',
 });
-api[3].list.push({
+api[4].list.push({
     order: '7',
     desc: '',
 });
 api.push({
     alias: 'UserController',
-    order: '5',
+    order: '6',
     link: '&lt;p&gt;用户表_前端控制器&lt;/p&gt;',
     desc: '&lt;p&gt;用户表 前端控制器&lt;/p&gt;',
     list: []
 })
 api.push({
     alias: 'UserRoleController',
-    order: '6',
+    order: '7',
     link: '&lt;p&gt;用户角色表_前端控制器&lt;/p&gt;',
     desc: '&lt;p&gt;用户角色表 前端控制器&lt;/p&gt;',
     list: []
 })
-api[5].list.push({
+api[6].list.push({
     order: '1',
+    desc: '查看当前用户的角色',
+});
+api[6].list.push({
+    order: '2',
     desc: '获取用户角色列表',
 });
-api[5].list.push({
-    order: '2',
+api[6].list.push({
+    order: '3',
     desc: '绑定用户部门和角色',
 });
-api[5].list.push({
-    order: '3',
+api[6].list.push({
+    order: '4',
     desc: '修改用户角色',
 });
-api[5].list.push({
-    order: '4',
+api[6].list.push({
+    order: '5',
     desc: '删除用户某个角色',
+});
+api[6].list.push({
+    order: '6',
+    desc: '根据部门code和角色id获取人员角色列表',
 });
 api.push({
     alias: 'dict',
-    order: '7',
+    order: '8',
     link: 'dict_list',
     desc: '数据字典',
     list: []

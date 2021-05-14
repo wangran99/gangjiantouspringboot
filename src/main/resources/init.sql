@@ -66,7 +66,9 @@ CREATE TABLE `file`
     `path`        VARCHAR(200) NOT NULL COMMENT '相对路径',
     `user_id`     VARCHAR(20)  NOT NULL COMMENT '用户id',
     `user_name`   VARCHAR(20)  NOT NULL COMMENT '用户姓名',
+    `uuid`        VARCHAR(100) NOT NULL COMMENT '文件uuid',
     `approval_id` bigint       NOT NULL COMMENT '审批ID',
+    `upload_time` datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
     PRIMARY KEY (`id`),
     INDEX (`approval_id`)
 ) ENGINE = InnoDB
