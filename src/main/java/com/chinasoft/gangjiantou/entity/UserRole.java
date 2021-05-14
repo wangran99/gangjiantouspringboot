@@ -37,6 +37,11 @@ public class UserRole implements Serializable {
     private String userId;
 
     /**
+     * 用户姓名
+     */
+    private String userName;
+
+    /**
      * 角色ID
      */
     private Integer roleId;

@@ -39,7 +39,12 @@ public class Department implements Serializable {
     /**
      * 部门排序
      */
-    private String orderNo;
+    private Integer orderNo;
+
+    /**
+     * 部门层级
+     */
+    private Integer deptLevel;
 
     /**
      * 部门管理人员列表

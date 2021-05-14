@@ -38,16 +38,17 @@ public class SyncService {
         TenantInfoRes tenantInfoRes = openAPI.getTenantInfo();
         DeptDetailRes rootDept = new DeptDetailRes();
         rootDept.setDeptCode("0");
-        rootDept.setFatherCode("-1");
+        rootDept.setParentCode("-1");
+        rootDept.setDeptLevel(0);
         rootDept.setHasChildDept(1);
         rootDept.setDeptNameCn(tenantInfoRes.getCompanyNameCn());
         insertDept(rootDept);
         QueryDepartmentInfoResPage queryDepartmentInfoResPage = openAPI.getSubDept("0", 0, 1, 100);
-        for (DeptDetailRes deptDetailRes : queryDepartmentInfoResPage.getDepartmentInfo()) {
+        for (DeptDetailRes deptDetailRes : queryDepartmentInfoResPage.getData()) {
             insertDept(deptDetailRes);
             if (deptDetailRes.getHasChildDept() == 1) {
                 QueryDepartmentInfoResPage subDept = openAPI.getSubDept(deptDetailRes.getDeptCode(), 1, 1, 100);
-                for (DeptDetailRes temp : subDept.getDepartmentInfo()) {
+                for (DeptDetailRes temp : subDept.getData()) {
                     insertDept(temp);
                 }
             }
@@ -59,9 +60,10 @@ public class SyncService {
         Department department = new Department();
         department.setDeptCode(deptDetailRes.getDeptCode());
         department.setDeptNameCn(deptDetailRes.getDeptNameCn());
-        department.setParentCode(deptDetailRes.getFatherCode());
+        department.setParentCode(deptDetailRes.getParentCode());
         department.setOrderNo(deptDetailRes.getOrderNo());
-        department.setManagerId(department.getManagerId());
+        department.setDeptLevel(deptDetailRes.getDeptLevel());
+        department.setManagerId(deptDetailRes.getManagerId() == null || deptDetailRes.getManagerId().isEmpty() ? null : deptDetailRes.getManagerId().toString());
         department.setHasChildDept(deptDetailRes.getHasChildDept());
         departmentService.save(department);
     }
