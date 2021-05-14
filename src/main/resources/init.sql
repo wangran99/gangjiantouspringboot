@@ -58,3 +58,16 @@ CREATE TABLE `user_role`
     INDEX (`role_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户角色表';
+
+CREATE TABLE `file`
+(
+    `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `file_name`   VARCHAR(100) NOT NULL COMMENT '文件名',
+    `path`        VARCHAR(200) NOT NULL COMMENT '相对路径',
+    `user_id`     VARCHAR(20)  NOT NULL COMMENT '用户id',
+    `user_name`   VARCHAR(20)  NOT NULL COMMENT '用户姓名',
+    `approval_id` bigint       NOT NULL COMMENT '审批ID',
+    PRIMARY KEY (`id`),
+    INDEX (`approval_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='上传文件信息表';

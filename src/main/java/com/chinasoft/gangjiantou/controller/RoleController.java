@@ -2,6 +2,7 @@ package com.chinasoft.gangjiantou.controller;
 
 
 import com.chinasoft.gangjiantou.entity.Role;
+import com.chinasoft.gangjiantou.entity.UserRole;
 import com.chinasoft.gangjiantou.service.IRoleService;
 import com.chinasoft.gangjiantou.service.IUserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class RoleController {
 
     @Autowired
     IRoleService roleService;
+
 
     /**
      * 获取所有定义的角色

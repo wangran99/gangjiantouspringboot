@@ -24,6 +24,18 @@ public class UserRoleController {
     IUserRoleService userRoleService;
 
     /**
+     * 查看当前用户的角色
+     *
+     * @param authCode
+     * @return
+     */
+    @GetMapping("my")
+    List<UserRole> getMyRoles(@RequestHeader("authCode") String authCode) {
+        String userId = "123";
+        return userRoleService.lambdaQuery().eq(UserRole::getUserId, userId).list();
+    }
+
+    /**
      * 获取用户角色列表
      *
      * @return
@@ -67,5 +79,17 @@ public class UserRoleController {
     boolean delete(Long id) {
         userRoleService.removeById(id);
         return true;
+    }
+
+    /**
+     * 根据部门code和角色id获取人员角色列表
+     *
+     * @param deptCode
+     * @param roleId
+     * @return
+     */
+    @GetMapping("query")
+    List<UserRole> getUserRoleList(String deptCode, String roleId) {
+        return userRoleService.lambdaQuery().eq(UserRole::getRoleId, roleId).eq(UserRole::getDeptCode, deptCode).list();
     }
 }

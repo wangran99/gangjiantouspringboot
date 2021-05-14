@@ -97,7 +97,11 @@ public class SyncService {
                     user.setPosition(userBasicInfoRes.getPosition());
                     user.setIsAdmin(userBasicInfoRes.getIsAdmin());
 
-                    userService.saveOrUpdate(user);
+                    User temp = userService.getById(user.getUserId());
+                    if (temp == null)
+                        userService.save(user);
+                    else
+                        userService.updateById(user);
                 }
                 if (queryUserInfoResPage.getHasMore() == 1)//最后一页
                     break;
