@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author WangRan
- * @since 2021-05-13
+ * @since 2021-05-21
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -23,7 +23,7 @@ public class Department implements Serializable {
     /**
      * 部门id
      */
-    @TableId(value = "dept_code", type = IdType.INPUT)
+    @TableId(value = "dept_code", type = IdType.AUTO)
     private String deptCode;
 
     /**
@@ -42,7 +42,7 @@ public class Department implements Serializable {
     private Integer orderNo;
 
     /**
-     * 部门层级
+     * 部门层次
      */
     private Integer deptLevel;
 

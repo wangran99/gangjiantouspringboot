@@ -38,10 +38,11 @@ public class FileController {
 
     /**
      * 多个文件上传
+     *
      * @param files
      */
     @PostMapping("/uploadFile")
-    public void uploadFile(@RequestParam("files") List<MultipartFile> files) {
+    public void uploadFile(@RequestParam("files") List<MultipartFile> files) throws IOException {
         StringBuffer buffer = new StringBuffer();
         for (MultipartFile file : files) {
             //获取原文件名称和后缀
@@ -54,20 +55,15 @@ public class FileController {
             int month = now.getMonthValue();
             int day = now.getDayOfMonth();
             String path = String.format("{}-{}-{}", year, month, day);
-            try {
-                File file1 = new File(filePath + path);
-                boolean mkdirs = file1.mkdirs();
-                log.info("文件夹{}创建{}", file1.getAbsolutePath(), mkdirs ? "成功" : "失败");
-                file.transferTo(file1);
-                //file.renameTo(new File(path))
-                log.info("{} 上传成功！", originalFilename);
 
-                buffer.append(path);
-            } catch (IOException e) {
-                e.printStackTrace();
-                log.error("{} 上传失败！", originalFilename);
-                continue;
-            }
+            File file1 = new File(filePath + path);
+            boolean mkdirs = file1.mkdirs();
+            log.info("文件夹{}创建{}", file1.getAbsolutePath(), mkdirs ? "成功" : "失败");
+            file.transferTo(file1);
+            //file.renameTo(new File(path))
+            log.info("{} 上传成功！", originalFilename);
+
+            buffer.append(path);
 
         }
 

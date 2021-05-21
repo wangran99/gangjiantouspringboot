@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author WangRan
- * @since 2021-05-13
+ * @since 2021-05-21
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -23,7 +23,7 @@ public class User implements Serializable {
     /**
      * 用户id
      */
-    @TableId(value = "user_id", type = IdType.INPUT)
+    @TableId(value = "user_id", type = IdType.AUTO)
     private String userId;
 
     /**
@@ -32,7 +32,7 @@ public class User implements Serializable {
     private String userNameCn;
 
     /**
-     * 性别
+     * 性别.M:男，F：女，其他：未知
      */
     private String sex;
 

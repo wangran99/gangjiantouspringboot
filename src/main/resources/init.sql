@@ -26,17 +26,26 @@ CREATE TABLE `user`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户表';
 
+CREATE TABLE `manager`
+(
+    `user_id` VARCHAR(50) NOT NULL COMMENT '用户id',
+    `name`    VARCHAR(20) NOT NULL UNIQUE COMMENT '角色名称',
+    `create_time` datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '设置时间',
+    PRIMARY KEY (`user_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='系统管理员表';
+
 CREATE TABLE `role`
 (
     `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
     `role_name` VARCHAR(20) NOT NULL UNIQUE COMMENT '角色名称',
+    `create_time` datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '设置时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='角色定义表';
+
 insert into `role` (`role_name`)
 values ('董事长');
-insert into `role` (`role_name`)
-values ('系统管理员');
 insert into `role` (`role_name`)
 values ('总经理');
 insert into `role` (`role_name`)
@@ -51,6 +60,7 @@ CREATE TABLE `user_role`
     `user_id`   VARCHAR(20) NOT NULL COMMENT '用户id',
     `user_name` VARCHAR(20) NOT NULL COMMENT '用户姓名',
     `role_id`   INT         NOT NULL COMMENT '角色ID',
+    `create_time` datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '设置时间',
     PRIMARY KEY (`id`),
     UNIQUE (`dept_code`, `user_id`, `role_id`),
     INDEX (`dept_code`),
@@ -66,7 +76,6 @@ CREATE TABLE `file`
     `path`        VARCHAR(200) NOT NULL COMMENT '相对路径',
     `user_id`     VARCHAR(20)  NOT NULL COMMENT '用户id',
     `user_name`   VARCHAR(20)  NOT NULL COMMENT '用户姓名',
-    `uuid`        VARCHAR(100) NOT NULL COMMENT '文件uuid',
     `approval_id` bigint       NOT NULL COMMENT '审批ID',
     `upload_time` datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
     PRIMARY KEY (`id`),
