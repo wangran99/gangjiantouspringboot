@@ -2,6 +2,7 @@ package com.chinasoft.gangjiantou.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import java.time.LocalDateTime;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -45,6 +46,11 @@ public class UserRole implements Serializable {
      * 角色ID
      */
     private Integer roleId;
+
+    /**
+     * 设置时间
+     */
+    private LocalDateTime createTime;
 
 
 }

@@ -1,15 +1,15 @@
 package com.chinasoft.gangjiantou.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 角色定义表
+ * 系统管理员表
  * </p>
  *
  * @author WangRan
@@ -17,20 +17,20 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class Role implements Serializable {
+public class Manager implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * id
+     * 用户id
      */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    @TableId(value = "user_id", type = IdType.AUTO)
+    private String userId;
 
     /**
      * 角色名称
      */
-    private String roleName;
+    private String name;
 
     /**
      * 设置时间

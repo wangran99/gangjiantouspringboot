@@ -36,36 +36,43 @@ public class SyncService {
     public void syncDepts() {
         log.info("=====begin sync depts=======");
         TenantInfoRes tenantInfoRes = openAPI.getTenantInfo();
+        List<DeptDetailRes> deptList = new ArrayList<>();
         DeptDetailRes rootDept = new DeptDetailRes();
         rootDept.setDeptCode("0");
         rootDept.setParentCode("-1");
         rootDept.setDeptLevel(0);
         rootDept.setHasChildDept(1);
         rootDept.setDeptNameCn(tenantInfoRes.getCompanyNameCn());
-        insertDept(rootDept);
+        deptList.add(rootDept);
         QueryDepartmentInfoResPage queryDepartmentInfoResPage = openAPI.getSubDept("0", 0, 1, 100);
         for (DeptDetailRes deptDetailRes : queryDepartmentInfoResPage.getData()) {
-            insertDept(deptDetailRes);
+            deptList.add(deptDetailRes);
             if (deptDetailRes.getHasChildDept() == 1) {
                 QueryDepartmentInfoResPage subDept = openAPI.getSubDept(deptDetailRes.getDeptCode(), 1, 1, 100);
                 for (DeptDetailRes temp : subDept.getData()) {
-                    insertDept(temp);
+                    deptList.add(temp);
                 }
             }
         }
+        insertBatchDept(deptList);
         log.info("=====end sync depts=======");
     }
 
-    private void insertDept(DeptDetailRes deptDetailRes) {
-        Department department = new Department();
-        department.setDeptCode(deptDetailRes.getDeptCode());
-        department.setDeptNameCn(deptDetailRes.getDeptNameCn());
-        department.setParentCode(deptDetailRes.getParentCode());
-        department.setOrderNo(deptDetailRes.getOrderNo());
-        department.setDeptLevel(deptDetailRes.getDeptLevel());
-        department.setManagerId(deptDetailRes.getManagerId() == null || deptDetailRes.getManagerId().isEmpty() ? null : deptDetailRes.getManagerId().toString());
-        department.setHasChildDept(deptDetailRes.getHasChildDept());
-        departmentService.save(department);
+    private void insertBatchDept(List<DeptDetailRes> deptList) {
+        List<Department> list = new ArrayList<>();
+        for (DeptDetailRes deptDetailRes : deptList) {
+            Department department = new Department();
+            department.setDeptCode(deptDetailRes.getDeptCode());
+            department.setDeptNameCn(deptDetailRes.getDeptNameCn());
+            department.setParentCode(deptDetailRes.getParentCode());
+            department.setOrderNo(deptDetailRes.getOrderNo());
+            department.setDeptLevel(deptDetailRes.getDeptLevel());
+            department.setManagerId(deptDetailRes.getManagerId() == null || deptDetailRes.getManagerId().isEmpty() ? null : deptDetailRes.getManagerId().toString());
+            department.setHasChildDept(deptDetailRes.getHasChildDept());
+            list.add(department);
+        }
+        departmentService.saveBatch(list);
+
     }
 
     public void delDepts() {

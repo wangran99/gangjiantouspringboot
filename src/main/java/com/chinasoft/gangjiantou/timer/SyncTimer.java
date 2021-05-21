@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class SyncTimer {
     @Autowired
     SyncService syncService;
-    //每隔两分钟
-    @Scheduled(fixedRateString = "120000",initialDelay = 2000)
+    //每隔1小时
+    @Scheduled(fixedRate = 1*60*60*1000,initialDelay = 2000)
     @Transactional
     public void scheduled() {
         syncService.delDepts();
