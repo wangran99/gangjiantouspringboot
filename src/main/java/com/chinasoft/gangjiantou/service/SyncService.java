@@ -87,7 +87,12 @@ public class SyncService {
 
     public void syncUsers() {
         log.info("=====begin sync users=======");
+        List<String> userList = new ArrayList<>();
+        userService.list().stream().forEach(e -> userList.add(e.getUserId()));
+        if (!userList.isEmpty())
+            userService.removeByIds(userList);
         List<Department> list = departmentService.list();
+
         for (Department department : list) {
             int pageNum = 1;
             while (true) {
@@ -100,6 +105,7 @@ public class SyncService {
                     user.setSex(userBasicInfoRes.getSex());
                     user.setMobileNumber(userBasicInfoRes.getMobileNumber());
                     user.setMainDeptCode(userBasicInfoRes.getMainDeptCode());
+                    user.setDeptCode(department.getDeptCode());
                     user.setUserEmail(userBasicInfoRes.getUserEmail());
                     user.setPosition(userBasicInfoRes.getPosition());
                     user.setIsAdmin(userBasicInfoRes.getIsAdmin());
@@ -107,8 +113,11 @@ public class SyncService {
                     User temp = userService.getById(user.getUserId());
                     if (temp == null)
                         userService.save(user);
-                    else
-                        userService.updateById(user);
+                    else {
+                        String deptCode = temp.getDeptCode();
+                        temp.setDeptCode(deptCode + "," + department.getDeptCode());
+                        userService.updateById(temp);
+                    }
                 }
                 if (queryUserInfoResPage.getHasMore() == 1)//最后一页
                     break;

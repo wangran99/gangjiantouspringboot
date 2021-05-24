@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author WangRan
- * @since 2021-05-21
+ * @since 2021-05-24
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -45,6 +45,11 @@ public class User implements Serializable {
      * 主管部门
      */
     private String mainDeptCode;
+
+    /**
+     * 所在部门
+     */
+    private String deptCode;
 
     /**
      * 电子邮件

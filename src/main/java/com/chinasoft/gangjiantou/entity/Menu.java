@@ -2,14 +2,13 @@ package com.chinasoft.gangjiantou.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 上传文件信息表
+ * 菜单表
  * </p>
  *
  * @author WangRan
@@ -17,7 +16,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class File implements Serializable {
+public class Menu implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,34 +27,24 @@ public class File implements Serializable {
     private Long id;
 
     /**
-     * 文件名
+     * 菜单名称
      */
-    private String fileName;
+    private String menuName;
 
     /**
-     * 相对路径
+     * 父目录id
      */
-    private String path;
+    private Long parentId;
 
     /**
-     * 用户id
+     * 路由
      */
-    private String userId;
+    private String router;
 
     /**
-     * 用户姓名
+     * 排序
      */
-    private String userName;
-
-    /**
-     * 审批ID
-     */
-    private Long approvalId;
-
-    /**
-     * 上传时间
-     */
-    private LocalDateTime uploadTime;
+    private Integer order;
 
 
 }

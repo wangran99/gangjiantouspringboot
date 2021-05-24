@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 上传文件信息表
+ * 用户岗位表
  * </p>
  *
  * @author WangRan
@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class File implements Serializable {
+public class UserPosition implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,14 +28,9 @@ public class File implements Serializable {
     private Long id;
 
     /**
-     * 文件名
+     * 部门id
      */
-    private String fileName;
-
-    /**
-     * 相对路径
-     */
-    private String path;
+    private String deptCode;
 
     /**
      * 用户id
@@ -48,14 +43,14 @@ public class File implements Serializable {
     private String userName;
 
     /**
-     * 审批ID
+     * 岗位ID
      */
-    private Long approvalId;
+    private Integer positionId;
 
     /**
-     * 上传时间
+     * 设置时间
      */
-    private LocalDateTime uploadTime;
+    private LocalDateTime createTime;
 
 
 }

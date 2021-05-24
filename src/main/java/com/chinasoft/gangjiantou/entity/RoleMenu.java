@@ -1,7 +1,6 @@
 package com.chinasoft.gangjiantou.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import lombok.Data;
@@ -9,33 +8,33 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 系统管理员表
+ * 角色菜单对应表
  * </p>
  *
  * @author WangRan
- * @since 2021-05-21
+ * @since 2021-05-24
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class Manager implements Serializable {
+public class RoleMenu implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户id
+     * id
      */
-    @TableId(value = "user_id", type = IdType.AUTO)
-    private String userId;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     /**
-     * 角色名称
+     * 角色id
      */
-    private String name;
+    private Long roleId;
 
     /**
-     * 设置时间
+     * 菜单id
      */
-    private LocalDateTime createTime;
+    private Long menuId;
 
 
 }

@@ -2,14 +2,13 @@ package com.chinasoft.gangjiantou.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 上传文件信息表
+ * 审批抄送表
  * </p>
  *
  * @author WangRan
@@ -17,7 +16,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class File implements Serializable {
+public class CarbonCopy implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,34 +27,19 @@ public class File implements Serializable {
     private Long id;
 
     /**
-     * 文件名
+     * 访客申请id
      */
-    private String fileName;
+    private Long applyId;
 
     /**
-     * 相对路径
-     */
-    private String path;
-
-    /**
-     * 用户id
+     * 收到待办消息的用户id
      */
     private String userId;
 
     /**
-     * 用户姓名
+     * 收到待办消息的用户姓名
      */
     private String userName;
-
-    /**
-     * 审批ID
-     */
-    private Long approvalId;
-
-    /**
-     * 上传时间
-     */
-    private LocalDateTime uploadTime;
 
 
 }

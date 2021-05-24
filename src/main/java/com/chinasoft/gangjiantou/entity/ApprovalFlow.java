@@ -2,14 +2,13 @@ package com.chinasoft.gangjiantou.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 上传文件信息表
+ * 审批流程定义表
  * </p>
  *
  * @author WangRan
@@ -17,7 +16,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class File implements Serializable {
+public class ApprovalFlow implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,34 +27,34 @@ public class File implements Serializable {
     private Long id;
 
     /**
-     * 文件名
+     * 流程名称
      */
-    private String fileName;
+    private String flowName;
 
     /**
-     * 相对路径
+     * 流程适用部门id
      */
-    private String path;
+    private String deptCode;
 
     /**
-     * 用户id
+     * 审批岗位id
      */
-    private String userId;
+    private Long positionId;
 
     /**
-     * 用户姓名
+     * 最大文件数
      */
-    private String userName;
+    private Integer maxFile;
 
     /**
-     * 审批ID
+     * 上传的文件能否编辑：0：不能编辑，1：可以编辑
      */
-    private Long approvalId;
+    private Integer fileEditable;
 
     /**
-     * 上传时间
+     * 流程定义状态：0：不生效，1：生效
      */
-    private LocalDateTime uploadTime;
+    private Integer status;
 
 
 }
