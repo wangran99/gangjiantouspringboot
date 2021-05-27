@@ -28,11 +28,6 @@ public class UserRole implements Serializable {
     private Long id;
 
     /**
-     * 部门id
-     */
-    private String deptCode;
-
-    /**
      * 用户id
      */
     private String userId;
@@ -45,7 +40,7 @@ public class UserRole implements Serializable {
     /**
      * 角色ID
      */
-    private Integer roleId;
+    private Long roleId;
 
     /**
      * 设置时间

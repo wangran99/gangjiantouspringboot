@@ -23,7 +23,7 @@ public class Department implements Serializable {
     /**
      * 部门id
      */
-    @TableId(value = "dept_code", type = IdType.AUTO)
+    @TableId(value = "dept_code", type = IdType.INPUT)
     private String deptCode;
 
     /**

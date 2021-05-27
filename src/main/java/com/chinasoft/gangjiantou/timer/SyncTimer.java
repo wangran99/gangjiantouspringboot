@@ -17,8 +17,8 @@ public class SyncTimer {
     @Scheduled(fixedRate = 1 * 60 * 60 * 1000, initialDelay = 2000)
     @Transactional
     public void scheduled() {
-        syncService.delDepts();
-        syncService.syncDepts();
-        syncService.syncUsers();
+//        syncService.delDepts();
+//        syncService.syncDepts();
+//        syncService.syncUsers();
     }
 }

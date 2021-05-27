@@ -2,13 +2,19 @@ package com.chinasoft.gangjiantou.controller;
 
 
 import com.chinasoft.gangjiantou.entity.Role;
+import com.chinasoft.gangjiantou.entity.RoleMenu;
+import com.chinasoft.gangjiantou.entity.User;
 import com.chinasoft.gangjiantou.entity.UserRole;
 import com.chinasoft.gangjiantou.exception.CommonException;
+import com.chinasoft.gangjiantou.service.IRoleMenuService;
 import com.chinasoft.gangjiantou.service.IRoleService;
 import com.chinasoft.gangjiantou.service.IUserRoleService;
+import com.chinasoft.gangjiantou.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +32,14 @@ public class RoleController {
     @Autowired
     IRoleService roleService;
 
+    @Autowired
+    IUserRoleService userRoleService;
+
+    @Autowired
+    IUserService userService;
+
+    @Autowired
+    IRoleMenuService roleMenuService;
 
     /**
      * 获取所有定义的角色
@@ -72,5 +86,33 @@ public class RoleController {
         roleService.removeById(roleId);
         return true;
     }
+
+    /**
+     * 绑定用户角色
+     * @param roleId
+     * @param userId
+     * @return
+     */
+    @PostMapping("bind")
+    @Transactional
+    boolean bind(Long roleId,String userId,List<Long> menuIdList){
+        User user=userService.getById(roleId);
+        UserRole userRole=new UserRole();
+        userRole.setRoleId(roleId);
+        userRole.setUserId(userId);
+        userRole.setUserName(user.getUserNameCn());
+        userRoleService.save(userRole);
+
+        List<RoleMenu> roleMenuList=new ArrayList<>();
+        for(Long menuId:menuIdList){
+        RoleMenu roleMenu=new RoleMenu();
+        roleMenu.setRoleId(roleId);
+        roleMenu.setMenuId(menuId);
+        roleMenuList.add(roleMenu);
+        }
+        roleMenuService.saveBatch(roleMenuList);
+        return true;
+    }
+
 
 }

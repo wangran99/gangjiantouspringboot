@@ -53,14 +53,13 @@ values ('职员', 'employee');
 CREATE TABLE `user_position`
 (
     `id`          bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `dept_code`   VARCHAR(20) NOT NULL COMMENT '部门id',
     `user_id`     VARCHAR(20) NOT NULL COMMENT '用户id',
     `user_name`   VARCHAR(20) NOT NULL COMMENT '用户姓名',
-    `position_id` INT         NOT NULL COMMENT '岗位ID',
+    `position_id` bigint         NOT NULL COMMENT '岗位ID',
     `create_time` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '设置时间',
     PRIMARY KEY (`id`),
-    UNIQUE (`dept_code`, `user_id`, `position_id`),
-    INDEX (`dept_code`, `position_id`),
+    UNIQUE (`user_id`, `position_id`),
+    INDEX ( `position_id`),
     INDEX (`user_id`),
     INDEX (`position_id`)
 ) ENGINE = InnoDB
@@ -95,6 +94,23 @@ INSERT INTO `role` (`id`, `role_name`, `note`, `status`)
 values (1, '管理员', '', 0),
        (2, '普通用户', '', 0);
 
+CREATE TABLE `user_role`
+(
+    `id`          bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `user_id`     VARCHAR(20) NOT NULL COMMENT '用户id',
+    `user_name`   VARCHAR(20) NOT NULL COMMENT '用户姓名',
+    `role_id` bigint         NOT NULL COMMENT '角色ID',
+    `create_time` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '设置时间',
+    PRIMARY KEY (`id`),
+    UNIQUE (`user_id`, `role_id`),
+    INDEX (`role_id`),
+    INDEX (`user_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='用户角色表';
+INSERT INTO `user_role` (`user_id`,`user_name`,`role_id`)
+values ("wangran@18856235161","汪然",1),
+       ("yangjie@18856235161","杨杰",1);
+
 CREATE TABLE `menu`
 (
     `id`        bigint      NOT NULL COMMENT 'id',
@@ -107,16 +123,16 @@ CREATE TABLE `menu`
   DEFAULT CHARSET = utf8mb4 COMMENT ='菜单表';
 INSERT INTO `menu` (`id`, `menu_name`, `parent_id`, `router`, `order`)
 values (1000, "组织管理", null, null, 1000),
-       (1100, "用户管理", 1000, null, 1000),
-       (1200, "部门管理", 1000, null, 1000),
-       (1300, "角色管理", 1000, null, 1000),
-       (1400, "岗位管理", 1000, null, 1000),
+       (1100, "用户管理", 1000, "/userMessage", 1000),
+       (1200, "部门管理", 1000, "/dept", 1000),
+       (1300, "角色管理", 1000, "/roleMessage", 1000),
+       (1400, "岗位管理", 1000, "/station", 1000),
 
        (2000, "审批管理", null, null, 1000),
-       (2100, "审批流程", 2000, null, 1000),
-       (2200, "我的申请", 2000, null, 1000),
-       (2300, "我的审批", 2000, null, 1000),
-       (2400, "抄送我的", 2000, null, 1000);
+       (2100, "流程管理", 2000, "/process", 1000),
+       (2200, "我的申请", 2000, "/myPending", 1000),
+       (2300, "我的审批", 2000, "/myApproval", 1000),
+       (2400, "抄送我的", 2000, "/sendMe", 1000);
 
 CREATE TABLE `role_menu`
 (
