@@ -3,6 +3,7 @@ package com.chinasoft.gangjiantou.controller;
 
 import com.chinasoft.gangjiantou.entity.Role;
 import com.chinasoft.gangjiantou.entity.UserRole;
+import com.chinasoft.gangjiantou.exception.CommonException;
 import com.chinasoft.gangjiantou.service.IRoleService;
 import com.chinasoft.gangjiantou.service.IUserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,8 @@ public class RoleController {
      */
     @PostMapping("edit")
     boolean edit(@RequestBody Role role){
+        if(role.getStatus()==0)
+            throw new CommonException("该角色禁止编辑");
         roleService.updateById(role);
         return true;
     }
@@ -63,7 +66,11 @@ public class RoleController {
      */
     @PostMapping("del")
     boolean delete(Long roleId){
+        Role role= roleService.getById(roleId);
+        if(role.getStatus()==0)
+            throw new CommonException("该角色禁止删除");
         roleService.removeById(roleId);
         return true;
     }
+    
 }

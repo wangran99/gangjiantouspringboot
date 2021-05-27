@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author WangRan
- * @since 2021-05-24
+ * @since 2021-05-27
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -31,6 +31,16 @@ public class Role implements Serializable {
      * 角色名称
      */
     private String roleName;
+
+    /**
+     * 角色备注
+     */
+    private String note;
+
+    /**
+     * 角色状态.0:不可删除。1：可删除
+     */
+    private Integer status;
 
     /**
      * 设置时间

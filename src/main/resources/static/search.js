@@ -38,6 +38,10 @@ api.push({
 })
 api[2].list.push({
     order: '1',
+    desc: '',
+});
+api[2].list.push({
+    order: '2',
     desc: '多个文件上传',
 });
 api.push({

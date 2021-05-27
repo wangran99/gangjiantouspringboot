@@ -2,6 +2,7 @@ package com.chinasoft.gangjiantou.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import java.time.LocalDateTime;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author WangRan
- * @since 2021-05-24
+ * @since 2021-05-27
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -27,19 +28,34 @@ public class CarbonCopy implements Serializable {
     private Long id;
 
     /**
-     * 访客申请id
+     * 申请id
      */
     private Long applyId;
 
     /**
-     * 收到待办消息的用户id
+     * 抄送的用户id
      */
     private String userId;
 
     /**
-     * 收到待办消息的用户姓名
+     * 抄送用户姓名
      */
     private String userName;
+
+    /**
+     * 创建者的用户id
+     */
+    private String createUserId;
+
+    /**
+     * 创建者用户姓名
+     */
+    private String createUserName;
+
+    /**
+     * 添加抄送用户的时间
+     */
+    private LocalDateTime createTime;
 
 
 }

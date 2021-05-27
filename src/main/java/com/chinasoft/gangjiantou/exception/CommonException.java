@@ -15,6 +15,11 @@ public class CommonException extends RuntimeException{
         this.msg = iException.getDesc();
         this.code = iException.getCode();
     }
+    public CommonException(String msg) {
+        super();
+        this.msg = msg;
+        this.code = 2;
+    }
     public CommonException() {
         super("CommonException");
     }

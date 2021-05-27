@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author WangRan
- * @since 2021-05-24
+ * @since 2021-05-27
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -38,6 +38,16 @@ public class Apply implements Serializable {
     private String applicantId;
 
     /**
+     * 审批单名称
+     */
+    private String subject;
+
+    /**
+     * 流水号
+     */
+    private String serialNumber;
+
+    /**
      * 流程定义id
      */
     private Long flowId;
@@ -58,7 +68,7 @@ public class Apply implements Serializable {
     private String currentApprover;
 
     /**
-     * 状态（0：审核中 1：已撤回 2：已拒绝 3：审批通过）
+     * 状态（0：待审核 1：已撤回 2：已拒绝 3：审批通过）
      */
     private Integer status;
 
@@ -71,6 +81,11 @@ public class Apply implements Serializable {
      * 撤回时间
      */
     private LocalDateTime recallTime;
+
+    /**
+     * 审批完成时间
+     */
+    private LocalDateTime endTime;
 
 
 }

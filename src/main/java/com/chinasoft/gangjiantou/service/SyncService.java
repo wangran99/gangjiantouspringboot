@@ -79,7 +79,7 @@ public class SyncService {
         log.info("=====begin del depts=======");
         List<String> list = new ArrayList<>();
         departmentService.query().list().stream().forEach(e -> list.add(e.getDeptCode()));
-        if (!list.isEmpty())
+//        if (!list.isEmpty())
             departmentService.removeByIds(list);
         log.info("=====end del depts=======");
     }
@@ -102,6 +102,7 @@ public class SyncService {
                     user.setUserId(userBasicInfoRes.getUserId());
                     user.setUserNameCn(userBasicInfoRes.getUserNameCn());
                     user.setAvatar(userBasicInfoRes.getAvatar());
+                    user.setStatus(userBasicInfoRes.getUserStatus());
                     user.setSex(userBasicInfoRes.getSex());
                     user.setMobileNumber(userBasicInfoRes.getMobileNumber());
                     user.setMainDeptCode(userBasicInfoRes.getMainDeptCode());

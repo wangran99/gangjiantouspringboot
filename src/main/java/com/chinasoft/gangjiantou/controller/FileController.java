@@ -1,11 +1,10 @@
 package com.chinasoft.gangjiantou.controller;
 
+import com.chinasoft.gangjiantou.dto.Callback;
+import com.chinasoft.gangjiantou.dto.CallbackRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -36,11 +35,20 @@ public class FileController {
     @Value("${file.path}")
     private String filePath;
 
-    /**
-     * 多个文件上传
-     *
-     * @param files
-     */
+    @PostMapping("/ping")
+    public CallbackRes ping(@RequestBody Callback callback)  {
+        log.error(callback.toString());
+        CallbackRes callbackRes=new CallbackRes();
+        callbackRes.setError(0);
+        return null;
+//        return callbackRes;
+    }
+
+        /**
+         * 多个文件上传
+         *
+         * @param files
+         */
     @PostMapping("/uploadFile")
     public void uploadFile(@RequestParam("files") List<MultipartFile> files) throws IOException {
         StringBuffer buffer = new StringBuffer();

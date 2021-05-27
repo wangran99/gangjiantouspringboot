@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author WangRan
- * @since 2021-05-24
+ * @since 2021-05-27
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -27,7 +27,7 @@ public class TodoTask implements Serializable {
     private Long id;
 
     /**
-     * 访客申请id
+     * 申请id
      */
     private Long applyId;
 

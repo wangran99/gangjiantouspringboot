@@ -57,7 +57,7 @@ public class AuthorizationController {
     private OpenManagerApi openManagerApi;
 
     /**
-     * 手机We码认证
+     * PC/手机 We码认证
      *
      * @param authCode 前端we码获取的authCode
      * @param response

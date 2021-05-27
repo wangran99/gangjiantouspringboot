@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author WangRan
- * @since 2021-05-24
+ * @since 2021-05-27
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -41,6 +41,11 @@ public class Position implements Serializable {
      * 岗位排序
      */
     private Integer order;
+
+    /**
+     * 岗位备注
+     */
+    private String note;
 
     /**
      * 岗位状态.0:停用。1：正常
