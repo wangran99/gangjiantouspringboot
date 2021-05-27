@@ -1,13 +1,19 @@
 package com.chinasoft.gangjiantou.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.chinasoft.gangjiantou.entity.RoleMenu;
+import com.chinasoft.gangjiantou.entity.User;
 import com.chinasoft.gangjiantou.entity.UserRole;
 import com.chinasoft.gangjiantou.redis.RedisService;
 import com.chinasoft.gangjiantou.service.IUserRoleService;
+import com.chinasoft.gangjiantou.service.IUserService;
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,6 +33,9 @@ public class UserRoleController {
 
     @Autowired
     RedisService redisService;
+
+    @Autowired
+    IUserService userService;
 
     private UserBasicInfoRes getUserBasicInfoRes(String authCode) {
         return redisService.getUserInfo(authCode);
@@ -57,38 +66,27 @@ public class UserRoleController {
 
 
     /**
-     * 修改用户角色
-     *
-     * @param userRole
+     * 绑定用户和角色
+     * @param userId
+     * @param roleIdList
      * @return
      */
-    @PostMapping("edit")
-    boolean edit(@RequestBody UserRole userRole) {
-        userRoleService.updateById(userRole);
+    @PostMapping("bind")
+    @Transactional
+    boolean bind(String userId,List<Long> roleIdList ){
+        QueryWrapper<UserRole> wrapper = new QueryWrapper<>();
+        userRoleService.remove(wrapper.lambda().in(UserRole::getRoleId, roleIdList));
+
+        User user= userService.getById(userId);
+        List<UserRole> list=new ArrayList<>();
+        for(Long roleId:roleIdList){
+            UserRole userRole=new UserRole();
+            userRole.setUserId(userId);
+            userRole.setUserName(user.getUserNameCn());
+            userRole.setRoleId(roleId);
+            list.add(userRole);
+        }
+        userRoleService.saveBatch(list);
         return true;
     }
-
-    /**
-     * 删除用户某个角色
-     *
-     * @param id
-     * @return
-     */
-    @PostMapping("delete")
-    boolean delete(Long id) {
-        userRoleService.removeById(id);
-        return true;
-    }
-
-//    /**
-//     * 根据部门code和角色id获取人员角色列表
-//     *
-//     * @param deptCode
-//     * @param roleId
-//     * @return
-//     */
-//    @GetMapping("query")
-//    List<UserRole> getUserRoleList(String deptCode, String roleId) {
-//        return userRoleService.lambdaQuery().eq(UserRole::getRoleId, roleId).eq(UserRole::getDeptCode, deptCode).list();
-//    }
 }

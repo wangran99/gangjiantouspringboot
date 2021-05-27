@@ -89,6 +89,10 @@ api.push({
 })
 api[7].list.push({
     order: '1',
+    desc: '获取所有的菜单',
+});
+api[7].list.push({
+    order: '2',
     desc: '获取我的菜单',
 });
 api.push({
@@ -107,23 +111,7 @@ api.push({
 })
 api[9].list.push({
     order: '1',
-    desc: '获取所有定义的角色',
-});
-api[9].list.push({
-    order: '2',
-    desc: '增加新角色',
-});
-api[9].list.push({
-    order: '3',
-    desc: '修改角色',
-});
-api[9].list.push({
-    order: '4',
-    desc: '删除角色',
-});
-api[9].list.push({
-    order: '5',
-    desc: '绑定用户角色',
+    desc: '查询定义的角色信息',
 });
 api.push({
     alias: 'RoleMenuController',
@@ -132,6 +120,18 @@ api.push({
     desc: '&lt;p&gt;角色菜单对应表 前端控制器&lt;/p&gt;',
     list: []
 })
+api[10].list.push({
+    order: '1',
+    desc: '增加新角色和对应的菜单',
+});
+api[10].list.push({
+    order: '2',
+    desc: '修改绑定角色和菜单',
+});
+api[10].list.push({
+    order: '3',
+    desc: '删除角色以及绑定的菜单',
+});
 api.push({
     alias: 'TestController',
     order: '12',

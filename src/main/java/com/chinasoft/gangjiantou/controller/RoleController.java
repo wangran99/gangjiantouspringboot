@@ -1,6 +1,8 @@
 package com.chinasoft.gangjiantou.controller;
 
 
+import com.chinasoft.gangjiantou.dto.RoleMenuDetailDto;
+import com.chinasoft.gangjiantou.dto.RoleMenuDto;
 import com.chinasoft.gangjiantou.entity.Role;
 import com.chinasoft.gangjiantou.entity.RoleMenu;
 import com.chinasoft.gangjiantou.entity.User;
@@ -42,75 +44,23 @@ public class RoleController {
     IRoleMenuService roleMenuService;
 
     /**
-     * 获取所有定义的角色
+     * 查询定义的角色信息
      *
      * @return
      */
-    @GetMapping("all")
-    List<Role> getRoles() {
-        return roleService.list();
-    }
-
-    /**
-     * 增加新角色
-     *
-     * @param role
-     * @return
-     */
-    @PostMapping("add")
-    boolean add(@RequestBody Role role) {
-        roleService.save(role);
-        return true;
-    }
-
-    /**
-     * 修改角色
-     *
-     * @param role
-     * @return
-     */
-    @PostMapping("edit")
-    boolean edit(@RequestBody Role role) {
-        if (role.getStatus() == 0)
-            throw new CommonException("该角色禁止编辑");
-        roleService.updateById(role);
-        return true;
-    }
-
-    /**
-     * 删除角色
-     *
-     * @param roleId
-     * @return
-     */
-    @PostMapping("del")
-    boolean delete(Long roleId) {
-        Role role = roleService.getById(roleId);
-        if (role.getStatus() == 0)
-            throw new CommonException("该角色禁止删除");
-        roleService.removeById(roleId);
-        return true;
-    }
-
-    /**
-     * 绑定角色和菜单
-     *
-     * @param roleId
-     * @return
-     */
-    @PostMapping("bind")
-    @Transactional
-    boolean bind(Long roleId, List<Long> menuIdList) {
-        List<RoleMenu> roleMenuList = new ArrayList<>();
-        for (Long menuId : menuIdList) {
-            RoleMenu roleMenu = new RoleMenu();
-            roleMenu.setRoleId(roleId);
-            roleMenu.setMenuId(menuId);
-            roleMenuList.add(roleMenu);
+    @PostMapping("query")
+    List<RoleMenuDetailDto> query(String roleName) {
+        List<Role> roleList = roleService.lambdaQuery().like(true,Role::getRoleName,roleName).list();
+        List<RoleMenuDetailDto> roleMenuDetailDtoList = new ArrayList<>();
+        for(Role role:roleList){
+            RoleMenuDetailDto roleMenuDetailDto=new RoleMenuDetailDto();
+            roleMenuDetailDto.setRole(role);
+            roleMenuDetailDto.setRoleMenuList(roleMenuService.lambdaQuery().eq(RoleMenu::getRoleId,role.getId()).list());
+            roleMenuDetailDtoList.add(roleMenuDetailDto);
         }
-        roleMenuService.saveBatch(roleMenuList);
-        return true;
+        return roleMenuDetailDtoList;
     }
+
 
 
 }
