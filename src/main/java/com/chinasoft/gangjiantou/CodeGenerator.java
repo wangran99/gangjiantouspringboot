@@ -98,19 +98,19 @@ public class CodeGenerator {
             }
         });
 
-//        cfg.setFileCreate(new IFileCreate() {
-//            @Override
-//            public boolean isCreate(ConfigBuilder configBuilder, FileType fileType, String filePath) {
-//                // 判断自定义文件夹是否需要创建
-////                checkDir("调用默认方法创建的目录，自定义目录用");
-//                if (fileType == FileType.ENTITY) {
-//                    // 已经生成 mapper 文件判断存在，不想重新生成返回 false
-//                    return true;
-//                }
-//                // 允许生成模板文件
-//                return false;
-//            }
-//        });
+        cfg.setFileCreate(new IFileCreate() {
+            @Override
+            public boolean isCreate(ConfigBuilder configBuilder, FileType fileType, String filePath) {
+                // 判断自定义文件夹是否需要创建
+//                checkDir("调用默认方法创建的目录，自定义目录用");
+                if (fileType == FileType.ENTITY) {
+                    // 已经生成 ENTITY 文件判断存在，不想重新生成返回 false
+                    return true;
+                }
+                // 允许生成模板文件
+                return false;
+            }
+        });
 
         cfg.setFileOutConfigList(focList);
         mpg.setCfg(cfg);

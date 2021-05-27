@@ -51,6 +51,30 @@ public class MenuController {
     }
 
     /**
+     * 获取所有的菜单
+     * @return
+     */
+    @GetMapping("all")
+    public List<MyMenu> all(){
+        List<Menu> menuList = menuService.list();
+        List<MyMenu> myMenuList = new ArrayList<>();
+        for (Menu menu : menuList) //一级目录
+            if (menu.getParentId() == null) {
+                MyMenu myMenu = new MyMenu();
+                myMenu.setMenu(menu);
+                myMenuList.add(myMenu);
+            }
+        for (MyMenu myMenu : myMenuList) {//二级目录
+            List<Menu> subMenuList = new ArrayList<>();
+            myMenu.setSubMenu(subMenuList);
+            for (Menu menu : menuList)
+                if (myMenu.getMenu().getId().equals(menu.getParentId()))
+                    subMenuList.add(menu);
+        }
+        return myMenuList;
+    }
+
+    /**
      * 获取我的菜单
      *
      * @param authCode

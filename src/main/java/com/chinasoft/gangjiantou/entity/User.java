@@ -3,8 +3,11 @@ package com.chinasoft.gangjiantou.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.annotation.Transient;
 
 /**
  * <p>
@@ -75,6 +78,15 @@ public class User implements Serializable {
      * 用户状态。1：未开户，2：开户中，3：已开户，4：已销户
      */
     private String status;
-
+    /**
+     * 用户角色
+     */
+    @Transient
+    private List<UserRole> roleList;
+    /**
+     * 用户岗位
+     */
+    @Transient
+    private List<UserPosition> positionList;
 
 }

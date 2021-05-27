@@ -121,6 +121,10 @@ api[9].list.push({
     order: '4',
     desc: '删除角色',
 });
+api[9].list.push({
+    order: '5',
+    desc: '绑定用户角色',
+});
 api.push({
     alias: 'RoleMenuController',
     order: '11',
@@ -197,7 +201,7 @@ api.push({
 })
 api[15].list.push({
     order: '1',
-    desc: '查看当前用户的角色',
+    desc: '获取当前用户的角色',
 });
 api[15].list.push({
     order: '2',
@@ -205,19 +209,11 @@ api[15].list.push({
 });
 api[15].list.push({
     order: '3',
-    desc: '绑定用户部门和角色',
-});
-api[15].list.push({
-    order: '4',
     desc: '修改用户角色',
 });
 api[15].list.push({
-    order: '5',
+    order: '4',
     desc: '删除用户某个角色',
-});
-api[15].list.push({
-    order: '6',
-    desc: '根据部门code和角色id获取人员角色列表',
 });
 api.push({
     alias: 'dict',

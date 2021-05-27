@@ -28,11 +28,6 @@ public class UserPosition implements Serializable {
     private Long id;
 
     /**
-     * 部门id
-     */
-    private String deptCode;
-
-    /**
      * 用户id
      */
     private String userId;
@@ -45,7 +40,7 @@ public class UserPosition implements Serializable {
     /**
      * 岗位ID
      */
-    private Integer positionId;
+    private Long positionId;
 
     /**
      * 设置时间

@@ -2,7 +2,9 @@ package com.chinasoft.gangjiantou.controller;
 
 
 import com.chinasoft.gangjiantou.entity.UserRole;
+import com.chinasoft.gangjiantou.redis.RedisService;
 import com.chinasoft.gangjiantou.service.IUserRoleService;
+import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,16 +25,24 @@ public class UserRoleController {
     @Autowired
     IUserRoleService userRoleService;
 
+    @Autowired
+    RedisService redisService;
+
+    private UserBasicInfoRes getUserBasicInfoRes(String authCode) {
+        return redisService.getUserInfo(authCode);
+    }
+
+
     /**
-     * 查看当前用户的角色
+     * 获取当前用户的角色
      *
      * @param authCode
      * @return
      */
     @GetMapping("my")
     List<UserRole> getMyRoles(@RequestHeader("authCode") String authCode) {
-        String userId = "123";
-        return userRoleService.lambdaQuery().eq(UserRole::getUserId, userId).list();
+        UserBasicInfoRes userBasicInfoRes=redisService.getUserInfo(authCode);
+        return userRoleService.lambdaQuery().eq(UserRole::getUserId, userBasicInfoRes.getUserId()).list();
     }
 
     /**
@@ -45,17 +55,6 @@ public class UserRoleController {
         return userRoleService.lambdaQuery().eq(UserRole::getUserId, userId).list();
     }
 
-    /**
-     * 绑定用户部门和角色
-     *
-     * @param userRole
-     * @return
-     */
-    @PostMapping("bind")
-    boolean bind(@RequestBody UserRole userRole) {
-        userRoleService.save(userRole);
-        return true;
-    }
 
     /**
      * 修改用户角色
@@ -81,15 +80,15 @@ public class UserRoleController {
         return true;
     }
 
-    /**
-     * 根据部门code和角色id获取人员角色列表
-     *
-     * @param deptCode
-     * @param roleId
-     * @return
-     */
-    @GetMapping("query")
-    List<UserRole> getUserRoleList(String deptCode, String roleId) {
-        return userRoleService.lambdaQuery().eq(UserRole::getRoleId, roleId).eq(UserRole::getDeptCode, deptCode).list();
-    }
+//    /**
+//     * 根据部门code和角色id获取人员角色列表
+//     *
+//     * @param deptCode
+//     * @param roleId
+//     * @return
+//     */
+//    @GetMapping("query")
+//    List<UserRole> getUserRoleList(String deptCode, String roleId) {
+//        return userRoleService.lambdaQuery().eq(UserRole::getRoleId, roleId).eq(UserRole::getDeptCode, deptCode).list();
+//    }
 }
