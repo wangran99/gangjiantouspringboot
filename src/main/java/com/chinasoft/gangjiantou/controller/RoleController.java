@@ -72,5 +72,5 @@ public class RoleController {
         roleService.removeById(roleId);
         return true;
     }
-    
+
 }
