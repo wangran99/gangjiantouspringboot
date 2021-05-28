@@ -89,4 +89,9 @@ public class User implements Serializable {
 
     private transient List<UserPosition> positionList;
 
+    /**
+     * 用户所在部门列表
+     */
+    private transient List<Department> departmentList;
+
 }

@@ -56,5 +56,9 @@ public class Department implements Serializable {
      */
     private Integer hasChildDept;
 
+    /**
+     * 父部门名称
+     */
+    private transient String parentName;
 
 }

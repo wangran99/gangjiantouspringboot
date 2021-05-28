@@ -46,6 +46,9 @@ public class UserPosition implements Serializable {
      * 设置时间
      */
     private LocalDateTime createTime;
-
+    /**
+     * 岗位名称
+     */
+    private transient String positionName;
 
 }

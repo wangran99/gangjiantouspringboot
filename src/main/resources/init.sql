@@ -34,29 +34,30 @@ CREATE TABLE `position`
     `id`            bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
     `position_name` VARCHAR(20) NOT NULL UNIQUE COMMENT '岗位名称',
     `position_code` VARCHAR(20) NOT NULL UNIQUE COMMENT '岗位编码',
-    `order_num`         INT         NOT NULL DEFAULT 1000 COMMENT '岗位排序',
+    `order_num`     INT         NOT NULL DEFAULT 1000 COMMENT '岗位排序',
     `note`          VARCHAR(100)         DEFAULT NULL COMMENT '岗位备注',
     `status`        TINYINT     NOT NULL DEFAULT 1 COMMENT '岗位状态.0:停用。1：正常',
+    `editable`      TINYINT     NOT NULL DEFAULT 1 COMMENT '岗位是否可编辑/删除.0:不能编辑/删除。1：可编辑/删除',
     `create_time`   datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '设置时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='岗位定义表';
-insert into `position` (`id`,`position_name`, `position_code`)
-values (4,'董事长', 'CEO'),
- (3,'项目经理', 'project manager'),
- (2,'产品经理', 'product manager'),
- (1,'普通职员', 'employee');
+insert into `position` (`id`, `position_name`, `position_code`, `editable`)
+values (4, '董事长', 'CEO', 1),
+       (3, '项目经理', 'project manager', 1),
+       (2, '产品经理', 'product manager', 1),
+       (1, '普通职员', 'employee', 0);
 
 CREATE TABLE `user_position`
 (
     `id`          bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
     `user_id`     VARCHAR(50) NOT NULL COMMENT '用户id',
     `user_name`   VARCHAR(20) NOT NULL COMMENT '用户姓名',
-    `position_id` bigint         NOT NULL COMMENT '岗位ID',
+    `position_id` bigint      NOT NULL COMMENT '岗位ID',
     `create_time` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '设置时间',
     PRIMARY KEY (`id`),
     UNIQUE (`user_id`, `position_id`),
-    INDEX ( `position_id`),
+    INDEX (`position_id`),
     INDEX (`user_id`),
     INDEX (`position_id`)
 ) ENGINE = InnoDB
@@ -67,14 +68,16 @@ CREATE TABLE `file`
     `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
     `file_name`   VARCHAR(100) NOT NULL COMMENT '文件名',
     `path`        VARCHAR(200) NOT NULL COMMENT '相对路径',
-    `user_id`     VARCHAR(20)  NOT NULL COMMENT '用户id',
+    `uuid`        VARCHAR(100) NOT NULL COMMENT '文件uuid',
+    `user_id`     VARCHAR(50)  NOT NULL COMMENT '用户id',
     `user_name`   VARCHAR(20)  NOT NULL COMMENT '用户姓名',
-    `approval_id` bigint       NOT NULL COMMENT '审批ID',
+    `apply_id`    bigint       NOT NULL DEFAULT -1 COMMENT '申请id',
+    `approval_id` bigint       NOT NULL DEFAULT -1 COMMENT '审批环节ID',
     `upload_time` datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
     PRIMARY KEY (`id`),
     INDEX (`approval_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='上传文件信息表';
+  DEFAULT CHARSET = utf8mb4 COMMENT ='上传/修订文件信息表';
 
 
 CREATE TABLE `role`
@@ -96,7 +99,7 @@ CREATE TABLE `user_role`
     `id`          bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
     `user_id`     VARCHAR(50) NOT NULL COMMENT '用户id',
     `user_name`   VARCHAR(20) NOT NULL COMMENT '用户姓名',
-    `role_id` bigint         NOT NULL COMMENT '角色ID',
+    `role_id`     bigint      NOT NULL COMMENT '角色ID',
     `create_time` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '设置时间',
     PRIMARY KEY (`id`),
     UNIQUE (`user_id`, `role_id`),
@@ -104,9 +107,9 @@ CREATE TABLE `user_role`
     INDEX (`user_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户角色表';
-INSERT INTO `user_role` (`user_id`,`user_name`,`role_id`)
-values ("wangran@18856235161","汪然",1),
-       ("yangjie@18856235161","杨杰",1);
+INSERT INTO `user_role` (`user_id`, `user_name`, `role_id`)
+values ("wangran@18856235161", "汪然", 1),
+       ("yangjie@18856235161", "杨杰", 1);
 
 CREATE TABLE `menu`
 (
@@ -114,7 +117,7 @@ CREATE TABLE `menu`
     `menu_name` VARCHAR(50) NOT NULL COMMENT '菜单名称',
     `parent_id` bigint      DEFAULT NULL COMMENT '父目录id',
     `router`    VARCHAR(50) DEFAULT NULL COMMENT '路由',
-    `order_num`     INT         DEFAULT 1000 COMMENT '排序',
+    `order_num` INT         DEFAULT 1000 COMMENT '排序',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='菜单表';
@@ -158,42 +161,71 @@ values (1, 1000),
        (2, 2300),
        (2, 2400);
 
+CREATE TABLE `approval_flow`
+(
+    `id`            bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `flow_name`     VARCHAR(100) NOT NULL COMMENT '流程名称',
+    `dept_code`     VARCHAR(30)  NOT NULL COMMENT '流程适用部门id',
+    `position_id`   bigint       NOT NULL COMMENT '适用申请的岗位id',
+    `max_file`      INT          NOT NULL COMMENT '最大文件数',
+    `file_editable` TINYINT      NOT NULL COMMENT '上传的文件能否编辑：0：不能编辑，1：可以编辑',
+    `status`        TINYINT      NOT NULL COMMENT '流程定义状态：0：不生效，1：生效',
+    PRIMARY KEY (`id`),
+    UNIQUE (`flow_name`, `dept_code`),
+    INDEX (`dept_code`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='审批流程定义表';
+
+CREATE TABLE `flow_approver`
+(
+    `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `flow_id`   bigint      NOT NULL COMMENT '流程id',
+    `user_id`   VARCHAR(50) NOT NULL COMMENT '审批人id',
+    `user_name` VARCHAR(50) NOT NULL COMMENT '审批人姓名',
+    PRIMARY KEY (`id`),
+    UNIQUE (`flow_id`, `user_id`),
+    INDEX (`flow_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='审批流程定义默认的审批人表';
+
 CREATE TABLE `apply`
 (
     `id`                  bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
     `applicant`           varchar(20)  NOT NULL COMMENT '申请人',
     `applicant_id`        varchar(100) NOT NULL COMMENT '申请人id',
-    `subject`             varchar(100) NOT NULL COMMENT '审批单名称',
-    `serial_number`       varchar(100) NOT NULL COMMENT '流水号',
+    `subject`             varchar(100) NOT NULL COMMENT '主题',
+    `serial_number`       varchar(100) NOT NULL COMMENT '审批单名称',
     `flow_id`             bigint       NOT NULL COMMENT '流程定义id',
     `note`                varchar(200) NOT NULL COMMENT '申请原因说明',
     `current_approver_id` varchar(100) NOT NULL COMMENT '当前审批人id',
     `current_approver`    varchar(20)  NOT NULL COMMENT '当前审批人',
-    `status`              TINYINT      NOT NULL DEFAULT 0 COMMENT '状态（0：待审核 1：已撤回 2：已拒绝 3：审批通过）',
+    `status`              TINYINT      NOT NULL DEFAULT 0 COMMENT '状态（0：待审核 1：已撤回 2：审批中 3：已拒绝 4：审批通过）',
     `apply_time`          datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `recall_time`         datetime(0)           DEFAULT NULL COMMENT '撤回时间',
     `end_time`            datetime(0)           DEFAULT NULL COMMENT '审批完成时间',
     PRIMARY KEY (`id`),
-    INDEX (`applicant_id`)
+    INDEX (`applicant_id`),
+    INDEX (`serial_number`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='申请表';
 
-CREATE TABLE `approver`
+CREATE TABLE `apply_approver`
 (
-    `id`                 bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `apply_id`           bigint       NOT NULL COMMENT '审批请求id',
-    `approver_id`        VARCHAR(100) NOT NULL COMMENT '审批人id',
-    `approver_name`      VARCHAR(20)  NOT NULL COMMENT '审批人姓名',
-    `next_approver_id`   VARCHAR(100)          DEFAULT NULL COMMENT '下一个审批人id',
-    `next_approver_name` VARCHAR(20)           DEFAULT NULL COMMENT '下一个审批人姓名',
-    `status`             TINYINT      NOT NULL DEFAULT 0 COMMENT '状态（0：待审核 1：审批通过 2：已拒绝 3：转移审批给别人）',
-    `comment`            VARCHAR(200)          DEFAULT NULL COMMENT '审批意见',
-    `approval_time`      datetime(0)  NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '审批时间',
+    `id`                 bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `apply_id`           bigint      NOT NULL COMMENT '审批请求id',
+    `approver_id`        VARCHAR(50) NOT NULL COMMENT '审批人id',
+    `approver_name`      VARCHAR(20) NOT NULL COMMENT '审批人姓名',
+    `next_approver_id`   VARCHAR(50)          DEFAULT NULL COMMENT '下一个审批人id',
+    `next_approver_name` VARCHAR(20)          DEFAULT NULL COMMENT '下一个审批人姓名',
+    `status`             TINYINT     NOT NULL DEFAULT 0 COMMENT '状态（0：待审核 1：审批通过 2：已拒绝 3：转移审批给别人）',
+    `comment`            VARCHAR(200)         DEFAULT NULL COMMENT '审批意见',
+    `approval_time`      datetime(0) NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '审批时间',
     PRIMARY KEY (`id`),
     UNIQUE (`apply_id`, `approver_id`),
     INDEX (`apply_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='审批人表';
+  DEFAULT CHARSET = utf8mb4 COMMENT ='审批过程经过的审批人(包含转发审批人)表';
+
 
 CREATE TABLE `todo_task`
 (
@@ -222,18 +254,3 @@ CREATE TABLE `carbon_copy`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='审批抄送表';
 
-
-CREATE TABLE `approval_flow`
-(
-    `id`            bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `flow_name`     VARCHAR(100) NOT NULL COMMENT '流程名称',
-    `dept_code`     VARCHAR(20)  NOT NULL COMMENT '流程适用部门id',
-    `position_id`   bigint       NOT NULL COMMENT '适用申请的岗位id',
-    `max_file`      INT          NOT NULL COMMENT '最大文件数',
-    `file_editable` TINYINT      NOT NULL COMMENT '上传的文件能否编辑：0：不能编辑，1：可以编辑',
-    `status`        TINYINT      NOT NULL COMMENT '流程定义状态：0：不生效，1：生效',
-    PRIMARY KEY (`id`),
-    UNIQUE (`flow_name`, `dept_code`),
-    INDEX (`dept_code`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='审批流程定义表';

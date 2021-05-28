@@ -38,6 +38,11 @@ public class File implements Serializable {
     private String path;
 
     /**
+     * 文件uuid
+     */
+    private String uuid;
+
+    /**
      * 用户id
      */
     private String userId;

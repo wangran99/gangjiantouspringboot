@@ -53,6 +53,11 @@ public class Position implements Serializable {
     private Integer status;
 
     /**
+     * 岗位是否可编辑/删除.0:不能编辑/删除。1：可编辑/删除
+     */
+    private Integer editable;
+
+    /**
      * 设置时间
      */
     private LocalDateTime createTime;

@@ -63,18 +63,22 @@ api[5].list.push({
 });
 api[5].list.push({
     order: '2',
+    desc: '获取直接子部门列表',
+});
+api[5].list.push({
+    order: '3',
     desc: '按结构获取所有部门列表',
 });
 api.push({
     alias: 'FileController',
     order: '7',
-    link: '&lt;p&gt;上传文件_前端控制器&lt;/p&gt;',
-    desc: '&lt;p&gt;上传文件 前端控制器&lt;/p&gt;',
+    link: '&lt;p&gt;上传下载文件_前端控制器&lt;/p&gt;',
+    desc: '&lt;p&gt;上传下载文件 前端控制器&lt;/p&gt;',
     list: []
 })
 api[6].list.push({
     order: '1',
-    desc: '',
+    desc: '畅写office回调接口',
 });
 api[6].list.push({
     order: '2',
@@ -117,6 +121,10 @@ api[8].list.push({
 api[8].list.push({
     order: '4',
     desc: '删除岗位',
+});
+api[8].list.push({
+    order: '5',
+    desc: '岗位分页查询',
 });
 api.push({
     alias: 'RoleController',
@@ -207,10 +215,14 @@ api[13].list.push({
 });
 api[13].list.push({
     order: '2',
-    desc: '根据用户id查询用户信息（包含角色和岗位信息）',
+    desc: '根据岗位和部门查询用户',
 });
 api[13].list.push({
     order: '3',
+    desc: '根据用户id查询用户信息（包含角色和岗位信息）',
+});
+api[13].list.push({
+    order: '4',
     desc: '绑定用户和岗位&角色',
 });
 api.push({

@@ -46,6 +46,10 @@ public class UserRole implements Serializable {
      * 设置时间
      */
     private LocalDateTime createTime;
+    /**
+     * 角色名称
+     */
+    private transient String roleName;
 
 
 }

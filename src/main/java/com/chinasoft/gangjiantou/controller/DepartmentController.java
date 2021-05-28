@@ -39,6 +39,22 @@ public class DepartmentController {
     }
 
     /**
+     * 获取直接子部门列表
+     * @param deptCode
+     * @return
+     */
+    @GetMapping("subDept")
+    public List<Department> subDept(String deptCode){
+        List<Department>  list=departmentService.lambdaQuery().eq(Department::getParentCode,deptCode)
+                .orderByDesc(Department::getOrderNo).list();
+        list.forEach(e->{
+            Department department=departmentService.getById(e.getParentCode());
+            e.setParentName(department.getDeptNameCn());
+        });
+        return list;
+    }
+
+    /**
      * 按结构获取所有部门列表
      *
      * @return
