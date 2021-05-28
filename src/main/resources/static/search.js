@@ -104,19 +104,19 @@ api.push({
 })
 api[8].list.push({
     order: '1',
-    desc: '添加岗位',
+    desc: '获取所有的岗位',
 });
 api[8].list.push({
     order: '2',
-    desc: '修改岗位',
+    desc: '添加岗位',
 });
 api[8].list.push({
     order: '3',
-    desc: '删除岗位',
+    desc: '修改岗位',
 });
 api[8].list.push({
     order: '4',
-    desc: '绑定用户和岗位',
+    desc: '删除岗位',
 });
 api.push({
     alias: 'RoleController',
@@ -127,6 +127,10 @@ api.push({
 })
 api[9].list.push({
     order: '1',
+    desc: '获取所有的角色',
+});
+api[9].list.push({
+    order: '2',
     desc: '查询定义的角色信息',
 });
 api.push({
@@ -205,6 +209,10 @@ api[13].list.push({
     order: '2',
     desc: '根据用户id查询用户信息（包含角色和岗位信息）',
 });
+api[13].list.push({
+    order: '3',
+    desc: '绑定用户和岗位&角色',
+});
 api.push({
     alias: 'UserPositionController',
     order: '15',
@@ -226,10 +234,6 @@ api[15].list.push({
 api[15].list.push({
     order: '2',
     desc: '获取用户角色列表',
-});
-api[15].list.push({
-    order: '3',
-    desc: '绑定用户和角色',
 });
 api.push({
     alias: 'dict',

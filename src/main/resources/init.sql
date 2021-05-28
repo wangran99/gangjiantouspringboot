@@ -157,6 +157,7 @@ values (1, 1000),
        (2, 2200),
        (2, 2300),
        (2, 2400);
+
 CREATE TABLE `apply`
 (
     `id`                  bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',

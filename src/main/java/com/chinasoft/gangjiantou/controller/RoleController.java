@@ -3,10 +3,7 @@ package com.chinasoft.gangjiantou.controller;
 
 import com.chinasoft.gangjiantou.dto.RoleMenuDetailDto;
 import com.chinasoft.gangjiantou.dto.RoleMenuDto;
-import com.chinasoft.gangjiantou.entity.Role;
-import com.chinasoft.gangjiantou.entity.RoleMenu;
-import com.chinasoft.gangjiantou.entity.User;
-import com.chinasoft.gangjiantou.entity.UserRole;
+import com.chinasoft.gangjiantou.entity.*;
 import com.chinasoft.gangjiantou.exception.CommonException;
 import com.chinasoft.gangjiantou.service.IRoleMenuService;
 import com.chinasoft.gangjiantou.service.IRoleService;
@@ -42,6 +39,15 @@ public class RoleController {
 
     @Autowired
     IRoleMenuService roleMenuService;
+
+    /**
+     * 获取所有的角色
+     * @return
+     */
+    @GetMapping("all")
+    public List<Role> all(){
+        return roleService.list();
+    }
 
     /**
      * 查询定义的角色信息

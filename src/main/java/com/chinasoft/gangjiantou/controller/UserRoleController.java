@@ -37,10 +37,6 @@ public class UserRoleController {
     @Autowired
     IUserService userService;
 
-    private UserBasicInfoRes getUserBasicInfoRes(String authCode) {
-        return redisService.getUserInfo(authCode);
-    }
-
 
     /**
      * 获取当前用户的角色
@@ -50,7 +46,7 @@ public class UserRoleController {
      */
     @GetMapping("my")
     List<UserRole> getMyRoles(@RequestHeader("authCode") String authCode) {
-        UserBasicInfoRes userBasicInfoRes=redisService.getUserInfo(authCode);
+        UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         return userRoleService.lambdaQuery().eq(UserRole::getUserId, userBasicInfoRes.getUserId()).list();
     }
 
@@ -65,28 +61,28 @@ public class UserRoleController {
     }
 
 
-    /**
-     * 绑定用户和角色
-     * @param userId
-     * @param roleIdList
-     * @return
-     */
-    @PostMapping("bind")
-    @Transactional
-    boolean bind(String userId,List<Long> roleIdList ){
-        QueryWrapper<UserRole> wrapper = new QueryWrapper<>();
-        userRoleService.remove(wrapper.lambda().in(UserRole::getRoleId, roleIdList));
-
-        User user= userService.getById(userId);
-        List<UserRole> list=new ArrayList<>();
-        for(Long roleId:roleIdList){
-            UserRole userRole=new UserRole();
-            userRole.setUserId(userId);
-            userRole.setUserName(user.getUserNameCn());
-            userRole.setRoleId(roleId);
-            list.add(userRole);
-        }
-        userRoleService.saveBatch(list);
-        return true;
-    }
+//    /**
+//     * 绑定用户和角色
+//     * @param userId
+//     * @param roleIdList
+//     * @return
+//     */
+//    @PostMapping("bind")
+//    @Transactional
+//    boolean bind(String userId,List<Long> roleIdList ){
+//        QueryWrapper<UserRole> wrapper = new QueryWrapper<>();
+//        userRoleService.remove(wrapper.lambda().in(UserRole::getRoleId, roleIdList));
+//
+//        User user= userService.getById(userId);
+//        List<UserRole> list=new ArrayList<>();
+//        for(Long roleId:roleIdList){
+//            UserRole userRole=new UserRole();
+//            userRole.setUserId(userId);
+//            userRole.setUserName(user.getUserNameCn());
+//            userRole.setRoleId(roleId);
+//            list.add(userRole);
+//        }
+//        userRoleService.saveBatch(list);
+//        return true;
+//    }
 }

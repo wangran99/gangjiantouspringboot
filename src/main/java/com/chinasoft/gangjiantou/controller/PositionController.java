@@ -11,11 +11,7 @@ import com.chinasoft.gangjiantou.service.IUserPositionService;
 import com.chinasoft.gangjiantou.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +35,14 @@ public class PositionController {
     @Autowired
     IUserPositionService userPositionService;
 
+    /**
+     * 获取所有的岗位
+     * @return
+     */
+    @GetMapping("all")
+    public List<Position> all(){
+        return positionService.list();
+    }
     /**
      * 添加岗位
      *
@@ -74,29 +78,29 @@ public class PositionController {
         return true;
     }
 
-    /**
-     * 绑定用户和岗位
-     *
-     * @param userId
-     * @param positionIdList
-     * @return
-     */
-    @PostMapping("bind")
-    @Transactional
-    boolean bind(String userId, List<Long> positionIdList) {
-        QueryWrapper<UserPosition> wrapper = new QueryWrapper<>();
-        userPositionService.remove(wrapper.lambda().in(UserPosition::getUserId, userId));
-
-        User user = userService.getById(userId);
-        List<UserPosition> list = new ArrayList<>();
-        for (Long positionId : positionIdList) {
-            UserPosition userPosition = new UserPosition();
-            userPosition.setUserId(userId);
-            userPosition.setUserName(user.getUserNameCn());
-            userPosition.setPositionId(positionId);
-            list.add(userPosition);
-        }
-        userPositionService.saveBatch(list);
-        return true;
-    }
+//    /**
+//     * 绑定用户和岗位
+//     *
+//     * @param userId
+//     * @param positionIdList
+//     * @return
+//     */
+//    @PostMapping("bind")
+//    @Transactional
+//    boolean bind(String userId, List<Long> positionIdList) {
+//        QueryWrapper<UserPosition> wrapper = new QueryWrapper<>();
+//        userPositionService.remove(wrapper.lambda().in(UserPosition::getUserId, userId));
+//
+//        User user = userService.getById(userId);
+//        List<UserPosition> list = new ArrayList<>();
+//        for (Long positionId : positionIdList) {
+//            UserPosition userPosition = new UserPosition();
+//            userPosition.setUserId(userId);
+//            userPosition.setUserName(user.getUserNameCn());
+//            userPosition.setPositionId(positionId);
+//            list.add(userPosition);
+//        }
+//        userPositionService.saveBatch(list);
+//        return true;
+//    }
 }
