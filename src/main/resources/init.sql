@@ -34,7 +34,7 @@ CREATE TABLE `position`
     `id`            bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
     `position_name` VARCHAR(20) NOT NULL UNIQUE COMMENT '岗位名称',
     `position_code` VARCHAR(20) NOT NULL UNIQUE COMMENT '岗位编码',
-    `order`         INT         NOT NULL DEFAULT 1000 COMMENT '岗位排序',
+    `order_num`         INT         NOT NULL DEFAULT 1000 COMMENT '岗位排序',
     `note`          VARCHAR(100)         DEFAULT NULL COMMENT '岗位备注',
     `status`        TINYINT     NOT NULL DEFAULT 1 COMMENT '岗位状态.0:停用。1：正常',
     `create_time`   datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '设置时间',
@@ -117,11 +117,11 @@ CREATE TABLE `menu`
     `menu_name` VARCHAR(50) NOT NULL COMMENT '菜单名称',
     `parent_id` bigint      DEFAULT NULL COMMENT '父目录id',
     `router`    VARCHAR(50) DEFAULT NULL COMMENT '路由',
-    `order`     INT         DEFAULT 1000 COMMENT '排序',
+    `order_num`     INT         DEFAULT 1000 COMMENT '排序',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='菜单表';
-INSERT INTO `menu` (`id`, `menu_name`, `parent_id`, `router`, `order`)
+INSERT INTO `menu` (`id`, `menu_name`, `parent_id`, `router`, `order_num`)
 values (1000, "组织管理", null, null, 1000),
        (1100, "用户管理", 1000, "/userMessage", 1000),
        (1200, "部门管理", 1000, "/dept", 1000),

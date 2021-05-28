@@ -15,7 +15,7 @@ import org.springframework.data.annotation.Transient;
  * </p>
  *
  * @author WangRan
- * @since 2021-05-27
+ * @since 2021-05-28
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -81,12 +81,12 @@ public class User implements Serializable {
     /**
      * 用户角色
      */
-    @Transient
-    private List<UserRole> roleList;
+
+    private transient  List<UserRole> roleList;
     /**
      * 用户岗位
      */
-    @Transient
-    private List<UserPosition> positionList;
+
+    private transient List<UserPosition> positionList;
 
 }

@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author WangRan
- * @since 2021-05-27
+ * @since 2021-05-28
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -44,7 +44,7 @@ public class Menu implements Serializable {
     /**
      * 排序
      */
-    private Integer order;
+    private Integer orderNum;
 
 
 }

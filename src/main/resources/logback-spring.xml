@@ -185,6 +185,10 @@
     不能设置为INHERITED或者同义词NULL。默认是DEBUG
     可以包含零个或多个元素，标识这个appender将会添加到这个logger。
     -->
+    <logger name="com.chinasoft.gangjiantou.mapper" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="INFO_FILE"/>
+    </logger>
 
     <springProfile name="dev,uat">
         <root level="info">

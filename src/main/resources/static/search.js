@@ -102,6 +102,22 @@ api.push({
     desc: '&lt;p&gt;岗位定义表 前端控制器&lt;/p&gt;',
     list: []
 })
+api[8].list.push({
+    order: '1',
+    desc: '添加岗位',
+});
+api[8].list.push({
+    order: '2',
+    desc: '修改岗位',
+});
+api[8].list.push({
+    order: '3',
+    desc: '删除岗位',
+});
+api[8].list.push({
+    order: '4',
+    desc: '绑定用户和岗位',
+});
 api.push({
     alias: 'RoleController',
     order: '10',
@@ -209,11 +225,7 @@ api[15].list.push({
 });
 api[15].list.push({
     order: '3',
-    desc: '修改用户角色',
-});
-api[15].list.push({
-    order: '4',
-    desc: '删除用户某个角色',
+    desc: '绑定用户和角色',
 });
 api.push({
     alias: 'dict',
