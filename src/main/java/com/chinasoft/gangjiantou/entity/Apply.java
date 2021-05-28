@@ -38,12 +38,12 @@ public class Apply implements Serializable {
     private String applicantId;
 
     /**
-     * 审批单名称
+     * 主题
      */
     private String subject;
 
     /**
-     * 流水号
+     * 审批单名称
      */
     private String serialNumber;
 
@@ -68,7 +68,7 @@ public class Apply implements Serializable {
     private String currentApprover;
 
     /**
-     * 状态（0：待审核 1：已撤回 2：已拒绝 3：审批通过）
+     * 状态（0：待审核 1：已撤回 2：审批中 3：已拒绝 4：审批通过）
      */
     private Integer status;
 

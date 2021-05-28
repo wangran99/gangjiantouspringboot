@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 上传/修订文件信息表
+ * 审批过程经过的审批人(包含转发审批人)表
  * </p>
  *
  * @author WangRan
@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class File implements Serializable {
+public class ApplyApprover implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,44 +28,44 @@ public class File implements Serializable {
     private Long id;
 
     /**
-     * 文件名
-     */
-    private String fileName;
-
-    /**
-     * 相对路径
-     */
-    private String path;
-
-    /**
-     * 文件uuid
-     */
-    private String uuid;
-
-    /**
-     * 用户id
-     */
-    private String userId;
-
-    /**
-     * 用户姓名
-     */
-    private String userName;
-
-    /**
-     * 申请id
+     * 审批请求id
      */
     private Long applyId;
 
     /**
-     * 审批环节ID
+     * 审批人id
      */
-    private Long approvalId;
+    private String approverId;
 
     /**
-     * 上传时间
+     * 审批人姓名
      */
-    private LocalDateTime uploadTime;
+    private String approverName;
+
+    /**
+     * 下一个审批人id
+     */
+    private String nextApproverId;
+
+    /**
+     * 下一个审批人姓名
+     */
+    private String nextApproverName;
+
+    /**
+     * 状态（0：待审核 1：审批通过 2：已拒绝 3：转移审批给别人）
+     */
+    private Integer status;
+
+    /**
+     * 审批意见
+     */
+    private String comment;
+
+    /**
+     * 审批时间
+     */
+    private LocalDateTime approvalTime;
 
 
 }

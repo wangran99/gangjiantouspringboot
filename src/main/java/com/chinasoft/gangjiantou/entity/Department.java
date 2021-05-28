@@ -60,5 +60,4 @@ public class Department implements Serializable {
      * 父部门名称
      */
     private transient String parentName;
-
 }
