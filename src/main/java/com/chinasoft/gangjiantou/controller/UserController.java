@@ -8,11 +8,7 @@ import com.chinasoft.gangjiantou.entity.UserPosition;
 import com.chinasoft.gangjiantou.entity.UserRole;
 import com.chinasoft.gangjiantou.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -40,7 +36,7 @@ public class UserController {
     IUserRoleService userRoleService;
 
     /**
-     * 根据条件查询用户
+     * 根据条件查询用户详细信息
      *
      * @param user
      * @return
@@ -55,5 +51,18 @@ public class UserController {
             temp.setPositionList(userPositionService.lambdaQuery().eq(UserPosition::getUserId, temp.getUserId()).list());
         }
         return list;
+    }
+
+    /**
+     * 根据用户id查询用户信息（包含角色和岗位信息）
+     * @param userId
+     * @return
+     */
+    @PostMapping("detail")
+    public User detail(String userId){
+        User user= userService.getById(userId);
+        user.setRoleList(userRoleService.lambdaQuery().eq(UserRole::getUserId, userId).list());
+        user.setPositionList(userPositionService.lambdaQuery().eq(UserPosition::getUserId, userId).list());
+        return user;
     }
 }

@@ -41,19 +41,16 @@ CREATE TABLE `position`
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='岗位定义表';
-insert into `position` (`position_name`, `position_code`)
-values ('董事长', 'CEO');
-insert into `position` (`position_name`, `position_code`)
-values ('总经理', 'manager');
-insert into `position` (`position_name`, `position_code`)
-values ('副总经理', 'vice manager');
-insert into `position` (`position_name`, `position_code`)
-values ('职员', 'employee');
+insert into `position` (`id`,`position_name`, `position_code`)
+values (4,'董事长', 'CEO'),
+ (3,'项目经理', 'project manager'),
+ (2,'产品经理', 'product manager'),
+ (1,'普通职员', 'employee');
 
 CREATE TABLE `user_position`
 (
     `id`          bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `user_id`     VARCHAR(20) NOT NULL COMMENT '用户id',
+    `user_id`     VARCHAR(50) NOT NULL COMMENT '用户id',
     `user_name`   VARCHAR(20) NOT NULL COMMENT '用户姓名',
     `position_id` bigint         NOT NULL COMMENT '岗位ID',
     `create_time` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '设置时间',
@@ -97,7 +94,7 @@ values (1, '管理员', '', 0),
 CREATE TABLE `user_role`
 (
     `id`          bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `user_id`     VARCHAR(20) NOT NULL COMMENT '用户id',
+    `user_id`     VARCHAR(50) NOT NULL COMMENT '用户id',
     `user_name`   VARCHAR(20) NOT NULL COMMENT '用户姓名',
     `role_id` bigint         NOT NULL COMMENT '角色ID',
     `create_time` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '设置时间',

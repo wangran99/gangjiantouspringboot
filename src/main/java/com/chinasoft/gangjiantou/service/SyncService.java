@@ -2,8 +2,7 @@ package com.chinasoft.gangjiantou.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.chinasoft.gangjiantou.entity.Department;
-import com.chinasoft.gangjiantou.entity.User;
+import com.chinasoft.gangjiantou.entity.*;
 import com.chinasoft.gangjiantou.mapper.DepartmentMapper;
 import com.chinasoft.gangjiantou.mapper.UserMapper;
 import com.github.wangran99.welink.api.client.openapi.OpenAPI;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -32,6 +32,12 @@ public class SyncService {
 
     @Autowired
     IUserService userService;
+
+    @Autowired
+    IUserRoleService userRoleService;
+
+    @Autowired
+    IUserPositionService userPositionService;
 
     public void syncDepts() {
         log.info("=====begin sync depts=======");
@@ -118,6 +124,22 @@ public class SyncService {
                         String deptCode = temp.getDeptCode();
                         temp.setDeptCode(deptCode + "," + department.getDeptCode());
                         userService.updateById(temp);
+                    }
+                  List<UserRole> userRoleList=  userRoleService.lambdaQuery().eq(UserRole::getUserId,user.getUserId()).list();
+                    if(userRoleList.isEmpty()){
+                        UserRole userRole=new UserRole();
+                        userRole.setUserId(user.getUserId());
+                        userRole.setUserName(user.getUserNameCn());
+                        userRole.setRoleId(2L);
+                        userRoleService.save(userRole);
+                    }
+                    List<UserPosition> userPositionList  =userPositionService.lambdaQuery().eq(UserPosition::getUserId,user.getUserId()).list();
+                    if(userPositionList.isEmpty()){
+                        UserPosition userPosition=new UserPosition();
+                        userPosition.setUserId(user.getUserId());
+                        userPosition.setUserName(user.getUserNameCn());
+                        userPosition.setPositionId(1L);
+                        userPositionService.save(userPosition);
                     }
                 }
                 if (queryUserInfoResPage.getHasMore() == 1)//最后一页
