@@ -67,6 +67,7 @@ CREATE TABLE `file`
 (
     `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
     `file_name`   VARCHAR(100) NOT NULL COMMENT '文件名',
+    `temp_id`     bigint       NOT NULL COMMENT '上传文件的临时id',
     `path`        VARCHAR(200) NOT NULL COMMENT '相对路径',
     `uuid`        VARCHAR(100) NOT NULL COMMENT '文件uuid',
     `user_id`     VARCHAR(50)  NOT NULL COMMENT '用户id',
@@ -75,7 +76,8 @@ CREATE TABLE `file`
     `approval_id` bigint       NOT NULL DEFAULT -1 COMMENT '审批环节ID',
     `upload_time` datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
     PRIMARY KEY (`id`),
-    INDEX (`approval_id`)
+    INDEX (`approval_id`),
+    INDEX (`temp_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='上传/修订文件信息表';
 
