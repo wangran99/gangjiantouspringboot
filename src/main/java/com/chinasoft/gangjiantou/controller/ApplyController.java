@@ -332,11 +332,12 @@ public class ApplyController {
      * @param applyId     申请id
      * @param shiftUserId 转给人的用户id
      * @param authCode
+     * @param common 意见说明
      * @return
      */
     @PostMapping("shift")
     @Transactional
-    public boolean shiftApprover(Long applyId, String shiftUserId, @RequestHeader("authCode") String authCode) {
+    public boolean shiftApprover(Long applyId, String shiftUserId, @RequestHeader("authCode") String authCode,String common) {
         UserBasicInfoRes user = redisService.getUserInfo(authCode);
         Apply apply = applyService.getById(applyId);
         if (apply == null)
@@ -350,6 +351,7 @@ public class ApplyController {
         ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, applyId)
                 .eq(ApplyApprover::getApproverId, user.getUserId()).one();
         applyApprover.setStatus(3);
+        applyApprover.setComment(common);
 
         ApplyApprover newApplyApprover = new ApplyApprover();
         newApplyApprover.setApplyId(applyId);
