@@ -62,8 +62,8 @@ public class ApprovalFlowController {
      *
      * @param flowId
      */
-    @GetMapping("add")
-    FlowDto add(@PathVariable("flowId") Long flowId) {
+    @GetMapping("detail")
+    FlowDto detail(@PathVariable("flowId") Long flowId) {
         FlowDto flowDto = new FlowDto();
         flowDto.setApprovalFlow(approvalFlowService.getById(flowId));
         flowDto.setFlowApproverList(flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, flowDto).list());
@@ -98,7 +98,7 @@ public class ApprovalFlowController {
      */
     @PostMapping("del")
     @Transactional
-    boolean edit(Long flowId) {
+    boolean del(Long flowId) {
         approvalFlowService.removeById(flowId);
         flowApproverService.remove(new QueryWrapper<FlowApprover>().lambda()
                 .eq(FlowApprover::getFlowId, flowId));
@@ -111,7 +111,7 @@ public class ApprovalFlowController {
      * @param flowQueryDto
      */
     @PostMapping("query")
-    Page<ApprovalFlow> edit(FlowQueryDto flowQueryDto) {
+    Page<ApprovalFlow> query(FlowQueryDto flowQueryDto) {
         Page<ApprovalFlow> page = new Page<>(flowQueryDto.getPageNumber(), flowQueryDto.getPageSize());
         Page<ApprovalFlow> approvalFlowPage = approvalFlowService.lambdaQuery()
                 .like(StringUtils.hasText(flowQueryDto.getFlowName()), ApprovalFlow::getFlowName, flowQueryDto.getFlowName())

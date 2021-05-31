@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -67,5 +69,8 @@ public class ApplyApprover implements Serializable {
      */
     private LocalDateTime approvalTime;
 
-
+    /**
+     * 每一级审批对应修改后的文件列表
+     */
+    private transient List<File> fileList;
 }

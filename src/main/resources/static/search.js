@@ -6,6 +6,26 @@ api.push({
     desc: '&lt;p&gt;申请表 前端控制器&lt;/p&gt;',
     list: []
 })
+api[0].list.push({
+    order: '1',
+    desc: '每一次申请上传文件，需要提前获取文件临时id',
+});
+api[0].list.push({
+    order: '2',
+    desc: '获取我能发起申请的列表',
+});
+api[0].list.push({
+    order: '3',
+    desc: '新增申请',
+});
+api[0].list.push({
+    order: '4',
+    desc: '分页查询我的申请',
+});
+api[0].list.push({
+    order: '5',
+    desc: '根据id获取申请详情',
+});
 api.push({
     alias: 'ApprovalFlowController',
     order: '2',

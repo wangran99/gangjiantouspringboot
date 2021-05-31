@@ -90,9 +90,24 @@ public class Apply implements Serializable {
     private LocalDateTime endTime;
 
     /**
+     * 申请部门
+     */
+    private transient String deptName;
+
+    /**
+     * 流程名称
+     */
+    private transient String flowName;
+
+    /**
      * 申请对应文件的临时id
      */
     private transient Long fileTempId;
+
+    /**
+     * 申请人上传的原始文件
+     */
+    private transient List<File> fileList;
 
     /**
      * 申请对应的抄送人列表
