@@ -111,13 +111,13 @@ public class ApprovalFlowController {
      * @param flowQueryDto
      */
     @PostMapping("query")
-    Page<ApprovalFlow> query(FlowQueryDto flowQueryDto) {
+    Page<ApprovalFlow> query(@RequestBody FlowQueryDto flowQueryDto) {
         Page<ApprovalFlow> page = new Page<>(flowQueryDto.getPageNumber(), flowQueryDto.getPageSize());
         Page<ApprovalFlow> approvalFlowPage = approvalFlowService.lambdaQuery()
                 .like(StringUtils.hasText(flowQueryDto.getFlowName()), ApprovalFlow::getFlowName, flowQueryDto.getFlowName())
                 .eq(flowQueryDto.getDeptCode() != null, ApprovalFlow::getDeptCode, flowQueryDto.getDeptCode()).page(page);
         approvalFlowPage.getRecords().forEach(e -> {
-            e.setFlowName(departmentService.getById(e.getId()).getDeptNameCn());
+            e.setDeptName(departmentService.getById(e.getDeptCode()).getDeptNameCn());
         });
         return approvalFlowPage;
     }

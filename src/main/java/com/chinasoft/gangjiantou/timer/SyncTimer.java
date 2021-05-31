@@ -14,7 +14,7 @@ public class SyncTimer {
     SyncService syncService;
 
     //每隔1小时
-    @Scheduled(fixedRate = 1 * 60 * 60 * 1000, initialDelay = 2000)
+    @Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 2000)
     @Transactional
     public void scheduled() {
 //        syncService.delDepts();

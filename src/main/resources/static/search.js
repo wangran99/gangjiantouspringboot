@@ -24,7 +24,31 @@ api[0].list.push({
 });
 api[0].list.push({
     order: '5',
+    desc: '分页查询待我审批的申请',
+});
+api[0].list.push({
+    order: '6',
     desc: '根据id获取申请详情',
+});
+api[0].list.push({
+    order: '7',
+    desc: '审批通过',
+});
+api[0].list.push({
+    order: '8',
+    desc: '审批拒绝',
+});
+api[0].list.push({
+    order: '9',
+    desc: '转给其他人审批',
+});
+api[0].list.push({
+    order: '10',
+    desc: '撤回审批请求',
+});
+api[0].list.push({
+    order: '11',
+    desc: '分页查询抄送我的审批',
 });
 api.push({
     alias: 'ApprovalFlowController',
