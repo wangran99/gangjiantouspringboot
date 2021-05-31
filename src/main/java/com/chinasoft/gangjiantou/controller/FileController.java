@@ -1,5 +1,6 @@
 package com.chinasoft.gangjiantou.controller;
 
+import cn.hutool.http.HttpUtil;
 import com.chinasoft.gangjiantou.dto.Callback;
 import com.chinasoft.gangjiantou.dto.CallbackRes;
 import com.chinasoft.gangjiantou.redis.RedisService;
@@ -8,15 +9,20 @@ import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * <p>
@@ -93,5 +99,30 @@ public class FileController {
         }
         fileService.saveBatch(list);
         return list;
+    }
+
+    public  String downloadImage(String fileUrl ) {
+        ThreadLocalRandom threadRandom = ThreadLocalRandom.current();
+       Long randomLong = threadRandom.nextLong(0L,Long.MAX_VALUE);
+        long l = 0L;
+        String path = null;
+        String staticAndMksDir = null;
+        if (fileUrl != null) {
+            //下载时文件名称
+            String fileName = fileUrl.substring(fileUrl.lastIndexOf("."));
+            try {
+                String dataStr = new SimpleDateFormat("yyyyMMdd").format(new Date());
+                String uuidName = UUID.randomUUID().toString();
+                path = "resources/images/"+dataStr+"/"+uuidName+fileName;
+                staticAndMksDir = Paths.get(ResourceUtils.getURL("classpath:").getPath(),"resources", "images",dataStr).toString();
+                HttpUtil.downloadFile(fileUrl, staticAndMksDir + File.separator + uuidName + fileName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+
+            }
+        }
+        System.out.println(System.currentTimeMillis()-l);
+        return path;
     }
 }

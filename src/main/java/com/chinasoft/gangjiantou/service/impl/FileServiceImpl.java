@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 上传文件信息表 服务实现类
+ * 上传/修订文件信息表 服务实现类
  * </p>
  *
  * @author WangRan
- * @since 2021-05-27
+ * @since 2021-05-31
  */
 @Service
 public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IFileService {

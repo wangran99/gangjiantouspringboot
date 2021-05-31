@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author WangRan
- * @since 2021-05-28
+ * @since 2021-05-31
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -33,9 +33,9 @@ public class File implements Serializable {
     private String fileName;
 
     /**
-     * 文件上传临时ID
+     * 上传文件的临时id
      */
-    private String tempId;
+    private Long tempId;
 
     /**
      * 相对路径

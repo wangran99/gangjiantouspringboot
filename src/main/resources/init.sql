@@ -76,6 +76,7 @@ CREATE TABLE `file`
     `approval_id` bigint       NOT NULL DEFAULT -1 COMMENT '审批环节ID',
     `upload_time` datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
     PRIMARY KEY (`id`),
+    INDEX (`apply_id`),
     INDEX (`approval_id`),
     INDEX (`temp_id`)
 ) ENGINE = InnoDB

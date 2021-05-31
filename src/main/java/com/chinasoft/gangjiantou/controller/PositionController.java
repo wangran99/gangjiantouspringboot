@@ -100,7 +100,7 @@ public class PositionController {
     public Page<Position> query(@RequestBody PositionDto positionDto) {
         Page<Position> positionPage = new Page<>(positionDto.getPageNum(), positionDto.getPageSize());
         return positionService.lambdaQuery().eq(StringUtils.hasText(positionDto.getCode()), Position::getPositionCode, positionDto.getCode())
-                .eq(StringUtils.hasText(positionDto.getName()), Position::getPositionName, positionDto.getName())
+                .like(StringUtils.hasText(positionDto.getName()), Position::getPositionName, positionDto.getName())
                 .eq(positionDto.getStatus() != null, Position::getStatus, positionDto.getStatus()).page(positionPage);
     }
 

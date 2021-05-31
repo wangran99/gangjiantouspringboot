@@ -52,10 +52,13 @@ public class UserController {
         userRoleList.stream().forEach(e -> {
             e.setRoleName(roleService.getById(e.getRoleId()).getRoleName());
         });
+        user.setRoleList(userRoleList);
+
         List<UserPosition> userPositionList = userPositionService.lambdaQuery().eq(UserPosition::getUserId, user.getUserId()).list();
         userPositionList.stream().forEach(e -> {
             e.setPositionName(positionService.getById(e.getPositionId()).getPositionName());
         });
+        user.setPositionList(userPositionList);
         user.setDepartmentList(departmentService.listByIds(Arrays.asList(user.getDeptCode().split(","))));
 
     }

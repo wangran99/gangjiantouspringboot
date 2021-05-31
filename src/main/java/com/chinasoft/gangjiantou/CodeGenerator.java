@@ -107,8 +107,12 @@ public class CodeGenerator {
                     // 已经生成 ENTITY 文件判断存在，不想重新生成返回 false
                     return true;
                 }
+                if (fileType == FileType.CONTROLLER) {
+                    // 已经生成 ENTITY 文件判断存在，不想重新生成返回 false
+                    return false;
+                }
                 // 允许生成模板文件
-                return false;
+                return true;
             }
         });
 
