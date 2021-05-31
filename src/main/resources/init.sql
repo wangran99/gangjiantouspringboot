@@ -197,7 +197,7 @@ CREATE TABLE `apply`
     `applicant`           varchar(20)  NOT NULL COMMENT '申请人',
     `applicant_id`        varchar(100) NOT NULL COMMENT '申请人id',
     `subject`             varchar(100) NOT NULL COMMENT '主题',
-    `serial_number`       varchar(100) NOT NULL COMMENT '审批单名称',
+    `serial_number`       varchar(100) NOT NULL UNIQUE COMMENT '审批单号',
     `flow_id`             bigint       NOT NULL COMMENT '流程定义id',
     `note`                varchar(200) NOT NULL COMMENT '申请原因说明',
     `current_approver_id` varchar(100) NOT NULL COMMENT '当前审批人id',

@@ -55,6 +55,9 @@ public class ApprovalFlow implements Serializable {
      * 流程定义状态：0：不生效，1：生效
      */
     private Integer status;
-
+    /**
+     * 流程适用部门名称
+     */
+    private transient String deptName;
 
 }

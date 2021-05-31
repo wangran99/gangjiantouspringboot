@@ -13,6 +13,26 @@ api.push({
     desc: '&lt;p&gt;审批流程定义表 前端控制器&lt;/p&gt;',
     list: []
 })
+api[1].list.push({
+    order: '1',
+    desc: '添加审批流程模型',
+});
+api[1].list.push({
+    order: '2',
+    desc: '根据ID获取审批流程模型',
+});
+api[1].list.push({
+    order: '3',
+    desc: '编辑审批流程模型',
+});
+api[1].list.push({
+    order: '4',
+    desc: '删除审批流程模型',
+});
+api[1].list.push({
+    order: '5',
+    desc: '分页查询审批流程模型',
+});
 api.push({
     alias: 'ApproverController',
     order: '3',

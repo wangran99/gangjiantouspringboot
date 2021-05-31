@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -87,5 +89,13 @@ public class Apply implements Serializable {
      */
     private LocalDateTime endTime;
 
+    /**
+     * 申请对应文件的临时id
+     */
+    private transient Long fileTempId;
 
+    /**
+     * 申请对应的抄送人列表
+     */
+    private transient List<String> ccList;
 }
