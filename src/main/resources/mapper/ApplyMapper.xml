@@ -2,4 +2,62 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.chinasoft.gangjiantou.mapper.ApplyMapper">
 
+    <select id="pendingApply" resultType="com.chinasoft.gangjiantou.entity.Apply">
+        select apl.* from apply apl inner join  apply_approver appover on apl.id=appover.apply_id
+        where
+        appover.approver_id = #{userId}
+
+        <if test="applyPendingDto.applicant != null and applyPendingDto.applicant !='' ">
+            and apl.applicant like concat('%',#{applyPendingDto.applicant,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="applyPendingDto.serialNumber != null and applyPendingDto.serialNumber !='' ">
+            and apl.serial_number = #{applyPendingDto.serialNumber,jdbcType=VARCHAR},
+        </if>
+        <if test="applyPendingDto.subject != null and applyPendingDto.subject !='' ">
+            and apl.subject = #{applyPendingDto.subject,jdbcType=VARCHAR},
+        </if>
+        <if test="applyPendingDto.status != null ">
+            and apl.status = #{applyPendingDto.status,jdbcType=TINYINT},
+        </if>
+        <if test="applyPendingDto.startTime != null ">
+            <![CDATA[
+            and apl.apply_time >= >#{applyPendingDto.startTime,jdbcType=datetime},
+               ]]>
+        </if>
+        <if test="applyPendingDto.endTime != null ">
+            <![CDATA[
+            and apl.apply_time <= #{applyPendingDto.endTime,jdbcType=datetime},
+            ]]>
+        </if>
+        order by apl.apply_time desc
+
+    </select>
+    <select id="queryCC" resultType="com.chinasoft.gangjiantou.entity.Apply">
+        select apl.* from apply apl inner join  carbon_copy cc on apl.id=cc.apply_id
+        where
+            cc.user_id = #{userId}
+        <if test="applyPendingDto.applicant != null and applyPendingDto.applicant !='' ">
+            and apl.applicant like concat('%',#{applyPendingDto.applicant,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="applyPendingDto.serialNumber != null and applyPendingDto.serialNumber !='' ">
+            and apl.serial_number = #{applyPendingDto.serialNumber,jdbcType=VARCHAR},
+        </if>
+        <if test="applyPendingDto.subject != null and applyPendingDto.subject !='' ">
+            and apl.subject = #{applyPendingDto.subject,jdbcType=VARCHAR},
+        </if>
+        <if test="applyPendingDto.status != null ">
+            and apl.status = #{applyPendingDto.status,jdbcType=TINYINT},
+        </if>
+        <if test="applyPendingDto.startTime != null ">
+            <![CDATA[
+            and apl.apply_time >= >#{applyPendingDto.startTime,jdbcType=datetime},
+               ]]>
+        </if>
+        <if test="applyPendingDto.endTime != null ">
+            <![CDATA[
+            and apl.apply_time <= #{applyPendingDto.endTime,jdbcType=datetime},
+            ]]>
+        </if>
+        order by apl.apply_time desc
+    </select>
 </mapper>

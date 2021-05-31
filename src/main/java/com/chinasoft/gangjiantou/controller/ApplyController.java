@@ -1,9 +1,12 @@
 package com.chinasoft.gangjiantou.controller;
 
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chinasoft.gangjiantou.dto.ApplyDto;
+import com.chinasoft.gangjiantou.dto.ApplyPendingDto;
 import com.chinasoft.gangjiantou.dto.ApplyQueryDto;
+import com.chinasoft.gangjiantou.dto.ApprovalDto;
 import com.chinasoft.gangjiantou.entity.*;
 import com.chinasoft.gangjiantou.exception.CommonException;
 import com.chinasoft.gangjiantou.redis.RedisService;
@@ -11,6 +14,7 @@ import com.chinasoft.gangjiantou.service.*;
 import com.github.wangran99.welink.api.client.openapi.OpenAPI;
 import com.github.wangran99.welink.api.client.openapi.model.AddTodoTaskReq;
 import com.github.wangran99.welink.api.client.openapi.model.AddTodoTaskRes;
+import com.github.wangran99.welink.api.client.openapi.model.SendOfficialAccountMsgReq;
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,12 +123,25 @@ public class ApplyController {
 
         applyService.save(apply);
 
-        //插入第一个实际审批人
-        ApplyApprover applyApprover=new ApplyApprover();
-        applyApprover.setApplyId(apply.getId());
-        applyApprover.setApproverId(apply.getCurrentApproverId());
-        applyApprover.setApproverName(apply.getCurrentApprover());
-        applyApproverService.save(applyApprover);
+        List<ApplyApprover> applyApproverList = new ArrayList<>();
+        flowApproverList.forEach(e -> {
+            ApplyApprover applyApprover = new ApplyApprover();
+            applyApprover.setApplyId(apply.getId());
+            applyApprover.setApproverId(e.getUserId());
+            applyApprover.setApproverName(e.getUserName());
+            applyApproverList.add(applyApprover);
+        });
+        //插入审批人
+        for (int i = 0; i < applyApproverList.size(); i++) {
+            ApplyApprover approver = applyApproverList.get(i);
+            approver.setApplyId(apply.getId());
+            if ((i + 1) < applyApproverList.size()) {
+                ApplyApprover next = applyApproverList.get(i + 1);
+                approver.setNextApproverId(next.getApproverId());
+                approver.setNextApproverName(next.getApproverName());
+            }
+        }
+        applyApproverService.saveBatch(applyApproverList);
 
         fileService.lambdaUpdate().eq(File::getTempId, apply.getFileTempId()).set(File::getApplyId, apply.getId())
                 .set(File::getTempId, -1L).update();
@@ -156,7 +173,28 @@ public class ApplyController {
                 .eq(applyDto.getFlowId() != null, Apply::getFlowId, applyDto.getFlowId())
                 .eq(applyDto.getStatus() != null, Apply::getStatus, applyDto.getStatus())
                 .ge(applyDto.getStartTime() != null, Apply::getApplyTime, applyDto.getStartTime())
-                .le(applyDto.getEndTime() != null, Apply::getApplyTime, applyDto.getEndTime()).page(page);
+                .le(applyDto.getEndTime() != null, Apply::getApplyTime, applyDto.getEndTime())
+                .orderByDesc(Apply::getApplyTime).page(page);
+        applyPage.getRecords().forEach(e -> {
+            ApprovalFlow approvalFlow = approvalFlowService.getById(e.getFlowId());
+            e.setFlowName(approvalFlow.getFlowName());
+            e.setDeptName(departmentService.getById(approvalFlow.getDeptCode()).getDeptNameCn());
+        });
+        return applyPage;
+    }
+
+    /**
+     * 分页查询待我审批的申请
+     *
+     * @param authCode
+     * @param applyPendingDto
+     * @return
+     */
+    @PostMapping("pending")
+    Page<Apply> pending(@RequestHeader("authCode") String authCode, @RequestBody ApplyPendingDto applyPendingDto) {
+        UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
+        Page<Apply> page = new Page<>(applyPendingDto.getPageNum(), applyPendingDto.getPageSize());
+        Page<Apply> applyPage = applyService.pendingApply(page, userBasicInfoRes.getUserId(), applyPendingDto);
         applyPage.getRecords().forEach(e -> {
             ApprovalFlow approvalFlow = approvalFlowService.getById(e.getFlowId());
             e.setFlowName(approvalFlow.getFlowName());
@@ -183,17 +221,197 @@ public class ApplyController {
                 || !flowApproverList.stream().map(e -> e.getUserId()).collect(Collectors.toList()).contains(userBasicInfoRes.getUserId()))
             throw new CommonException("你无权查看别人的审批流程");
         //获取抄送人员列表
-        apply.setCcList(carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId,id).list().stream().map(e->e.getUserName()).collect(Collectors.toList()));
+        apply.setCcList(carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId, id).list().stream().map(e -> e.getUserName()).collect(Collectors.toList()));
         ApprovalFlow approvalFlow = approvalFlowService.getById(apply.getFlowId());
         apply.setFlowName(approvalFlow.getFlowName());
         apply.setDeptName(departmentService.getById(approvalFlow.getDeptCode()).getDeptNameCn());
-        apply.setFileList(fileService.lambdaQuery().eq(File::getApplyId,id).list());
+        apply.setFileList(fileService.lambdaQuery().eq(File::getApplyId, id).list());
 
-        ApplyDto applyDto=new ApplyDto();
+        ApplyDto applyDto = new ApplyDto();
         applyDto.setApply(apply);
-        applyDto.setApplyApproverList(applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId,id).list());
-        applyDto.getApplyApproverList().forEach(e->e.setFileList(fileService.lambdaQuery().eq(File::getApplyId,id).eq(File::getApprovalId,e.getApproverId()).list()));
+        applyDto.setApplyApproverList(applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, id).list());
+        applyDto.getApplyApproverList().forEach(e -> e.setFileList(fileService.lambdaQuery().eq(File::getApplyId, id).eq(File::getApprovalId, e.getApproverId()).list()));
         return applyDto;
+    }
+
+    /**
+     * 审批通过
+     *
+     * @param authCode
+     * @param approvalDto
+     * @return
+     */
+    @PostMapping("ok")
+    @Transactional
+    boolean ok(@RequestHeader("authCode") String authCode, @RequestBody ApprovalDto approvalDto) {
+        UserBasicInfoRes user = redisService.getUserInfo(authCode);
+        Apply apply = applyService.getById(approvalDto.getApplyId());
+        if (apply == null)
+            throw new CommonException("该审批不存在");
+        if (apply.getStatus() == 1)
+            throw new CommonException("该审批已经撤回");
+        if (!apply.getCurrentApproverId().equals(user.getUserId()))
+            throw new CommonException("当前审批人未审核结束");
+
+        ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
+                .eq(ApplyApprover::getApproverId, user.getUserId()).one();
+        applyApprover.setStatus(1);
+        applyApprover.setComment(applyApprover.getComment());
+        applyApproverService.updateById(applyApprover);
+        delTodoTaskByApplyId(apply.getId());
+        if (applyApprover.getNextApproverId() == null) {
+            apply.setStatus(4);
+            applyService.updateById(apply);
+            SendOfficialAccountMsgReq sendOfficialAccountMsgReq = new SendOfficialAccountMsgReq();
+            sendOfficialAccountMsgReq.setMsgContent("文件申请通过");
+            sendOfficialAccountMsgReq.setMsgOwner("文件审批者");
+            sendOfficialAccountMsgReq.setUrlType("html");
+            sendOfficialAccountMsgReq.setUrlPath(url + "/#/detail?id=" + apply.getId());
+            List<String> list = new ArrayList<>();
+            list.add(apply.getApplicantId());
+            sendOfficialAccountMsgReq.setToUserList(list);
+            sendOfficialAccountMsgReq.setMsgTitle("文件审批");
+            sendOfficialAccountMsgReq.setMsgRange("0");
+            openAPI.sendOfficialAccountMsg(sendOfficialAccountMsgReq);
+        } else {
+            apply.setCurrentApproverId(applyApprover.getNextApproverId());
+            apply.setCurrentApprover(applyApprover.getNextApproverName());
+            apply.setStatus(2);
+            applyService.updateById(apply);
+            addTodoTask(apply);
+        }
+        return true;
+    }
+
+    /**
+     * 审批拒绝
+     *
+     * @param authCode
+     * @param approvalDto
+     * @return
+     */
+    @PostMapping("reject")
+    @Transactional
+    boolean reject(@RequestHeader("authCode") String authCode, @RequestBody ApprovalDto approvalDto) {
+        UserBasicInfoRes user = redisService.getUserInfo(authCode);
+        Apply apply = applyService.getById(approvalDto.getApplyId());
+        if (apply == null)
+            throw new CommonException("该审批不存在");
+        if (apply.getStatus() == 1)
+            throw new CommonException("该审批已经撤回");
+        if (!apply.getCurrentApproverId().equals(user.getUserId()))
+            throw new CommonException("当前审批人未审核结束");
+        apply.setStatus(2);
+        apply.setEndTime(LocalDateTime.now());
+        applyService.updateById(apply);
+
+        ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
+                .eq(ApplyApprover::getApproverId, user.getUserId()).one();
+        applyApprover.setStatus(2);
+        applyApprover.setComment(approvalDto.getComment());
+        applyApproverService.updateById(applyApprover);
+        delTodoTaskByApplyId(apply.getId());
+
+        SendOfficialAccountMsgReq sendOfficialAccountMsgReq = new SendOfficialAccountMsgReq();
+        sendOfficialAccountMsgReq.setMsgContent("文件审核被驳回,点击查看详情");
+        sendOfficialAccountMsgReq.setMsgOwner("文件审批者");
+        sendOfficialAccountMsgReq.setUrlType("html");
+        sendOfficialAccountMsgReq.setUrlPath(url + "/#/detail?id=" + apply.getId());
+        List<String> list = new ArrayList<>();
+        list.add(apply.getApplicantId());
+        sendOfficialAccountMsgReq.setToUserList(list);
+        sendOfficialAccountMsgReq.setMsgTitle("文件审批");
+        sendOfficialAccountMsgReq.setMsgRange("0");
+        openAPI.sendOfficialAccountMsg(sendOfficialAccountMsgReq);
+        return true;
+    }
+
+    /**
+     * 转给其他人审批
+     *
+     * @param applyId     申请id
+     * @param shiftUserId 转给人的用户id
+     * @param authCode
+     * @return
+     */
+    @PostMapping("shift")
+    @Transactional
+    public boolean shiftApprover(Long applyId, String shiftUserId, @RequestHeader("authCode") String authCode) {
+        UserBasicInfoRes user = redisService.getUserInfo(authCode);
+        Apply apply = applyService.getById(applyId);
+        if (apply == null)
+            throw new CommonException("审批不存在");
+        if (apply.getStatus() == 1)
+            throw new CommonException("该审批已经撤回");
+        if (!apply.getCurrentApproverId().equals(user.getUserId()))
+            throw new CommonException("当前审批人未审核结束");
+
+        User shiftUser = userService.getById(shiftUserId);
+        ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, applyId)
+                .eq(ApplyApprover::getApproverId, user.getUserId()).one();
+        applyApprover.setStatus(3);
+
+        ApplyApprover newApplyApprover = new ApplyApprover();
+        newApplyApprover.setApplyId(applyId);
+        newApplyApprover.setApproverId(shiftUserId);
+        newApplyApprover.setApproverName(shiftUser.getUserNameCn());
+        newApplyApprover.setNextApproverId(applyApprover.getNextApproverId());
+        newApplyApprover.setNextApproverName(applyApprover.getNextApproverName());
+        applyApproverService.save(newApplyApprover);
+
+        applyApprover.setNextApproverId(shiftUserId);
+        applyApprover.setNextApproverName(shiftUser.getUserNameCn());
+        applyApproverService.updateById(applyApprover);
+
+        apply.setCurrentApprover(shiftUser.getUserNameCn());
+        apply.setCurrentApproverId(shiftUserId);
+        applyService.updateById(apply);
+        delTodoTaskByApplyId(applyId);
+        addTodoTask(apply);
+        return true;
+    }
+
+    /**
+     * 撤回审批请求
+     *
+     * @param applyId  申请id
+     * @param authCode
+     * @return
+     */
+    @PostMapping("recall")
+    @Transactional
+    public boolean recallApply(Long applyId, @RequestHeader("authCode") String authCode) {
+        UserBasicInfoRes user = redisService.getUserInfo(authCode);
+        Apply apply = applyService.getById(applyId);
+        if (!apply.getApplicantId().equals(user.getUserId()))
+            throw new CommonException("您无权撤回别人的申请");
+        apply.setStatus(1);
+        apply.setRecallTime(LocalDateTime.now());
+        apply.setEndTime(LocalDateTime.now());
+        applyService.updateById(apply);
+        //删除所有待办
+        delTodoTaskByApplyId(applyId);
+        return true;
+    }
+
+    /**
+     * 分页查询抄送我的审批
+     *
+     * @param authCode
+     * @param applyPendingDto
+     */
+    @PostMapping("querycc")
+    Page<Apply> querycc(@RequestHeader("authCode") String authCode, @RequestBody ApplyPendingDto applyPendingDto) {
+        UserBasicInfoRes user = redisService.getUserInfo(authCode);
+        Page<Apply> page = new Page<>(applyPendingDto.getPageNum(), applyPendingDto.getPageSize());
+        return applyService.queryCC(page, user.getUserId(), applyPendingDto);
+    }
+
+    private void delTodoTaskByApplyId(Long applyId) {
+        List<TodoTask> list = todoTaskService.lambdaQuery().eq(TodoTask::getApplyId, applyId).list();
+        for (TodoTask todoTask : list)
+            openAPI.delTodoTask(todoTask.getTaskId());
+        todoTaskService.remove(Wrappers.<TodoTask>lambdaQuery().eq(TodoTask::getApplyId, applyId));
     }
 
     //发送welink审批待办消息提醒

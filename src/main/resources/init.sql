@@ -225,7 +225,8 @@ CREATE TABLE `apply_approver`
     `approval_time`      datetime(0) NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '审批时间',
     PRIMARY KEY (`id`),
     UNIQUE (`apply_id`, `approver_id`),
-    INDEX (`apply_id`)
+    INDEX (`apply_id`),
+    INDEX (`approver_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='审批过程经过的审批人(包含转发审批人)表';
 
@@ -253,7 +254,8 @@ CREATE TABLE `carbon_copy`
     `create_time`      datetime(0) NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '添加抄送用户的时间',
     PRIMARY KEY (`id`),
     UNIQUE (`apply_id`, `user_id`),
-    INDEX (`apply_id`)
+    INDEX (`apply_id`),
+    INDEX (`user_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='审批抄送表';
 

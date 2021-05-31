@@ -1,7 +1,12 @@
 package com.chinasoft.gangjiantou.mapper;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chinasoft.gangjiantou.dto.ApplyPendingDto;
 import com.chinasoft.gangjiantou.entity.Apply;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +17,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2021-05-31
  */
 public interface ApplyMapper extends BaseMapper<Apply> {
+
+  Page<Apply>  pendingApply(Page<Apply> page,String userId, ApplyPendingDto applyPendingDto);
+
+  Page<Apply>  queryCC(Page<Apply> page,String userId, ApplyPendingDto applyPendingDto);
 
 }

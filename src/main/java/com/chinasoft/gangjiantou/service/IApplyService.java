@@ -1,7 +1,11 @@
 package com.chinasoft.gangjiantou.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chinasoft.gangjiantou.dto.ApplyPendingDto;
 import com.chinasoft.gangjiantou.entity.Apply;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +16,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-05-31
  */
 public interface IApplyService extends IService<Apply> {
+    Page<Apply> pendingApply(Page<Apply> page, String userId, ApplyPendingDto applyPendingDto);
+
+    Page<Apply> queryCC(Page<Apply> page, String userId, ApplyPendingDto applyPendingDto);
 
 }
