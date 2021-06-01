@@ -9,6 +9,7 @@ import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -68,6 +69,7 @@ public class FileController {
      * @param files
      */
     @PostMapping("/uploadFile")
+    @Transactional
     public List<com.chinasoft.gangjiantou.entity.File> uploadFile(@RequestHeader("authCode") String authCode, @RequestParam("files") List<MultipartFile> files) throws IOException {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         List<com.chinasoft.gangjiantou.entity.File> list = new LinkedList();
@@ -81,7 +83,7 @@ public class FileController {
             int year = now.getYear();
             int month = now.getMonthValue();
             int day = now.getDayOfMonth();
-            String path = String.format("{}-{}-{}", year, month, day);
+            String path = String.format("%d-%d-%d", year, month, day);
 
             File file1 = new File(filePath + File.pathSeparator + path);
             if (!file1.exists())

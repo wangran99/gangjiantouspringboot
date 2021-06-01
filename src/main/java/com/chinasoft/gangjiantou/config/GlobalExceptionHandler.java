@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
+
 
 /**
  * @author ：WangRan
@@ -92,6 +94,18 @@ public class GlobalExceptionHandler {
     public ResultVO handlerCommonException(CommonException e) {
         log.error("发生通用异常！", e);
         return ResultVO.getError(e.getMessage());
+    }
+
+    /**
+     * IO异常
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(value = IOException.class)
+    public ResultVO handlerCommonException(IOException e) {
+        log.error("io异常！", e);
+        return ResultVO.getError("IO读写异常");
     }
 
 }

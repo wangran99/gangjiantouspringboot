@@ -143,7 +143,7 @@ public class UserController {
         userPositionService.saveBatch(list);
 
         QueryWrapper<UserRole> wrapper1 = new QueryWrapper<>();
-        userRoleService.remove(wrapper1.lambda().in(UserRole::getRoleId, roleIdList));
+        userRoleService.remove(wrapper1.lambda().in(!CollectionUtils.isEmpty(roleIdList),UserRole::getUserId, userId));
 
         List<UserRole> list1 = new ArrayList<>();
         for (Long roleId : roleIdList) {
