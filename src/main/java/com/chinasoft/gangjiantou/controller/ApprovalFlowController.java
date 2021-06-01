@@ -7,12 +7,16 @@ import com.chinasoft.gangjiantou.dto.FlowDto;
 import com.chinasoft.gangjiantou.dto.FlowQueryDto;
 import com.chinasoft.gangjiantou.entity.ApprovalFlow;
 import com.chinasoft.gangjiantou.entity.FlowApprover;
+import com.chinasoft.gangjiantou.entity.Position;
+import com.chinasoft.gangjiantou.exception.CommonException;
 import com.chinasoft.gangjiantou.redis.RedisService;
 import com.chinasoft.gangjiantou.service.IApprovalFlowService;
 import com.chinasoft.gangjiantou.service.IDepartmentService;
 import com.chinasoft.gangjiantou.service.IFlowApproverService;
+import com.chinasoft.gangjiantou.service.IPositionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,24 +40,28 @@ public class ApprovalFlowController {
     @Autowired
     IDepartmentService departmentService;
     @Autowired
+    IPositionService positionService;
+    @Autowired
     RedisService redisService;
 
     /**
      * 添加审批流程模型
      *
-     * @param fLowDto
+     * @param flowDto
      */
     @PostMapping("add")
     @Transactional
-    boolean add(@RequestBody FlowDto fLowDto) {
-        ApprovalFlow approvalFlow = fLowDto.getApprovalFlow();
+    boolean add(@RequestBody FlowDto flowDto) {
+        if (CollectionUtils.isEmpty(flowDto.getFlowApproverList()))
+            throw new CommonException("审批人不能为空");
+        ApprovalFlow approvalFlow = flowDto.getApprovalFlow();
         approvalFlow.setId(null);
         approvalFlowService.save(approvalFlow);
-        fLowDto.getFlowApproverList().forEach(e -> {
+        flowDto.getFlowApproverList().forEach(e -> {
             e.setId(null);
             e.setFlowId(approvalFlow.getId());
         });
-        flowApproverService.saveBatch(fLowDto.getFlowApproverList());
+        flowApproverService.saveBatch(flowDto.getFlowApproverList());
         return true;
     }
 
@@ -62,11 +70,16 @@ public class ApprovalFlowController {
      *
      * @param flowId
      */
-    @GetMapping("detail")
+    @GetMapping("detail/{flowId}")
     FlowDto detail(@PathVariable("flowId") Long flowId) {
         FlowDto flowDto = new FlowDto();
-        flowDto.setApprovalFlow(approvalFlowService.getById(flowId));
-        flowDto.setFlowApproverList(flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, flowDto).list());
+        ApprovalFlow approvalFlow = approvalFlowService.getById(flowId);
+        approvalFlow.setDeptName(departmentService.getById(approvalFlow.getDeptCode()).getDeptNameCn());
+        approvalFlow.setPositionName(positionService.getById(approvalFlow.getPositionId()).getPositionName());
+        flowDto.setApprovalFlow(approvalFlow);
+
+        flowDto.setFlowApproverList(flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, flowId).list());
+
         return flowDto;
     }
 
@@ -115,7 +128,7 @@ public class ApprovalFlowController {
         Page<ApprovalFlow> page = new Page<>(flowQueryDto.getPageNumber(), flowQueryDto.getPageSize());
         Page<ApprovalFlow> approvalFlowPage = approvalFlowService.lambdaQuery()
                 .like(StringUtils.hasText(flowQueryDto.getFlowName()), ApprovalFlow::getFlowName, flowQueryDto.getFlowName())
-                .eq(flowQueryDto.getDeptCode() != null, ApprovalFlow::getDeptCode, flowQueryDto.getDeptCode()).page(page);
+                .eq(StringUtils.hasText(flowQueryDto.getDeptCode()), ApprovalFlow::getDeptCode, flowQueryDto.getDeptCode()).page(page);
         approvalFlowPage.getRecords().forEach(e -> {
             e.setDeptName(departmentService.getById(e.getDeptCode()).getDeptNameCn());
         });

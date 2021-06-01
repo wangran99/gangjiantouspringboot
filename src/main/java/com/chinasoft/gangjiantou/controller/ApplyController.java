@@ -112,7 +112,7 @@ public class ApplyController {
         LocalDateTime localDateTime = LocalDateTime.now();
         ThreadLocalRandom threadRandom = ThreadLocalRandom.current();
         Long randomLong = threadRandom.nextLong(0L, Long.MAX_VALUE);
-        String serialNumber = String.format("{}{}{}", localDateTime.getYear(), localDateTime.getMonthValue(), localDateTime.getDayOfMonth())
+        String serialNumber = String.format("%d%d%d", localDateTime.getYear(), localDateTime.getMonthValue(), localDateTime.getDayOfMonth())
                 + randomLong;
         apply.setSerialNumber(serialNumber);
 

@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.chinasoft.gangjiantou.dto.RoleMenuDto;
 import com.chinasoft.gangjiantou.entity.Role;
 import com.chinasoft.gangjiantou.entity.RoleMenu;
+import com.chinasoft.gangjiantou.entity.UserRole;
 import com.chinasoft.gangjiantou.exception.CommonException;
 import com.chinasoft.gangjiantou.service.IRoleMenuService;
 import com.chinasoft.gangjiantou.service.IRoleService;
+import com.chinasoft.gangjiantou.service.IUserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +36,8 @@ public class RoleMenuController {
     IRoleMenuService roleMenuService;
     @Autowired
     IRoleService roleService;
+    @Autowired
+    IUserRoleService userRoleService;
 
     /**
      * 增加新角色和对应的菜单
@@ -102,6 +106,8 @@ public class RoleMenuController {
         roleService.removeById(roleId);
         QueryWrapper<RoleMenu> wrapper = new QueryWrapper<>();
         roleMenuService.remove(wrapper.lambda().eq(RoleMenu::getRoleId, roleId));
+        QueryWrapper<UserRole> wrapper1 = new QueryWrapper<>();
+        userRoleService.remove(wrapper1.lambda().eq(UserRole::getRoleId,roleId));
         return true;
     }
 }

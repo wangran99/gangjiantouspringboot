@@ -69,7 +69,7 @@ CREATE TABLE `file`
     `file_name`   VARCHAR(100) NOT NULL COMMENT '文件名',
     `temp_id`     bigint       NOT NULL COMMENT '上传文件的临时id',
     `path`        VARCHAR(200) NOT NULL COMMENT '相对路径',
-    `uuid`        VARCHAR(100) NOT NULL COMMENT '文件uuid',
+    `uuid`        VARCHAR(100) NOT NULL UNIQUE COMMENT '文件uuid',
     `user_id`     VARCHAR(50)  NOT NULL COMMENT '用户id',
     `user_name`   VARCHAR(20)  NOT NULL COMMENT '用户姓名',
     `apply_id`    bigint       NOT NULL DEFAULT -1 COMMENT '申请id',
@@ -77,6 +77,7 @@ CREATE TABLE `file`
     `upload_time` datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
     PRIMARY KEY (`id`),
     INDEX (`apply_id`),
+    INDEX (`uuid`),
     INDEX (`approval_id`),
     INDEX (`temp_id`)
 ) ENGINE = InnoDB
@@ -94,8 +95,8 @@ CREATE TABLE `role`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='角色定义表';
 INSERT INTO `role` (`id`, `role_name`, `note`, `status`)
-values (1, '管理员', '', 0),
-       (2, '普通用户', '', 0);
+values (1, '系统管理员', '系统管理员，可以管理用户角色、岗位，创建新流程', 0),
+       (2, '普通用户', '尽可以发起查看自己的审批流程', 0);
 
 CREATE TABLE `user_role`
 (
@@ -185,6 +186,7 @@ CREATE TABLE `flow_approver`
     `flow_id`   bigint      NOT NULL COMMENT '流程id',
     `user_id`   VARCHAR(50) NOT NULL COMMENT '审批人id',
     `user_name` VARCHAR(50) NOT NULL COMMENT '审批人姓名',
+    `position_id`   bigint       DEFAULT NULL COMMENT '岗位id',
     PRIMARY KEY (`id`),
     UNIQUE (`flow_id`, `user_id`),
     INDEX (`flow_id`)

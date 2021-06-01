@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chinasoft.gangjiantou.dto.BindDto;
 import com.chinasoft.gangjiantou.dto.UserDto;
 import com.chinasoft.gangjiantou.dto.UserSearchDto;
+import com.chinasoft.gangjiantou.entity.Role;
 import com.chinasoft.gangjiantou.entity.User;
 import com.chinasoft.gangjiantou.entity.UserPosition;
 import com.chinasoft.gangjiantou.entity.UserRole;
 import com.chinasoft.gangjiantou.service.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -31,6 +33,7 @@ import java.util.List;
  * @since 2021-05-21
  */
 @RestController
+@Slf4j
 @RequestMapping("/user")
 public class UserController {
 
@@ -50,6 +53,7 @@ public class UserController {
     private void getDetails(User user) {
         List<UserRole> userRoleList = userRoleService.lambdaQuery().eq(UserRole::getUserId, user.getUserId()).list();
         userRoleList.stream().forEach(e -> {
+            Role role = roleService.getById(e.getRoleId());
             e.setRoleName(roleService.getById(e.getRoleId()).getRoleName());
         });
         user.setRoleList(userRoleList);
@@ -143,7 +147,7 @@ public class UserController {
         userPositionService.saveBatch(list);
 
         QueryWrapper<UserRole> wrapper1 = new QueryWrapper<>();
-        userRoleService.remove(wrapper1.lambda().in(!CollectionUtils.isEmpty(roleIdList),UserRole::getUserId, userId));
+        userRoleService.remove(wrapper1.lambda().in(!CollectionUtils.isEmpty(roleIdList), UserRole::getUserId, userId));
 
         List<UserRole> list1 = new ArrayList<>();
         for (Long roleId : roleIdList) {

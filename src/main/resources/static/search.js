@@ -148,6 +148,10 @@ api[6].list.push({
     order: '2',
     desc: '多个文件上传',
 });
+api[6].list.push({
+    order: '3',
+    desc: '下载文件',
+});
 api.push({
     alias: 'MenuController',
     order: '8',

@@ -41,5 +41,10 @@ public class FlowApprover implements Serializable {
      */
     private String userName;
 
+    /**
+     * 审批人岗位id
+     */
+    private Long positionId;
+
 
 }

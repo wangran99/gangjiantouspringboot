@@ -1,6 +1,7 @@
 package com.chinasoft.gangjiantou.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
@@ -45,7 +46,7 @@ public class Apply implements Serializable {
     private String subject;
 
     /**
-     * 审批单名称
+     * 审批单号
      */
     private String serialNumber;
 
@@ -80,7 +81,7 @@ public class Apply implements Serializable {
     private LocalDateTime applyTime;
 
     /**
-     * 撤回时间
+     * 撤回的时间
      */
     private LocalDateTime recallTime;
 
@@ -90,7 +91,7 @@ public class Apply implements Serializable {
     private LocalDateTime endTime;
 
     /**
-     * 申请部门
+     * 申请部门名称
      */
     private transient String deptName;
 
@@ -102,15 +103,18 @@ public class Apply implements Serializable {
     /**
      * 申请对应文件的临时id
      */
-    private transient Long fileTempId;
+    @TableField(exist = false)
+    private  Long fileTempId;
 
     /**
-     * 申请人上传的原始文件
+     * 申请人上传的原始文件列表
      */
-    private transient List<File> fileList;
+    @TableField(exist = false)
+    private  List<File> fileList;
 
     /**
-     * 申请对应的抄送人列表
+     * 申请对应的抄送人ID列表
      */
-    private transient List<String> ccList;
+    @TableField(exist = false)
+    private  List<String> ccList;
 }

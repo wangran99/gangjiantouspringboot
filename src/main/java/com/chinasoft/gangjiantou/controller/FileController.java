@@ -1,8 +1,10 @@
 package com.chinasoft.gangjiantou.controller;
 
+import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.chinasoft.gangjiantou.dto.Callback;
 import com.chinasoft.gangjiantou.dto.CallbackRes;
+import com.chinasoft.gangjiantou.exception.CommonException;
 import com.chinasoft.gangjiantou.redis.RedisService;
 import com.chinasoft.gangjiantou.service.IFileService;
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
@@ -14,8 +16,10 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -109,28 +113,78 @@ public class FileController {
         return list;
     }
 
-    public  String downloadImage(String fileUrl ) {
-        ThreadLocalRandom threadRandom = ThreadLocalRandom.current();
-       Long randomLong = threadRandom.nextLong(0L,Long.MAX_VALUE);
-        long l = 0L;
-        String path = null;
-        String staticAndMksDir = null;
-        if (fileUrl != null) {
-            //下载时文件名称
-            String fileName = fileUrl.substring(fileUrl.lastIndexOf("."));
-            try {
-                String dataStr = new SimpleDateFormat("yyyyMMdd").format(new Date());
-                String uuidName = UUID.randomUUID().toString();
-                path = "resources/images/"+dataStr+"/"+uuidName+fileName;
-                staticAndMksDir = Paths.get(ResourceUtils.getURL("classpath:").getPath(),"resources", "images",dataStr).toString();
-                HttpUtil.downloadFile(fileUrl, staticAndMksDir + File.separator + uuidName + fileName);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-
+    /**
+     * 下载文件
+     * @param uuid 文件的uuid
+     * @param response
+     */
+    @GetMapping("download")
+    public  void download(String uuid , HttpServletResponse response) throws UnsupportedEncodingException {
+        com.chinasoft.gangjiantou.entity.File file =fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getUuid,uuid).one();
+        File file1 = new File(filePath +file.getPath());
+        if(!file1.exists())
+            throw new CommonException("文件不存在");
+        // 获得文件的长度
+        response.setHeader("Content-Length", String.valueOf(file1.length()));
+        response.setContentType("application/octet-stream");
+        // 下载文件能正常显示中文
+        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(file.getFileName(), "UTF-8"));
+        // 实现文件下载
+        byte[] buffer = new byte[1024];
+        FileInputStream fis = null;
+        BufferedInputStream bis = null;
+        try {
+            fis = new FileInputStream(file1);
+            bis = new BufferedInputStream(fis);
+            OutputStream os = response.getOutputStream();
+            int i = bis.read(buffer);
+            while (i != -1) {
+                os.write(buffer, 0, i);
+                i = bis.read(buffer);
+            }
+            System.out.println("Download the file successfully!");
+        } catch (Exception e) {
+            log.error("io exception.",e);
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        System.out.println(System.currentTimeMillis()-l);
-        return path;
+
+    }
+    public  boolean downloadDoc(String uuid , HttpResponse httpResponse) {
+//        ThreadLocalRandom threadRandom = ThreadLocalRandom.current();
+//       Long randomLong = threadRandom.nextLong(0L,Long.MAX_VALUE);
+//        long l = 0L;
+//        String path = null;
+//        String staticAndMksDir = null;
+//        if (fileUrl != null) {
+//            //下载时文件名称
+//            String fileName = fileUrl.substring(fileUrl.lastIndexOf("."));
+//            try {
+//                String dataStr = new SimpleDateFormat("yyyyMMdd").format(new Date());
+//                String uuidName = UUID.randomUUID().toString();
+//                path = "resources/images/"+dataStr+"/"+uuidName+fileName;
+//                staticAndMksDir = Paths.get(ResourceUtils.getURL("classpath:").getPath(),"resources", "images",dataStr).toString();
+//                HttpUtil.downloadFile(fileUrl, staticAndMksDir + File.separator + uuidName + fileName);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            } finally {
+//
+//            }
+//        }
+//        System.out.println(System.currentTimeMillis()-l);
+        return true;
     }
 }

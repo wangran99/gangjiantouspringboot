@@ -59,5 +59,9 @@ public class ApprovalFlow implements Serializable {
      * 流程适用部门名称
      */
     private transient String deptName;
+    /**
+     * 流程适用岗位名称
+     */
+    private transient String positionName;
 
 }
