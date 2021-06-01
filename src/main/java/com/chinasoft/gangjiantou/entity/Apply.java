@@ -56,9 +56,14 @@ public class Apply implements Serializable {
     private Long flowId;
 
     /**
-     * 申请原因说明
+     * 申请备注
      */
     private String note;
+
+    /**
+     * 申请原因说明
+     */
+    private String reason;
 
     /**
      * 当前审批人id

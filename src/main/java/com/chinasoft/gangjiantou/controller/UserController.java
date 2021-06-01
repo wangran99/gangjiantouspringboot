@@ -11,7 +11,9 @@ import com.chinasoft.gangjiantou.entity.Role;
 import com.chinasoft.gangjiantou.entity.User;
 import com.chinasoft.gangjiantou.entity.UserPosition;
 import com.chinasoft.gangjiantou.entity.UserRole;
+import com.chinasoft.gangjiantou.redis.RedisService;
 import com.chinasoft.gangjiantou.service.*;
+import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,8 @@ public class UserController {
     IUserRoleService userRoleService;
     @Autowired
     IDepartmentService departmentService;
+    @Autowired
+    RedisService redisService;
 
     private void getDetails(User user) {
         List<UserRole> userRoleList = userRoleService.lambdaQuery().eq(UserRole::getUserId, user.getUserId()).list();
@@ -115,6 +119,20 @@ public class UserController {
     @PostMapping("detail")
     public User detail(String userId) {
         User user = userService.getById(userId);
+        getDetails(user);
+        return user;
+    }
+
+    /**
+     * 查询自己的详细信息
+     *
+     * @param authCode
+     * @return
+     */
+    @GetMapping("my")
+    public User my(@RequestHeader("authCode")String authCode) {
+        UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
+        User user = userService.getById(userBasicInfoRes.getUserId());
         getDetails(user);
         return user;
     }

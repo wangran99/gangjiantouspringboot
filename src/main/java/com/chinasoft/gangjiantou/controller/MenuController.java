@@ -11,6 +11,7 @@ import com.chinasoft.gangjiantou.service.IRoleMenuService;
 import com.chinasoft.gangjiantou.service.IRoleService;
 import com.chinasoft.gangjiantou.service.IUserRoleService;
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
  * @since 2021-05-27
  */
 @RestController
+@Slf4j
 @RequestMapping("/menu")
 public class MenuController {
     @Autowired
@@ -82,7 +84,8 @@ public class MenuController {
      */
     @GetMapping("my")
     public List<MyMenu> getMyMenu(@RequestHeader("authCode") String authCode) {
-        UserBasicInfoRes userBasicInfoRes = getUserBasicInfoRes(authCode);
+        UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
+        log.error("user:"+userBasicInfoRes);
         List<UserRole> list = userRoleService.lambdaQuery().eq(UserRole::getUserId, userBasicInfoRes.getUserId()).list();
         List<RoleMenu> roleMenuList = roleMenuService.lambdaQuery().in(RoleMenu::getRoleId, list.stream().map(e -> e.getRoleId()).collect(Collectors.toList())).list();
         Set<Long> menuIdSet = new HashSet<>();

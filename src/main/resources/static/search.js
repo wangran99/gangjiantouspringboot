@@ -59,22 +59,30 @@ api.push({
 })
 api[1].list.push({
     order: '1',
-    desc: '添加审批流程模型',
+    desc: '使流程生效',
 });
 api[1].list.push({
     order: '2',
-    desc: '根据ID获取审批流程模型',
+    desc: '使流程不生效',
 });
 api[1].list.push({
     order: '3',
-    desc: '编辑审批流程模型',
+    desc: '添加审批流程模型',
 });
 api[1].list.push({
     order: '4',
-    desc: '删除审批流程模型',
+    desc: '根据ID获取审批流程模型',
 });
 api[1].list.push({
     order: '5',
+    desc: '编辑审批流程模型',
+});
+api[1].list.push({
+    order: '6',
+    desc: '删除审批流程模型',
+});
+api[1].list.push({
+    order: '7',
     desc: '分页查询审批流程模型',
 });
 api.push({
@@ -291,6 +299,10 @@ api[13].list.push({
 });
 api[13].list.push({
     order: '4',
+    desc: '查询自己的详细信息',
+});
+api[13].list.push({
+    order: '5',
     desc: '绑定用户和岗位&角色',
 });
 api.push({

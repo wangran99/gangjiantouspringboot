@@ -91,7 +91,9 @@ public class ApplyController {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         List<UserPosition> userPositionList = userPositionService.lambdaQuery().eq(UserPosition::getUserId, userBasicInfoRes.getUserId()).list();
         List<ApprovalFlow> approvalFlowList = approvalFlowService.lambdaQuery().in(ApprovalFlow::getDeptCode, userBasicInfoRes.getDeptCodes())
-                .in(ApprovalFlow::getPositionId, userPositionList.stream().map(e -> e.getPositionId()).collect(Collectors.toList())).list();
+                .eq(ApprovalFlow::getStatus,1).in(ApprovalFlow::getPositionId, userPositionList.stream().map(e -> e.getPositionId())
+                        .collect(Collectors.toList())).list();
+        approvalFlowList.forEach(e->e.setDeptName(departmentService.getById(e.getDeptCode()).getDeptNameCn()));
         return approvalFlowList;
     }
 
@@ -112,7 +114,7 @@ public class ApplyController {
         LocalDateTime localDateTime = LocalDateTime.now();
         ThreadLocalRandom threadRandom = ThreadLocalRandom.current();
         Long randomLong = threadRandom.nextLong(0L, Long.MAX_VALUE);
-        String serialNumber = String.format("%d%d%d", localDateTime.getYear(), localDateTime.getMonthValue(), localDateTime.getDayOfMonth())
+        String serialNumber = String.format("%d%02d%02d", localDateTime.getYear(), localDateTime.getMonthValue(), localDateTime.getDayOfMonth())
                 + randomLong;
         apply.setSerialNumber(serialNumber);
 

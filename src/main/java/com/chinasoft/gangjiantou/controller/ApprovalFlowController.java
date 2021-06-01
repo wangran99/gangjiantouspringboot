@@ -45,6 +45,32 @@ public class ApprovalFlowController {
     RedisService redisService;
 
     /**
+     * 使流程生效
+     * @param flowId
+     * @return
+     */
+    @PostMapping("available")
+    boolean ok(Long flowId) {
+      ApprovalFlow approvalFlow= approvalFlowService.getById(flowId);
+       approvalFlow.setStatus(1);
+       approvalFlowService.getById(approvalFlow);
+        return true;
+    }
+
+    /**
+     * 使流程不生效
+     * @param flowId
+     * @return
+     */
+    @PostMapping("inavailable")
+    boolean noOk(Long flowId) {
+        ApprovalFlow approvalFlow= approvalFlowService.getById(flowId);
+        approvalFlow.setStatus(0);
+        approvalFlowService.getById(approvalFlow);
+        return true;
+    }
+
+    /**
      * 添加审批流程模型
      *
      * @param flowDto
