@@ -1,5 +1,6 @@
 package com.chinasoft.gangjiantou.annotation;
 
+import com.chinasoft.gangjiantou.exception.CommonException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -34,7 +35,13 @@ public class ExceptionAop {
             log.error("exception!method full name:{}", getClassAndMethodName(method));
             for (int i = 0; i < parameterNames.length; i++)
                 log.error("exception!parameterName:{} = {}", parameterNames[i], args[i] == null ? "null" : args[i].toString());
-            throw (RuntimeException) throwable;
+            if(throwable instanceof RuntimeException)
+                log.error("runtime exception.");
+            else{
+                log.error("not runtime exception");
+                throwable.printStackTrace();
+            }
+            throw throwable instanceof RuntimeException? (RuntimeException) throwable:new CommonException(throwable.getMessage());
         }
     }
 

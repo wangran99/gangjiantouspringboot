@@ -22,6 +22,18 @@ import java.io.IOException;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    /**
+     * IO异常
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(value = IOException.class)
+    public ResultVO handlerCommonException(IOException e) {
+        log.error("io异常！", e);
+        return ResultVO.getError("IO读写异常");
+    }
+
 
     /**
      * 一般Exception
@@ -96,16 +108,6 @@ public class GlobalExceptionHandler {
         return ResultVO.getError(e.getMessage());
     }
 
-    /**
-     * IO异常
-     *
-     * @param e
-     * @return
-     */
-    @ExceptionHandler(value = IOException.class)
-    public ResultVO handlerCommonException(IOException e) {
-        log.error("io异常！", e);
-        return ResultVO.getError("IO读写异常");
-    }
+
 
 }

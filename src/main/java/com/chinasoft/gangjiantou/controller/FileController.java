@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -70,7 +72,7 @@ public class FileController {
      */
     @PostMapping("/uploadFile")
     @Transactional
-    public List<com.chinasoft.gangjiantou.entity.File> uploadFile(@RequestHeader("authCode") String authCode, @RequestParam("files") List<MultipartFile> files) throws IOException {
+    public List<com.chinasoft.gangjiantou.entity.File> uploadFile(@RequestHeader("authCode") String authCode, @RequestParam("files") List<MultipartFile> files, @RequestParam("tempId")Long tempId) throws IOException {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         List<com.chinasoft.gangjiantou.entity.File> list = new LinkedList();
         for (MultipartFile file : files) {
@@ -85,18 +87,22 @@ public class FileController {
             int day = now.getDayOfMonth();
             String path = String.format("%d-%d-%d", year, month, day);
 
-            File file1 = new File(filePath + File.pathSeparator + path);
+            File file1 = new File(filePath + File.separator + path);
             if (!file1.exists())
                 file1.mkdirs();
-            file.transferTo(file1);
+            Path path1 = Paths.get(filePath + File.separator + path +File.separator+uuid+"."+fil_extension);
+            byte[] bytes = file.getBytes();
+            Files.write(path1, bytes);
             //file.renameTo(new File(path))
             log.info("{} 上传成功！", originalFilename);
             com.chinasoft.gangjiantou.entity.File tempFile = new com.chinasoft.gangjiantou.entity.File();
             tempFile.setFileName(originalFilename);
             tempFile.setApprovalId(-1L);
-            tempFile.setPath(File.pathSeparator + path + File.pathSeparator + uuid + "." + fil_extension);
+            tempFile.setPath(File.separator + path + File.separator + uuid + "." + fil_extension);
             tempFile.setUserId(userBasicInfoRes.getUserId());
+            tempFile.setUuid(uuid);
             tempFile.setUserName(userBasicInfoRes.getUserNameCn());
+            tempFile.setTempId(tempId);
             list.add(tempFile);
         }
         fileService.saveBatch(list);
