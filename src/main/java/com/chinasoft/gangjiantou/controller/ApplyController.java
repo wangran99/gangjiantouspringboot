@@ -68,17 +68,6 @@ public class ApplyController {
     @Autowired
     OpenAPI openAPI;
 
-    /**
-     * 每一次申请上传文件，需要提前获取文件临时id
-     *
-     * @return
-     */
-    @GetMapping("fileTempId")
-    Long getFile() {
-        ThreadLocalRandom threadRandom = ThreadLocalRandom.current();
-        Long randomLong = threadRandom.nextLong(0L, Long.MAX_VALUE);
-        return randomLong;
-    }
 
     /**
      * 获取我能发起申请的列表
@@ -105,7 +94,6 @@ public class ApplyController {
     @PostMapping("add")
     @Transactional
     boolean add(@RequestHeader("authCode") String authCode, @RequestBody Apply apply) {
-        apply.setCurrentApprover(userService.getById(apply.getCurrentApproverId()).getUserNameCn());
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         apply.setId(null);
         apply.setApplicantId(userBasicInfoRes.getUserId());
@@ -145,8 +133,8 @@ public class ApplyController {
         }
         applyApproverService.saveBatch(applyApproverList);
 
-        fileService.lambdaUpdate().eq(File::getTempId, apply.getFileTempId()).set(File::getApplyId, apply.getId())
-                .set(File::getTempId, -1L).update();
+        fileService.lambdaUpdate().in(File::getId, apply.getFileList().stream().map(e->e.getId()).collect(Collectors.toList()))
+                .set(File::getApplyId, apply.getId()).update();
         for (String userId : apply.getCcList()) {
             CarbonCopy carbonCopy = new CarbonCopy();
             carbonCopy.setApplyId(apply.getId());

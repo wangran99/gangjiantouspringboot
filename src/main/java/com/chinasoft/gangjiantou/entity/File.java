@@ -33,11 +33,6 @@ public class File implements Serializable {
     private String fileName;
 
     /**
-     * 上传文件的临时id
-     */
-    private Long tempId;
-
-    /**
      * 相对路径
      */
     private String path;

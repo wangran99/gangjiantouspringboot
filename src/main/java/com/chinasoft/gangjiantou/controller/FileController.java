@@ -76,7 +76,7 @@ public class FileController {
      */
     @PostMapping("/uploadFile")
     @Transactional
-    public List<com.chinasoft.gangjiantou.entity.File> uploadFile(@RequestHeader("authCode") String authCode, @RequestParam("files") List<MultipartFile> files, @RequestParam("tempId")Long tempId) throws IOException {
+    public List<com.chinasoft.gangjiantou.entity.File> uploadFile(@RequestHeader("authCode") String authCode, @RequestParam("files") List<MultipartFile> files) throws IOException {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         List<com.chinasoft.gangjiantou.entity.File> list = new LinkedList();
         for (MultipartFile file : files) {
@@ -84,7 +84,7 @@ public class FileController {
             String originalFilename = file.getOriginalFilename();
             // 获取文件后缀名
             String fil_extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-            String uuid = UUID.randomUUID().toString();
+            String uuid = UUID.randomUUID().toString().replaceAll("-","");
             LocalDateTime now = LocalDateTime.now();
             int year = now.getYear();
             int month = now.getMonthValue();
@@ -106,7 +106,6 @@ public class FileController {
             tempFile.setUserId(userBasicInfoRes.getUserId());
             tempFile.setUuid(uuid);
             tempFile.setUserName(userBasicInfoRes.getUserNameCn());
-            tempFile.setTempId(tempId);
             list.add(tempFile);
         }
         fileService.saveBatch(list);

@@ -106,12 +106,6 @@ public class Apply implements Serializable {
     private transient String flowName;
 
     /**
-     * 申请对应文件的临时id
-     */
-    @TableField(exist = false)
-    private  Long fileTempId;
-
-    /**
      * 申请人上传的原始文件列表
      */
     @TableField(exist = false)

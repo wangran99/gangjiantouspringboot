@@ -8,46 +8,42 @@ api.push({
 })
 api[0].list.push({
     order: '1',
-    desc: '每一次申请上传文件，需要提前获取文件临时id',
-});
-api[0].list.push({
-    order: '2',
     desc: '获取我能发起申请的列表',
 });
 api[0].list.push({
-    order: '3',
+    order: '2',
     desc: '新增申请',
 });
 api[0].list.push({
-    order: '4',
+    order: '3',
     desc: '分页查询我的申请',
 });
 api[0].list.push({
-    order: '5',
+    order: '4',
     desc: '分页查询待我审批的申请',
 });
 api[0].list.push({
-    order: '6',
+    order: '5',
     desc: '根据id获取申请详情',
 });
 api[0].list.push({
-    order: '7',
+    order: '6',
     desc: '审批通过',
 });
 api[0].list.push({
-    order: '8',
+    order: '7',
     desc: '审批拒绝',
 });
 api[0].list.push({
-    order: '9',
+    order: '8',
     desc: '转给其他人审批',
 });
 api[0].list.push({
-    order: '10',
+    order: '9',
     desc: '撤回审批请求',
 });
 api[0].list.push({
-    order: '11',
+    order: '10',
     desc: '分页查询抄送我的审批',
 });
 api.push({
