@@ -5,20 +5,20 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chinasoft.gangjiantou.dto.FlowDto;
 import com.chinasoft.gangjiantou.dto.FlowQueryDto;
+import com.chinasoft.gangjiantou.entity.Apply;
 import com.chinasoft.gangjiantou.entity.ApprovalFlow;
 import com.chinasoft.gangjiantou.entity.FlowApprover;
 import com.chinasoft.gangjiantou.entity.Position;
 import com.chinasoft.gangjiantou.exception.CommonException;
 import com.chinasoft.gangjiantou.redis.RedisService;
-import com.chinasoft.gangjiantou.service.IApprovalFlowService;
-import com.chinasoft.gangjiantou.service.IDepartmentService;
-import com.chinasoft.gangjiantou.service.IFlowApproverService;
-import com.chinasoft.gangjiantou.service.IPositionService;
+import com.chinasoft.gangjiantou.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>
@@ -34,7 +34,8 @@ public class ApprovalFlowController {
 
     @Autowired
     IApprovalFlowService approvalFlowService;
-
+@Autowired
+    IApplyService applyService;
     @Autowired
     IFlowApproverService flowApproverService;
     @Autowired
@@ -46,27 +47,29 @@ public class ApprovalFlowController {
 
     /**
      * 使流程生效
+     *
      * @param flowId
      * @return
      */
     @PostMapping("available")
     boolean ok(Long flowId) {
-      ApprovalFlow approvalFlow= approvalFlowService.getById(flowId);
-       approvalFlow.setStatus(1);
-       approvalFlowService.getById(approvalFlow);
+        ApprovalFlow approvalFlow = approvalFlowService.getById(flowId);
+        approvalFlow.setStatus(1);
+        approvalFlowService.updateById(approvalFlow);
         return true;
     }
 
     /**
      * 使流程不生效
+     *
      * @param flowId
      * @return
      */
     @PostMapping("inavailable")
     boolean noOk(Long flowId) {
-        ApprovalFlow approvalFlow= approvalFlowService.getById(flowId);
+        ApprovalFlow approvalFlow = approvalFlowService.getById(flowId);
         approvalFlow.setStatus(0);
-        approvalFlowService.getById(approvalFlow);
+        approvalFlowService.updateById(approvalFlow);
         return true;
     }
 
@@ -104,7 +107,7 @@ public class ApprovalFlowController {
         approvalFlow.setPositionName(positionService.getById(approvalFlow.getPositionId()).getPositionName());
         flowDto.setApprovalFlow(approvalFlow);
 
-        flowDto.setFlowApproverList(flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, flowId).list());
+        flowDto.setFlowApproverList(flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, flowId).orderByAsc(FlowApprover::getId).list());
 
         return flowDto;
     }
@@ -138,6 +141,9 @@ public class ApprovalFlowController {
     @PostMapping("del")
     @Transactional
     boolean del(Long flowId) {
+//        List<Apply> list = applyService.lambdaQuery().eq(Apply::getFlowId,flowId).isNotNull(Apply::getEndTime).list();
+//        if(list.size()>0)
+//            throw new CommonException("当前流程有进行中的审批，禁止删除");
         approvalFlowService.removeById(flowId);
         flowApproverService.remove(new QueryWrapper<FlowApprover>().lambda()
                 .eq(FlowApprover::getFlowId, flowId));

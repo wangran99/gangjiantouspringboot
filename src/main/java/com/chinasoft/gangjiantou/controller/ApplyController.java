@@ -76,7 +76,7 @@ public class ApplyController {
      * @return
      */
     @GetMapping("myFlow")
-    List<ApprovalFlow> getApprovalsFlow(@RequestHeader("authCode") String authCode) {
+    List<ApprovalFlow> getMyFlow(@RequestHeader("authCode") String authCode) {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         List<UserPosition> userPositionList = userPositionService.lambdaQuery().eq(UserPosition::getUserId, userBasicInfoRes.getUserId()).list();
         List<ApprovalFlow> approvalFlowList = approvalFlowService.lambdaQuery().in(ApprovalFlow::getDeptCode, userBasicInfoRes.getDeptCodes())
@@ -107,7 +107,7 @@ public class ApplyController {
         apply.setSerialNumber(serialNumber);
 
         ApprovalFlow approvalFlow = approvalFlowService.getById(apply.getFlowId());
-        List<FlowApprover> flowApproverList = flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, approvalFlow.getId()).list();
+        List<FlowApprover> flowApproverList = flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, approvalFlow.getId()).orderByAsc(FlowApprover::getId).list();
         apply.setCurrentApproverId(flowApproverList.get(0).getUserId());
         apply.setCurrentApprover(flowApproverList.get(0).getUserName());
 
@@ -200,15 +200,16 @@ public class ApplyController {
      * @param authCode
      * @param id       申请的id
      */
-    @GetMapping("detail")
+    @GetMapping("detail/{id}")
     ApplyDto detail(@RequestHeader("authCode") String authCode, @PathVariable("id") Long id) {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         Apply apply = applyService.getById(id);
         List<ApplyApprover> applyApproverList = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId()).list();
-        List<FlowApprover> flowApproverList = flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, apply.getFlowId()).list();
+//        List<FlowApprover> flowApproverList = flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, apply.getFlowId()).list();
         if (!apply.getApplicantId().equals(userBasicInfoRes.getUserId())
                 || !applyApproverList.stream().map(e -> e.getApproverId()).collect(Collectors.toList()).contains(userBasicInfoRes.getUserId())
-                || !flowApproverList.stream().map(e -> e.getUserId()).collect(Collectors.toList()).contains(userBasicInfoRes.getUserId()))
+                ||!carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId, id).list().stream().map(e->e.getUserId()).collect(Collectors.toList()).contains(userBasicInfoRes.getUserId())
+        )
             throw new CommonException("你无权查看别人的审批流程");
         //获取抄送人员列表
         apply.setCcList(carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId, id).list().stream().map(e -> e.getUserName()).collect(Collectors.toList()));

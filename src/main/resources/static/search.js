@@ -150,10 +150,14 @@ api[6].list.push({
 });
 api[6].list.push({
     order: '2',
-    desc: '多个文件上传',
+    desc: '单个文件上传',
 });
 api[6].list.push({
     order: '3',
+    desc: '编辑文档后保存文档',
+});
+api[6].list.push({
+    order: '4',
     desc: '下载文件',
 });
 api.push({
@@ -283,22 +287,26 @@ api.push({
 })
 api[13].list.push({
     order: '1',
-    desc: '根据条件查询用户详细信息',
+    desc: '根据部门id获取直属部门下的人员信息',
 });
 api[13].list.push({
     order: '2',
-    desc: '根据岗位和部门查询用户',
+    desc: '根据条件查询用户详细信息',
 });
 api[13].list.push({
     order: '3',
-    desc: '根据用户id查询用户信息（包含角色和岗位信息）',
+    desc: '根据岗位和部门查询用户',
 });
 api[13].list.push({
     order: '4',
-    desc: '查询自己的详细信息',
+    desc: '根据用户id查询用户信息（包含角色和岗位信息）',
 });
 api[13].list.push({
     order: '5',
+    desc: '查询自己的详细信息',
+});
+api[13].list.push({
+    order: '6',
     desc: '绑定用户和岗位&角色',
 });
 api.push({

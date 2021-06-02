@@ -85,7 +85,6 @@ public class MenuController {
     @GetMapping("my")
     public List<MyMenu> getMyMenu(@RequestHeader("authCode") String authCode) {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
-        log.error("user:"+userBasicInfoRes);
         List<UserRole> list = userRoleService.lambdaQuery().eq(UserRole::getUserId, userBasicInfoRes.getUserId()).list();
         List<RoleMenu> roleMenuList = roleMenuService.lambdaQuery().in(RoleMenu::getRoleId, list.stream().map(e -> e.getRoleId()).collect(Collectors.toList())).list();
         Set<Long> menuIdSet = new HashSet<>();

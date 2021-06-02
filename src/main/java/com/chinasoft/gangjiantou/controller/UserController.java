@@ -72,6 +72,16 @@ public class UserController {
     }
 
     /**
+     * 根据部门id获取直属部门下的人员信息
+     * @param deptCode
+     * @return
+     */
+    @GetMapping("dept")
+    List<User> getUserByDept(String deptCode){
+      return   userService.lambdaQuery().like(User::getDeptCode,deptCode).list();
+    }
+
+    /**
      * 根据条件查询用户详细信息
      *
      * @param user

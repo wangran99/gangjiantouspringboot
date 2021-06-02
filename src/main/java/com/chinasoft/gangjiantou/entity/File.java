@@ -43,6 +43,16 @@ public class File implements Serializable {
     private String uuid;
 
     /**
+     * 文件名后缀
+     */
+    private String type;
+
+    /**
+     * 编辑后的文件对应的源文件ID
+     */
+    private Long source;
+
+    /**
      * 用户id
      */
     private String userId;

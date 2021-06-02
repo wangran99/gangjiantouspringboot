@@ -69,6 +69,8 @@ CREATE TABLE `file`
     `file_name`   VARCHAR(100) NOT NULL COMMENT '文件名',
     `path`        VARCHAR(200) NOT NULL COMMENT '相对路径',
     `uuid`        VARCHAR(100) NOT NULL UNIQUE COMMENT '文件uuid',
+    `type`        VARCHAR(10) NOT NULL  COMMENT '文件名后缀',
+    `source`      bigint       NOT NULL DEFAULT -1 COMMENT '编辑后的文件对应的源文件ID',
     `user_id`     VARCHAR(50)  NOT NULL COMMENT '用户id',
     `user_name`   VARCHAR(20)  NOT NULL COMMENT '用户姓名',
     `apply_id`    bigint       NOT NULL DEFAULT -1 COMMENT '申请id',
@@ -77,6 +79,7 @@ CREATE TABLE `file`
     PRIMARY KEY (`id`),
     INDEX (`apply_id`),
     INDEX (`uuid`),
+    INDEX (`source`),
     INDEX (`approval_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='上传/修订文件信息表';
@@ -131,7 +134,7 @@ values (1000, "组织管理", null, null, 1000),
        (1400, "岗位管理", 1000, "/station", 1000),
 
        (2000, "审批管理", null, null, 1000),
-       (2100, "流程管理", 2000, "/process", 1000),
+       (2100, "自定义审批流程", 2000, "/process", 1000),
        (2200, "我的申请", 2000, "/myPending", 1000),
        (2300, "我的审批", 2000, "/myApproval", 1000),
        (2400, "抄送我的", 2000, "/sendMe", 1000);
@@ -158,7 +161,6 @@ values (1, 1000),
        (1, 2300),
        (1, 2400),
        (2, 2000),
-       (2, 2100),
        (2, 2200),
        (2, 2300),
        (2, 2400);
@@ -180,11 +182,11 @@ CREATE TABLE `approval_flow`
 
 CREATE TABLE `flow_approver`
 (
-    `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `flow_id`   bigint      NOT NULL COMMENT '流程id',
-    `user_id`   VARCHAR(50) NOT NULL COMMENT '审批人id',
-    `user_name` VARCHAR(50) NOT NULL COMMENT '审批人姓名',
-    `position_id`   bigint       DEFAULT NULL COMMENT '岗位id',
+    `id`          bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `flow_id`     bigint      NOT NULL COMMENT '流程id',
+    `user_id`     VARCHAR(50) NOT NULL COMMENT '审批人id',
+    `user_name`   VARCHAR(50) NOT NULL COMMENT '审批人姓名',
+    `position_id` bigint DEFAULT NULL COMMENT '岗位id',
     PRIMARY KEY (`id`),
     UNIQUE (`flow_id`, `user_id`),
     INDEX (`flow_id`)
@@ -199,7 +201,7 @@ CREATE TABLE `apply`
     `subject`             varchar(100) NOT NULL COMMENT '主题',
     `serial_number`       varchar(100) NOT NULL UNIQUE COMMENT '审批单号',
     `flow_id`             bigint       NOT NULL COMMENT '流程定义id',
-    `reason`                varchar(200) NOT NULL COMMENT '申请原因说明',
+    `reason`              varchar(200) NOT NULL COMMENT '申请原因说明',
     `note`                varchar(200) NOT NULL COMMENT '申请备注说明',
     `current_approver_id` varchar(100) NOT NULL COMMENT '当前审批人id',
     `current_approver`    varchar(20)  NOT NULL COMMENT '当前审批人',
@@ -219,10 +221,10 @@ CREATE TABLE `apply_approver`
     `apply_id`           bigint      NOT NULL COMMENT '审批请求id',
     `approver_id`        VARCHAR(50) NOT NULL COMMENT '审批人id',
     `approver_name`      VARCHAR(20) NOT NULL COMMENT '审批人姓名',
-    `next_approver_id`   VARCHAR(50)          DEFAULT NULL COMMENT '下一个审批人id',
-    `next_approver_name` VARCHAR(20)          DEFAULT NULL COMMENT '下一个审批人姓名',
-    `status`             TINYINT     NOT NULL DEFAULT 0 COMMENT '状态（0：待审核 1：审批通过 2：已拒绝 3：转移审批给别人）',
-    `comment`            VARCHAR(200)         DEFAULT NULL COMMENT '审批意见',
+    `next_approver_id`   VARCHAR(50)                                  DEFAULT NULL COMMENT '下一个审批人id',
+    `next_approver_name` VARCHAR(20)                                  DEFAULT NULL COMMENT '下一个审批人姓名',
+    `status`             TINYINT     NOT NULL                         DEFAULT 0 COMMENT '状态（0：待审核 1：审批通过 2：已拒绝 3：转移审批给别人）',
+    `comment`            VARCHAR(200)                                 DEFAULT NULL COMMENT '审批意见',
     `approval_time`      datetime(0) NULL ON UPDATE CURRENT_TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '审批时间',
     PRIMARY KEY (`id`),
     UNIQUE (`apply_id`, `approver_id`),

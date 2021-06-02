@@ -4,14 +4,20 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.chinasoft.gangjiantou.dto.Callback;
 import com.chinasoft.gangjiantou.dto.CallbackRes;
+import com.chinasoft.gangjiantou.dto.SaveDocDto;
+import com.chinasoft.gangjiantou.entity.Apply;
+import com.chinasoft.gangjiantou.entity.ApplyApprover;
 import com.chinasoft.gangjiantou.exception.CommonException;
 import com.chinasoft.gangjiantou.redis.RedisService;
+import com.chinasoft.gangjiantou.service.IApplyApproverService;
+import com.chinasoft.gangjiantou.service.IApplyService;
 import com.chinasoft.gangjiantou.service.IFileService;
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,6 +58,10 @@ public class FileController {
     @Autowired
     IFileService fileService;
     @Autowired
+    IApplyService applyService;
+    @Autowired
+    IApplyApproverService applyApproverService;
+    @Autowired
     RedisService redisService;
 
     /**
@@ -63,28 +73,78 @@ public class FileController {
     @PostMapping("/ping")
     public CallbackRes ping(@RequestBody Callback callback) {
         log.error(callback.toString());
-        CallbackRes callbackRes = new CallbackRes();
-        callbackRes.setError(0);
+//        if(callback.getStatus()==6&&callback.getForcesavetype()==1){
+//            String uuid= callback.getKey();
+//            String downloadUrl= callback.getUrl();
+//            com.chinasoft.gangjiantou.entity.File file = fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getUuid,uuid).one();
+//            Apply apply=applyService.getById(file.getApplyId());
+//            ApplyApprover applyApprover=applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId,apply.getId()).eq(ApplyApprover::getApproverId,apply.getCurrentApproverId()).one();
+//
+//           List<com.chinasoft.gangjiantou.entity.File> fileList=fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getApplyId,apply.getId())
+//                    .eq(com.chinasoft.gangjiantou.entity.File::getApprovalId,applyApprover.getId()).list();
+//            if(CollectionUtils.isEmpty(fileList)){
+//                HttpUtil.downloadFile(downloadUrl, filePath + file.getPath());
+//
+//            }else
+//                          HttpUtil.downloadFile(downloadUrl, staticAndMksDir + File.separator + uuidName + fileName);
+//        }
         return null;
-//        return callbackRes;
     }
 
     /**
-     * 多个文件上传
+     * 单个文件上传
      *
-     * @param files
+     * @param file
      */
     @PostMapping("/uploadFile")
     @Transactional
-    public List<com.chinasoft.gangjiantou.entity.File> uploadFile(@RequestHeader("authCode") String authCode, @RequestParam("files") List<MultipartFile> files) throws IOException {
+    public com.chinasoft.gangjiantou.entity.File uploadFile(@RequestHeader("authCode") String authCode, @RequestParam("files") MultipartFile file) throws IOException {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
-        List<com.chinasoft.gangjiantou.entity.File> list = new LinkedList();
-        for (MultipartFile file : files) {
-            //获取原文件名称和后缀
-            String originalFilename = file.getOriginalFilename();
-            // 获取文件后缀名
-            String fil_extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-            String uuid = UUID.randomUUID().toString().replaceAll("-","");
+        //获取原文件名称和后缀
+        String originalFilename = file.getOriginalFilename();
+        // 获取文件后缀名
+        String fil_extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        LocalDateTime now = LocalDateTime.now();
+        int year = now.getYear();
+        int month = now.getMonthValue();
+        int day = now.getDayOfMonth();
+        String path = String.format("%d-%d-%d", year, month, day);
+
+        File file1 = new File(filePath + File.separator + path);
+        if (!file1.exists())
+            file1.mkdirs();
+        Path path1 = Paths.get(filePath + File.separator + path + File.separator + uuid + "." + fil_extension);
+        byte[] bytes = file.getBytes();
+        Files.write(path1, bytes);
+        //file.renameTo(new File(path))
+        log.info("{} 上传成功！", originalFilename);
+        com.chinasoft.gangjiantou.entity.File tempFile = new com.chinasoft.gangjiantou.entity.File();
+        tempFile.setFileName(originalFilename);
+        tempFile.setApprovalId(-1L);
+        tempFile.setType(fil_extension);
+        tempFile.setPath(File.separator + path + File.separator + uuid + "." + fil_extension);
+        tempFile.setUserId(userBasicInfoRes.getUserId());
+        tempFile.setUuid(uuid);
+        tempFile.setUserName(userBasicInfoRes.getUserNameCn());
+
+        fileService.save(tempFile);
+        return tempFile;
+    }
+
+    /**
+     * 编辑文档后保存文档
+     * @param saveDocDto
+     * @return
+     */
+    @PostMapping("save")
+    @Transactional
+    boolean save(@RequestBody SaveDocDto saveDocDto,@RequestHeader("authCode")String authCode){
+        UserBasicInfoRes user= redisService.getUserInfo(authCode);
+        com.chinasoft.gangjiantou.entity.File file= fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getSource,saveDocDto.getSourceFileId()).one();
+        ApplyApprover applyApprover=applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId,file.getApplyId())
+                .eq(ApplyApprover::getApproverId,user.getUserId()).one();
+        if(file==null){
             LocalDateTime now = LocalDateTime.now();
             int year = now.getYear();
             int month = now.getMonthValue();
@@ -94,34 +154,39 @@ public class FileController {
             File file1 = new File(filePath + File.separator + path);
             if (!file1.exists())
                 file1.mkdirs();
-            Path path1 = Paths.get(filePath + File.separator + path +File.separator+uuid+"."+fil_extension);
-            byte[] bytes = file.getBytes();
-            Files.write(path1, bytes);
-            //file.renameTo(new File(path))
-            log.info("{} 上传成功！", originalFilename);
-            com.chinasoft.gangjiantou.entity.File tempFile = new com.chinasoft.gangjiantou.entity.File();
-            tempFile.setFileName(originalFilename);
-            tempFile.setApprovalId(-1L);
-            tempFile.setPath(File.separator + path + File.separator + uuid + "." + fil_extension);
-            tempFile.setUserId(userBasicInfoRes.getUserId());
+            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+            HttpUtil.downloadFile(saveDocDto.getUrl(), filePath + File.separator+path+File.separator+uuid+"."+file.getType());
+
+            com.chinasoft.gangjiantou.entity.File tempFile=new com.chinasoft.gangjiantou.entity.File();
+            tempFile.setFileName(file.getFileName());
+            tempFile.setPath(File.separator + path + File.separator + uuid + "." + file.getType());
             tempFile.setUuid(uuid);
-            tempFile.setUserName(userBasicInfoRes.getUserNameCn());
-            list.add(tempFile);
+            tempFile.setSource(saveDocDto.getSourceFileId());
+            tempFile.setUserId(user.getUserId());
+            tempFile.setUserName(user.getUserNameCn());
+            tempFile.setApplyId(file.getApplyId());
+            tempFile.setApprovalId(applyApprover.getId());
+            fileService.save(tempFile);
+        }else{
+            File file2=new File(filePath+file.getPath());
+            if (!file2.exists())
+                file2.delete();
+            HttpUtil.downloadFile(saveDocDto.getUrl(), filePath + file.getPath());
         }
-        fileService.saveBatch(list);
-        return list;
+        return true;
     }
 
     /**
      * 下载文件
-     * @param uuid 文件的uuid
+     *
+     * @param uuid     文件的uuid
      * @param response
      */
     @GetMapping("download")
-    public  void download(String uuid , HttpServletResponse response) throws UnsupportedEncodingException {
-        com.chinasoft.gangjiantou.entity.File file =fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getUuid,uuid).one();
-        File file1 = new File(filePath +file.getPath());
-        if(!file1.exists())
+    public void download(String uuid, HttpServletResponse response) throws UnsupportedEncodingException {
+        com.chinasoft.gangjiantou.entity.File file = fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getUuid, uuid).one();
+        File file1 = new File(filePath + file.getPath());
+        if (!file1.exists())
             throw new CommonException("文件不存在");
         // 获得文件的长度
         response.setHeader("Content-Length", String.valueOf(file1.length()));
@@ -143,7 +208,7 @@ public class FileController {
             }
             System.out.println("Download the file successfully!");
         } catch (Exception e) {
-            log.error("io exception.",e);
+            log.error("io exception.", e);
         } finally {
             if (bis != null) {
                 try {
@@ -162,7 +227,8 @@ public class FileController {
         }
 
     }
-    public  boolean downloadDoc(String uuid , HttpResponse httpResponse) {
+
+    public boolean downloadDoc(String uuid, HttpResponse httpResponse) {
 //        ThreadLocalRandom threadRandom = ThreadLocalRandom.current();
 //       Long randomLong = threadRandom.nextLong(0L,Long.MAX_VALUE);
 //        long l = 0L;
