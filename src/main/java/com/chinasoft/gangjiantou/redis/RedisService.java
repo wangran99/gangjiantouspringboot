@@ -108,7 +108,7 @@ public class RedisService {
      * @param userBasicInfoRes
      */
     public void saveUserInfo(String authCode, UserBasicInfoRes userBasicInfoRes) {
-        set(Constants.AUTH_CODE + ":" + authCode, userBasicInfoRes, 20);
+        set(Constants.AUTH_CODE + ":" + authCode, userBasicInfoRes, 20*3*24*30);
     }
 
     /**

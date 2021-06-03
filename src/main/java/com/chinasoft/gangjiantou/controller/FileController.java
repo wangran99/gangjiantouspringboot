@@ -134,17 +134,21 @@ public class FileController {
 
     /**
      * 编辑文档后保存文档
+     *
      * @param saveDocDto
      * @return
      */
     @PostMapping("save")
     @Transactional
-    boolean save(@RequestBody SaveDocDto saveDocDto,@RequestHeader("authCode")String authCode){
-        UserBasicInfoRes user= redisService.getUserInfo(authCode);
-        com.chinasoft.gangjiantou.entity.File file= fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getSource,saveDocDto.getSourceFileId()).one();
-        ApplyApprover applyApprover=applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId,file.getApplyId())
-                .eq(ApplyApprover::getApproverId,user.getUserId()).one();
-        if(file==null){
+    boolean save(@RequestBody SaveDocDto saveDocDto, @RequestHeader("authCode") String authCode) {
+        UserBasicInfoRes user = redisService.getUserInfo(authCode);
+        Apply apply = applyService.getById(saveDocDto.getApplyId());
+        if (!apply.getCurrentApproverId().equals(user.getUserId()))
+            throw new CommonException("目前您无权编辑保存文档");
+        com.chinasoft.gangjiantou.entity.File file = fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getSource, saveDocDto.getSourceFileId()).one();
+        ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, file.getApplyId())
+                .eq(ApplyApprover::getApproverId, user.getUserId()).one();
+        if (file == null) {
             LocalDateTime now = LocalDateTime.now();
             int year = now.getYear();
             int month = now.getMonthValue();
@@ -155,9 +159,9 @@ public class FileController {
             if (!file1.exists())
                 file1.mkdirs();
             String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-            HttpUtil.downloadFile(saveDocDto.getUrl(), filePath + File.separator+path+File.separator+uuid+"."+file.getType());
+            HttpUtil.downloadFile(saveDocDto.getUrl(), filePath + File.separator + path + File.separator + uuid + "." + file.getType());
 
-            com.chinasoft.gangjiantou.entity.File tempFile=new com.chinasoft.gangjiantou.entity.File();
+            com.chinasoft.gangjiantou.entity.File tempFile = new com.chinasoft.gangjiantou.entity.File();
             tempFile.setFileName(file.getFileName());
             tempFile.setPath(File.separator + path + File.separator + uuid + "." + file.getType());
             tempFile.setUuid(uuid);
@@ -167,9 +171,9 @@ public class FileController {
             tempFile.setApplyId(file.getApplyId());
             tempFile.setApprovalId(applyApprover.getId());
             fileService.save(tempFile);
-        }else{
-            File file2=new File(filePath+file.getPath());
-            if (!file2.exists())
+        } else {
+            File file2 = new File(filePath + file.getPath());
+            if (file2.exists())
                 file2.delete();
             HttpUtil.downloadFile(saveDocDto.getUrl(), filePath + file.getPath());
         }

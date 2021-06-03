@@ -3,7 +3,7 @@
 <mapper namespace="com.chinasoft.gangjiantou.mapper.ApplyMapper">
 
     <select id="pendingApply" resultType="com.chinasoft.gangjiantou.entity.Apply">
-        select apl.* from apply apl inner join  apply_approver appover on apl.id=appover.apply_id
+        select apl.* from apply apl inner join apply_approver appover on apl.id=appover.apply_id
         where
         appover.approver_id = #{userId}
 
@@ -11,51 +11,60 @@
             and apl.applicant like concat('%',#{applyPendingDto.applicant,jdbcType=VARCHAR},'%')
         </if>
         <if test="applyPendingDto.serialNumber != null and applyPendingDto.serialNumber !='' ">
-            and apl.serial_number = #{applyPendingDto.serialNumber,jdbcType=VARCHAR},
+            and apl.serial_number = #{applyPendingDto.serialNumber,jdbcType=VARCHAR}
         </if>
         <if test="applyPendingDto.subject != null and applyPendingDto.subject !='' ">
-            and apl.subject = #{applyPendingDto.subject,jdbcType=VARCHAR},
+            and apl.subject like concat('%', #{applyPendingDto.subject,jdbcType=VARCHAR},'%')
         </if>
-        <if test="applyPendingDto.status != null ">
-            and apl.status = #{applyPendingDto.status,jdbcType=TINYINT},
+        <if test="applyPendingDto.status != null and applyPendingDto.status ==0">
+            and appover.status = 0
+            and apl.current_approver_id= #{userId,jdbcType=VARCHAR}
+        </if>
+        <if test="applyPendingDto.status != null and applyPendingDto.status !=0">
+            and appover.status = #{applyPendingDto.status,jdbcType=TINYINT}
+        </if>
+        <if test="applyPendingDto.status == null ">
+            and ( appover.status = 0
+            and apl.current_approver_id= #{userId,jdbcType=VARCHAR}
+            or appover.status in (1,2,3) )
         </if>
         <if test="applyPendingDto.startTime != null ">
             <![CDATA[
-            and apl.apply_time >= >#{applyPendingDto.startTime,jdbcType=datetime},
+            and apl.apply_time >= #{applyPendingDto.startTime,jdbcType=TIMESTAMP}
                ]]>
         </if>
         <if test="applyPendingDto.endTime != null ">
             <![CDATA[
-            and apl.apply_time <= #{applyPendingDto.endTime,jdbcType=datetime},
+            and apl.apply_time <= #{applyPendingDto.endTime,jdbcType=TIMESTAMP}
             ]]>
         </if>
         order by apl.apply_time desc
 
     </select>
     <select id="queryCC" resultType="com.chinasoft.gangjiantou.entity.Apply">
-        select apl.* from apply apl inner join  carbon_copy cc on apl.id=cc.apply_id
+        select apl.* from apply apl inner join carbon_copy cc on apl.id=cc.apply_id
         where
-            cc.user_id = #{userId}
-        <if test="applyPendingDto.applicant != null and applyPendingDto.applicant !='' ">
-            and apl.applicant like concat('%',#{applyPendingDto.applicant,jdbcType=VARCHAR},'%')
+        cc.user_id = #{userId}
+        <if test="ccDto.applicant != null and ccDto.applicant !='' ">
+            and apl.applicant like concat('%',#{ccDto.applicant,jdbcType=VARCHAR},'%')
         </if>
-        <if test="applyPendingDto.serialNumber != null and applyPendingDto.serialNumber !='' ">
-            and apl.serial_number = #{applyPendingDto.serialNumber,jdbcType=VARCHAR},
+        <if test="ccDto.serialNumber != null and ccDto.serialNumber !='' ">
+            and apl.serial_number = #{ccDto.serialNumber,jdbcType=VARCHAR}
         </if>
-        <if test="applyPendingDto.subject != null and applyPendingDto.subject !='' ">
-            and apl.subject = #{applyPendingDto.subject,jdbcType=VARCHAR},
+        <if test="ccDto.subject != null and ccDto.subject !='' ">
+            and apl.subject like concat('%', #{ccDto.subject,jdbcType=VARCHAR},'%')
         </if>
-        <if test="applyPendingDto.status != null ">
-            and apl.status = #{applyPendingDto.status,jdbcType=TINYINT},
+        <if test="ccDto.status != null ">
+            and apl.status = #{ccDto.status,jdbcType=TINYINT}
         </if>
-        <if test="applyPendingDto.startTime != null ">
+        <if test="ccDto.startTime != null ">
             <![CDATA[
-            and apl.apply_time >= >#{applyPendingDto.startTime,jdbcType=datetime},
+            and apl.apply_time >= #{ccDto.startTime,jdbcType=TIMESTAMP}
                ]]>
         </if>
-        <if test="applyPendingDto.endTime != null ">
+        <if test="ccDto.endTime != null ">
             <![CDATA[
-            and apl.apply_time <= #{applyPendingDto.endTime,jdbcType=datetime},
+            and apl.apply_time <= #{ccDto.endTime,jdbcType=TIMESTAMP}
             ]]>
         </if>
         order by apl.apply_time desc

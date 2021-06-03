@@ -2,6 +2,7 @@ package com.chinasoft.gangjiantou.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chinasoft.gangjiantou.dto.ApplyPendingDto;
+import com.chinasoft.gangjiantou.dto.CcDto;
 import com.chinasoft.gangjiantou.entity.Apply;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
@@ -20,6 +21,6 @@ public interface ApplyMapper extends BaseMapper<Apply> {
 
   Page<Apply>  pendingApply(Page<Apply> page,String userId, ApplyPendingDto applyPendingDto);
 
-  Page<Apply>  queryCC(Page<Apply> page,String userId, ApplyPendingDto applyPendingDto);
+  Page<Apply>  queryCC(Page<Apply> page,String userId, CcDto ccDto);
 
 }

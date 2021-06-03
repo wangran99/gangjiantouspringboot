@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class ApplyPendingDto {
+public class CcDto {
     /**
      * 审批单号
      */
@@ -25,7 +25,7 @@ public class ApplyPendingDto {
 
     /**
      *
-     * 状态（0：待审核 1：审批通过 2：已拒绝 3：转移审批给别人)
+     * 状态（0：待审核 1：已撤回 2：审批中 3：已拒绝 4：审批通过）
      */
     Long status;
     /**

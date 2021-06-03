@@ -65,6 +65,11 @@ public class ApplyApprover implements Serializable {
     private String comment;
 
     /**
+     * 文件修改意见
+     */
+    private String fileComment;
+
+    /**
      * 审批时间
      */
     private LocalDateTime approvalTime;
@@ -73,4 +78,9 @@ public class ApplyApprover implements Serializable {
      * 每一级审批对应修改后的文件列表
      */
     private transient List<File> fileList;
+
+    /**
+     * 岗位
+     */
+    private transient String position;
 }
