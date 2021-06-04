@@ -140,7 +140,7 @@ public class FileController {
      */
     @PostMapping("save")
     @Transactional
-    boolean save(@RequestBody SaveDocDto saveDocDto, @RequestHeader("authCode") String authCode) {
+   public boolean save(@RequestBody SaveDocDto saveDocDto, @RequestHeader("authCode") String authCode) {
         UserBasicInfoRes user = redisService.getUserInfo(authCode);
         Apply apply = applyService.getById(saveDocDto.getApplyId());
         if (!apply.getCurrentApproverId().equals(user.getUserId()))

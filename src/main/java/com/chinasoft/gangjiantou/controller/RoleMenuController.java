@@ -47,7 +47,7 @@ public class RoleMenuController {
      */
     @PostMapping("add")
     @Transactional
-    boolean add(@RequestBody RoleMenuDto roleMenuDto) {
+    public boolean add(@RequestBody RoleMenuDto roleMenuDto) {
         Role role = new Role();
         role.setRoleName(roleMenuDto.getRoleName());
         role.setNote(roleMenuDto.getNote());
@@ -72,7 +72,7 @@ public class RoleMenuController {
      */
     @PostMapping("edit")
     @Transactional
-    boolean edit(@RequestBody RoleMenuDto roleMenuDto) {
+    public boolean edit(@RequestBody RoleMenuDto roleMenuDto) {
         Role role = roleService.getById(roleMenuDto.getRoleId());
         if (role.getStatus() == 0)
             throw new CommonException("该角色禁止编辑");
@@ -99,7 +99,7 @@ public class RoleMenuController {
      */
     @PostMapping("del")
     @Transactional
-    boolean delete(Long roleId) {
+    public boolean delete(Long roleId) {
         Role role = roleService.getById(roleId);
         if (role.getStatus() == 0)
             throw new CommonException("该角色禁止删除");
@@ -107,7 +107,7 @@ public class RoleMenuController {
         QueryWrapper<RoleMenu> wrapper = new QueryWrapper<>();
         roleMenuService.remove(wrapper.lambda().eq(RoleMenu::getRoleId, roleId));
         QueryWrapper<UserRole> wrapper1 = new QueryWrapper<>();
-        userRoleService.remove(wrapper1.lambda().eq(UserRole::getRoleId,roleId));
+        userRoleService.remove(wrapper1.lambda().eq(UserRole::getRoleId, roleId));
         return true;
     }
 }

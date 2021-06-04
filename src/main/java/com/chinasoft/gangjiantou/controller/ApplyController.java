@@ -66,9 +66,24 @@ public class ApplyController {
     ITodoTaskService todoTaskService;
 
     @Autowired
+    IRoleService roleService;
+
+    @Autowired
     RedisService redisService;
     @Autowired
     OpenAPI openAPI;
+
+//    @GetMapping("test")
+//    @Transactional
+//    public void test(){
+//        for(int i=0;i<10;i++){
+//        Role role=new Role();
+//        role.setRoleName("qqqq");
+//        role.setNote("aaaaa");
+//        role.setStatus(0);
+//        roleService.save(role);}
+//
+//    }
 
 
     /**
@@ -95,7 +110,7 @@ public class ApplyController {
      */
     @PostMapping("add")
     @Transactional
-    boolean add(@RequestHeader("authCode") String authCode, @RequestBody Apply apply) {
+    public boolean add(@RequestHeader("authCode") String authCode, @RequestBody Apply apply) {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         apply.setId(null);
         apply.setApplicantId(userBasicInfoRes.getUserId());
@@ -110,7 +125,7 @@ public class ApplyController {
 
         ApprovalFlow approvalFlow = approvalFlowService.getById(apply.getFlowId());
         List<FlowApprover> flowApproverList = flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, approvalFlow.getId()).orderByAsc(FlowApprover::getId).list();
-        log.error("flowapproverlist:" + flowApproverList.toString());
+//        log.error("flowapproverlist:" + flowApproverList.toString());
         apply.setCurrentApproverId(flowApproverList.get(0).getUserId());
         apply.setCurrentApprover(flowApproverList.get(0).getUserName());
 
@@ -122,6 +137,8 @@ public class ApplyController {
             applyApprover.setApplyId(apply.getId());
             applyApprover.setApproverId(e.getUserId());
             applyApprover.setApproverName(e.getUserName());
+            Position position = positionService.getById(e.getPositionId());
+            applyApprover.setPositionName(position != null ? position.getPositionName() : "");
             applyApproverList.add(applyApprover);
         });
         //插入审批人
@@ -134,11 +151,11 @@ public class ApplyController {
                 approver.setNextApproverName(next.getApproverName());
             }
         }
-        log.error(" approverlist:" + applyApproverList.toString());
+//        log.error(" approverlist:" + applyApproverList.toString());
         applyApproverService.saveBatch(applyApproverList);
-
-        fileService.lambdaUpdate().in(File::getId, apply.getFileList().stream().map(e -> e.getId()).collect(Collectors.toList()))
-                .set(File::getApplyId, apply.getId()).update();
+        if (CollectionUtils.isNotEmpty(apply.getFileList()))
+            fileService.lambdaUpdate().in(File::getId, apply.getFileList().stream().map(e -> e.getId()).collect(Collectors.toList()))
+                    .set(File::getApplyId, apply.getId()).update();
         if (apply.getCcList() != null)
             for (String userId : apply.getCcList()) {
                 CarbonCopy carbonCopy = new CarbonCopy();
@@ -211,18 +228,7 @@ public class ApplyController {
         Apply apply = applyService.getById(id);
         List<ApplyApprover> applyApproverUnsortedList = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
                 .orderByAsc(ApplyApprover::getId).list();
-        applyApproverUnsortedList.forEach(e -> {
-            FlowApprover temp = flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, apply.getFlowId())
-                    .eq(FlowApprover::getUserId, e.getApproverId()).one();
-            if (temp != null)
-                e.setPosition(positionService.lambdaQuery().eq(Position::getId, temp.getPositionId()).one().getPositionName());
-            else {
-                List<UserPosition> userPositionList = userPositionService.lambdaQuery().eq(UserPosition::getUserId, e.getApproverId()).list();
-                List<Long> positionIdList = userPositionList.stream().map(a -> a.getPositionId()).collect(Collectors.toList());
-                e.setPosition(positionService.lambdaQuery().in(Position::getId, positionIdList).list().stream()
-                        .map(b -> b.getPositionName()).collect(Collectors.toList()).toString());
-            }
-        });
+
         List<ApplyApprover> applyApproverList = new ArrayList<>();
         ApplyApprover applyApprover = applyApproverUnsortedList.get(0);
         applyApproverList.add(applyApprover);
@@ -264,7 +270,7 @@ public class ApplyController {
      */
     @PostMapping("ok")
     @Transactional
-    boolean ok(@RequestHeader("authCode") String authCode, @RequestBody ApprovalDto approvalDto) {
+    public boolean ok(@RequestHeader("authCode") String authCode, @RequestBody ApprovalDto approvalDto) {
         UserBasicInfoRes user = redisService.getUserInfo(authCode);
         Apply apply = applyService.getById(approvalDto.getApplyId());
         if (apply == null)
@@ -319,7 +325,7 @@ public class ApplyController {
      */
     @PostMapping("reject")
     @Transactional
-    boolean reject(@RequestHeader("authCode") String authCode, @RequestBody ApprovalDto approvalDto) {
+    public boolean reject(@RequestHeader("authCode") String authCode, @RequestBody ApprovalDto approvalDto) {
         UserBasicInfoRes user = redisService.getUserInfo(authCode);
         Apply apply = applyService.getById(approvalDto.getApplyId());
         if (apply == null)
@@ -388,6 +394,7 @@ public class ApplyController {
         ApplyApprover newApplyApprover = new ApplyApprover();
         newApplyApprover.setApplyId(approvalDto.getApplyId());
         newApplyApprover.setApproverId(shiftUser.getUserId());
+        newApplyApprover.setPositionName("");
         newApplyApprover.setApproverName(shiftUser.getUserNameCn());
         newApplyApprover.setNextApproverId(applyApprover.getNextApproverId());
         newApplyApprover.setNextApproverName(applyApprover.getNextApproverName());
@@ -435,6 +442,8 @@ public class ApplyController {
             throw new CommonException("您无权撤回别人的申请");
         if (apply.getEndTime() != null)
             throw new CommonException("当前审批已经结束");
+        if (apply.getStatus() != 0)
+            throw new CommonException("当前审批正在进行中，不能撤回");
         apply.setStatus(1);
         apply.setRecallTime(LocalDateTime.now());
         apply.setEndTime(LocalDateTime.now());

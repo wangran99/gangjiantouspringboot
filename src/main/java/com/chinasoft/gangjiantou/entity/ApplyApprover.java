@@ -44,6 +44,12 @@ public class ApplyApprover implements Serializable {
      */
     private String approverName;
 
+
+    /**
+     * 审批人岗位
+     */
+    private String positionName;
+
     /**
      * 下一个审批人id
      */
@@ -79,8 +85,5 @@ public class ApplyApprover implements Serializable {
      */
     private transient List<File> fileList;
 
-    /**
-     * 岗位
-     */
-    private transient String position;
+
 }

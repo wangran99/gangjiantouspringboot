@@ -80,7 +80,7 @@ public class PositionController {
      */
     @PostMapping("del")
     @Transactional
-    boolean del(Long positionId) {
+    public boolean del(Long positionId) {
         Position tempPosition = positionService.getById(positionId);
         if (tempPosition.getEditable() == 0)
             throw new CommonException("该岗位不可编辑/删除");

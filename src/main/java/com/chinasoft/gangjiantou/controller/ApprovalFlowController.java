@@ -34,7 +34,7 @@ public class ApprovalFlowController {
 
     @Autowired
     IApprovalFlowService approvalFlowService;
-@Autowired
+    @Autowired
     IApplyService applyService;
     @Autowired
     IFlowApproverService flowApproverService;
@@ -80,7 +80,7 @@ public class ApprovalFlowController {
      */
     @PostMapping("add")
     @Transactional
-    boolean add(@RequestBody FlowDto flowDto) {
+    public boolean add(@RequestBody FlowDto flowDto) {
         if (CollectionUtils.isEmpty(flowDto.getFlowApproverList()))
             throw new CommonException("审批人不能为空");
         ApprovalFlow approvalFlow = flowDto.getApprovalFlow();
@@ -119,7 +119,7 @@ public class ApprovalFlowController {
      */
     @PostMapping("edit")
     @Transactional
-    boolean edit(@RequestBody FlowDto fLowDto) {
+    public boolean edit(@RequestBody FlowDto fLowDto) {
         ApprovalFlow approvalFlow = fLowDto.getApprovalFlow();
         flowApproverService.remove(new QueryWrapper<FlowApprover>().lambda()
                 .eq(FlowApprover::getFlowId, approvalFlow.getId()));
@@ -140,7 +140,7 @@ public class ApprovalFlowController {
      */
     @PostMapping("del")
     @Transactional
-    boolean del(Long flowId) {
+    public boolean del(Long flowId) {
 //        List<Apply> list = applyService.lambdaQuery().eq(Apply::getFlowId,flowId).isNotNull(Apply::getEndTime).list();
 //        if(list.size()>0)
 //            throw new CommonException("当前流程有进行中的审批，禁止删除");

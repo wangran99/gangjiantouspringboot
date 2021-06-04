@@ -73,12 +73,13 @@ public class UserController {
 
     /**
      * 根据部门id获取直属部门下的人员信息
+     *
      * @param deptCode
      * @return
      */
     @GetMapping("dept")
-    List<User> getUserByDept(String deptCode){
-      return   userService.lambdaQuery().like(User::getDeptCode,deptCode).list();
+    List<User> getUserByDept(String deptCode) {
+        return userService.lambdaQuery().like(StringUtils.hasText(deptCode), User::getDeptCode, deptCode).list();
     }
 
     /**
@@ -107,8 +108,8 @@ public class UserController {
      */
     @PostMapping("search")
     public List<User> search(@RequestBody UserSearchDto userSearchDto) {
-        List<User> list1 = userService.lambdaQuery().like(User::getDeptCode, userSearchDto.getDeptCode()).list();
-        List<UserPosition> list2 = userPositionService.lambdaQuery().eq(UserPosition::getPositionId, userSearchDto.getPositionId()).list();
+        List<User> list1 = userService.lambdaQuery().like(StringUtils.hasText(userSearchDto.getDeptCode()), User::getDeptCode, userSearchDto.getDeptCode()).list();
+        List<UserPosition> list2 = userPositionService.lambdaQuery().eq(userSearchDto.getPositionId() != null, UserPosition::getPositionId, userSearchDto.getPositionId()).list();
         List<User> list = new ArrayList<>();
 
         for (UserPosition userPosition : list2)
@@ -140,7 +141,7 @@ public class UserController {
      * @return
      */
     @GetMapping("my")
-    public User my(@RequestHeader("authCode")String authCode) {
+    public User my(@RequestHeader("authCode") String authCode) {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         User user = userService.getById(userBasicInfoRes.getUserId());
         getDetails(user);
@@ -155,7 +156,7 @@ public class UserController {
      */
     @PostMapping("bind")
     @Transactional
-    boolean bind(@RequestBody BindDto bindDto) {
+    public boolean bind(@RequestBody BindDto bindDto) {
         String userId = bindDto.getUserId();
         List<Long> positionIdList = bindDto.getPositionIdList();
         List<Long> roleIdList = bindDto.getRoleIdList();

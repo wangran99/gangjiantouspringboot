@@ -170,15 +170,6 @@
 
 
 
-<!--    <logger name="druid.sql.Statement" level="debug">-->
-<!--    </logger>-->
-<!--    <logger name="druid.sql.DataSource" level="debug">-->
-<!--    </logger>-->
-<!--    <logger name="druid.sql.Connection" level="debug">-->
-<!--    </logger>-->
-<!--    <logger name="druid.sql.ResultSet" level="debug">-->
-<!--    </logger>-->
-
     <!--
     root节点是必选节点，用来指定最基础的日志输出级别，只有一个level属性
     level:用来设置打印级别，大小写无关：TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF，
