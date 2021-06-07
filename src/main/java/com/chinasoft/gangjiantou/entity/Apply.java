@@ -51,9 +51,19 @@ public class Apply implements Serializable {
     private String serialNumber;
 
     /**
+     * 申请部门名称
+     */
+    private  String deptName;
+
+    /**
      * 流程定义id
      */
     private Long flowId;
+
+    /**
+     * 流程模型名称
+     */
+    private  String flowName;
 
     /**
      * 申请备注
@@ -94,16 +104,6 @@ public class Apply implements Serializable {
      * 审批完成时间
      */
     private LocalDateTime endTime;
-
-    /**
-     * 申请部门名称
-     */
-    private transient String deptName;
-
-    /**
-     * 流程名称
-     */
-    private transient String flowName;
 
     /**
      * 申请人上传的原始文件列表

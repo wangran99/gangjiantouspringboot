@@ -125,9 +125,10 @@ public class ApplyController {
 
         ApprovalFlow approvalFlow = approvalFlowService.getById(apply.getFlowId());
         List<FlowApprover> flowApproverList = flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, approvalFlow.getId()).orderByAsc(FlowApprover::getId).list();
-//        log.error("flowapproverlist:" + flowApproverList.toString());
         apply.setCurrentApproverId(flowApproverList.get(0).getUserId());
         apply.setCurrentApprover(flowApproverList.get(0).getUserName());
+        apply.setFlowName(approvalFlow.getFlowName());
+        apply.setDeptName(departmentService.getById(approvalFlow.getDeptCode()).getDeptNameCn());
 
         applyService.save(apply);
 
@@ -187,11 +188,6 @@ public class ApplyController {
                 .ge(applyDto.getStartTime() != null, Apply::getApplyTime, applyDto.getStartTime())
                 .le(applyDto.getEndTime() != null, Apply::getApplyTime, applyDto.getEndTime())
                 .orderByDesc(Apply::getApplyTime).page(page);
-        applyPage.getRecords().forEach(e -> {
-            ApprovalFlow approvalFlow = approvalFlowService.getById(e.getFlowId());
-            e.setFlowName(approvalFlow.getFlowName());
-            e.setDeptName(departmentService.getById(approvalFlow.getDeptCode()).getDeptNameCn());
-        });
         return applyPage;
     }
 
@@ -207,11 +203,6 @@ public class ApplyController {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         Page<Apply> page = new Page<>(applyPendingDto.getPageNum(), applyPendingDto.getPageSize());
         Page<Apply> applyPage = applyService.pendingApply(page, userBasicInfoRes.getUserId(), applyPendingDto);
-        applyPage.getRecords().forEach(e -> {
-            ApprovalFlow approvalFlow = approvalFlowService.getById(e.getFlowId());
-            e.setFlowName(approvalFlow.getFlowName());
-            e.setDeptName(departmentService.getById(approvalFlow.getDeptCode()).getDeptNameCn());
-        });
         return applyPage;
     }
 
@@ -248,9 +239,9 @@ public class ApplyController {
             throw new CommonException("你无权查看别人的审批流程");
         //获取抄送人员列表
         apply.setCcList(carbonCopyList.stream().map(e -> e.getUserName()).collect(Collectors.toList()));
-        ApprovalFlow approvalFlow = approvalFlowService.getById(apply.getFlowId());
-        apply.setFlowName(approvalFlow.getFlowName());
-        apply.setDeptName(departmentService.getById(approvalFlow.getDeptCode()).getDeptNameCn());
+//        ApprovalFlow approvalFlow = approvalFlowService.getById(apply.getFlowId());
+//        apply.setFlowName(approvalFlow.getFlowName());
+//        apply.setDeptName(departmentService.getById(approvalFlow.getDeptCode()).getDeptNameCn());
         apply.setFileList(fileService.lambdaQuery().eq(File::getApplyId, id).eq(File::getSource, -1).list());
 
         ApplyDto applyDto = new ApplyDto();
@@ -288,6 +279,20 @@ public class ApplyController {
         applyApprover.setComment(approvalDto.getComment());
         applyApprover.setFileComment(approvalDto.getFileComment());
         applyApproverService.updateById(applyApprover);
+
+        if (CollectionUtils.isNotEmpty(approvalDto.getCcList())) {
+            List<CarbonCopy> carbonCopyList = new ArrayList<>();
+            approvalDto.getCcList().forEach(e -> {
+                CarbonCopy carbonCopy = new CarbonCopy();
+                carbonCopy.setApplyId(apply.getId());
+                carbonCopy.setUserId(e);
+                carbonCopy.setUserName(userService.getById(e).getUserNameCn());
+                carbonCopy.setCreateUserId(user.getUserId());
+                carbonCopy.setCreateUserName(user.getUserNameCn());
+                carbonCopyList.add(carbonCopy);
+            });
+            carbonCopyService.saveBatch(carbonCopyList);
+        }
         delTodoTaskByApplyId(apply.getId());
         if (applyApprover.getNextApproverId() == null) {
             apply.setStatus(4);
@@ -464,11 +469,6 @@ public class ApplyController {
         UserBasicInfoRes user = redisService.getUserInfo(authCode);
         Page<Apply> page = new Page<>(ccDto.getPageNum(), ccDto.getPageSize());
         Page<Apply> applyPage = applyService.queryCC(page, user.getUserId(), ccDto);
-        applyPage.getRecords().forEach(e -> {
-            ApprovalFlow approvalFlow = approvalFlowService.getById(e.getFlowId());
-            e.setFlowName(approvalFlow.getFlowName());
-            e.setDeptName(departmentService.getById(approvalFlow.getDeptCode()).getDeptNameCn());
-        });
         return applyPage;
     }
 

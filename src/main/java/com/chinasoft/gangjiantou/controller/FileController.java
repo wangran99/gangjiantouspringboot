@@ -73,21 +73,6 @@ public class FileController {
     @PostMapping("/ping")
     public CallbackRes ping(@RequestBody Callback callback) {
         log.error(callback.toString());
-//        if(callback.getStatus()==6&&callback.getForcesavetype()==1){
-//            String uuid= callback.getKey();
-//            String downloadUrl= callback.getUrl();
-//            com.chinasoft.gangjiantou.entity.File file = fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getUuid,uuid).one();
-//            Apply apply=applyService.getById(file.getApplyId());
-//            ApplyApprover applyApprover=applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId,apply.getId()).eq(ApplyApprover::getApproverId,apply.getCurrentApproverId()).one();
-//
-//           List<com.chinasoft.gangjiantou.entity.File> fileList=fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getApplyId,apply.getId())
-//                    .eq(com.chinasoft.gangjiantou.entity.File::getApprovalId,applyApprover.getId()).list();
-//            if(CollectionUtils.isEmpty(fileList)){
-//                HttpUtil.downloadFile(downloadUrl, filePath + file.getPath());
-//
-//            }else
-//                          HttpUtil.downloadFile(downloadUrl, staticAndMksDir + File.separator + uuidName + fileName);
-//        }
         return null;
     }
 
@@ -98,7 +83,7 @@ public class FileController {
      */
     @PostMapping("/uploadFile")
     @Transactional
-    public com.chinasoft.gangjiantou.entity.File uploadFile(@RequestHeader("authCode") String authCode, @RequestParam("files") MultipartFile file) throws IOException {
+    public com.chinasoft.gangjiantou.entity.File uploadFile(@RequestHeader("authCode") String authCode, @RequestParam("file") MultipartFile file) throws IOException {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         //获取原文件名称和后缀
         String originalFilename = file.getOriginalFilename();
@@ -140,7 +125,7 @@ public class FileController {
      */
     @PostMapping("save")
     @Transactional
-   public boolean save(@RequestBody SaveDocDto saveDocDto, @RequestHeader("authCode") String authCode) {
+    public boolean save(@RequestBody SaveDocDto saveDocDto, @RequestHeader("authCode") String authCode) {
         UserBasicInfoRes user = redisService.getUserInfo(authCode);
         Apply apply = applyService.getById(saveDocDto.getApplyId());
         if (!apply.getCurrentApproverId().equals(user.getUserId()))
@@ -232,28 +217,4 @@ public class FileController {
 
     }
 
-    public boolean downloadDoc(String uuid, HttpResponse httpResponse) {
-//        ThreadLocalRandom threadRandom = ThreadLocalRandom.current();
-//       Long randomLong = threadRandom.nextLong(0L,Long.MAX_VALUE);
-//        long l = 0L;
-//        String path = null;
-//        String staticAndMksDir = null;
-//        if (fileUrl != null) {
-//            //下载时文件名称
-//            String fileName = fileUrl.substring(fileUrl.lastIndexOf("."));
-//            try {
-//                String dataStr = new SimpleDateFormat("yyyyMMdd").format(new Date());
-//                String uuidName = UUID.randomUUID().toString();
-//                path = "resources/images/"+dataStr+"/"+uuidName+fileName;
-//                staticAndMksDir = Paths.get(ResourceUtils.getURL("classpath:").getPath(),"resources", "images",dataStr).toString();
-//                HttpUtil.downloadFile(fileUrl, staticAndMksDir + File.separator + uuidName + fileName);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            } finally {
-//
-//            }
-//        }
-//        System.out.println(System.currentTimeMillis()-l);
-        return true;
-    }
 }

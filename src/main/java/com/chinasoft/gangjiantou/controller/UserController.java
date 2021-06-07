@@ -13,6 +13,8 @@ import com.chinasoft.gangjiantou.entity.UserPosition;
 import com.chinasoft.gangjiantou.entity.UserRole;
 import com.chinasoft.gangjiantou.redis.RedisService;
 import com.chinasoft.gangjiantou.service.*;
+import com.github.wangran99.welink.api.client.openapi.OpenAPI;
+import com.github.wangran99.welink.api.client.openapi.model.QueryUserInfoResPage;
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -53,6 +56,8 @@ public class UserController {
     IDepartmentService departmentService;
     @Autowired
     RedisService redisService;
+    @Autowired
+    OpenAPI openAPI;
 
     private void getDetails(User user) {
         List<UserRole> userRoleList = userRoleService.lambdaQuery().eq(UserRole::getUserId, user.getUserId()).list();
@@ -79,6 +84,14 @@ public class UserController {
      */
     @GetMapping("dept")
     List<User> getUserByDept(String deptCode) {
+        if ("0".equals(deptCode)) {
+            QueryUserInfoResPage queryUserInfoResPage = openAPI.getUsersByDeptCode("0", 1, 50);
+            if (!CollectionUtils.isEmpty(queryUserInfoResPage.getData())) {
+                List<String> userIdList = queryUserInfoResPage.getData().stream().map(e -> e.getUserId()).collect(Collectors.toList());
+                return userService.lambdaQuery().in(User::getUserId, userIdList).list();
+            } else
+                return new ArrayList<>();
+        }
         return userService.lambdaQuery().like(StringUtils.hasText(deptCode), User::getDeptCode, deptCode).list();
     }
 
@@ -90,9 +103,10 @@ public class UserController {
      */
     @PostMapping("query")
     public Page<User> query(@RequestBody UserDto user) {
+        String deptCode = user.getDeptList() != null && user.getDeptList().size() >= 1 ? user.getDeptList().get(0) : "";
         Page<User> userPage = new Page<>(user.getPageNum(), user.getPageSize());
         Page<User> list = userService.lambdaQuery().eq(StringUtils.hasText(user.getSex()), User::getSex, user.getSex()).
-                in(!CollectionUtils.isEmpty(user.getDeptList()), User::getDeptCode, user.getDeptList())
+                like(User::getDeptCode, deptCode)
                 .like(StringUtils.hasText(user.getName()), User::getUserNameCn, user.getName()).page(userPage);
 
         for (User temp : list.getRecords()) {

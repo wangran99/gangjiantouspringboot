@@ -70,6 +70,9 @@ public class PositionController {
         Position tempPosition = positionService.getById(position.getId());
         if (tempPosition.getEditable() == 0)
             throw new CommonException("该岗位不可编辑/删除");
+        if (position.getStatus() == 0)
+            if (userPositionService.lambdaQuery().eq(UserPosition::getPositionId, position.getId()).count() > 0)
+                throw new CommonException("该岗位已关联用户，不允许设置为停用");
         positionService.updateById(position);
     }
 
@@ -84,6 +87,8 @@ public class PositionController {
         Position tempPosition = positionService.getById(positionId);
         if (tempPosition.getEditable() == 0)
             throw new CommonException("该岗位不可编辑/删除");
+        if (userPositionService.lambdaQuery().eq(UserPosition::getPositionId, positionId).count() > 0)
+            throw new CommonException("该岗位已关联用户，不允许删除");
         positionService.removeById(positionId);
         QueryWrapper<UserPosition> wrapper = new QueryWrapper<>();
         userPositionService.remove(wrapper.lambda().in(UserPosition::getPositionId, positionId));
