@@ -1,6 +1,8 @@
 package com.chinasoft.gangjiantou.controller;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chinasoft.gangjiantou.dto.RoleDto;
 import com.chinasoft.gangjiantou.dto.RoleMenuDetailDto;
 import com.chinasoft.gangjiantou.dto.RoleMenuDto;
 import com.chinasoft.gangjiantou.entity.*;
@@ -11,6 +13,7 @@ import com.chinasoft.gangjiantou.service.IUserRoleService;
 import com.chinasoft.gangjiantou.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -55,16 +58,14 @@ public class RoleController {
      * @return
      */
     @PostMapping("query")
-    List<RoleMenuDetailDto> query(String roleName) {
-        List<Role> roleList = roleService.lambdaQuery().like(true,Role::getRoleName,roleName).list();
-        List<RoleMenuDetailDto> roleMenuDetailDtoList = new ArrayList<>();
-        for(Role role:roleList){
-            RoleMenuDetailDto roleMenuDetailDto=new RoleMenuDetailDto();
-            roleMenuDetailDto.setRole(role);
-            roleMenuDetailDto.setRoleMenuList(roleMenuService.lambdaQuery().eq(RoleMenu::getRoleId,role.getId()).list());
-            roleMenuDetailDtoList.add(roleMenuDetailDto);
-        }
-        return roleMenuDetailDtoList;
+    Page<Role> query(@RequestBody RoleDto roleDto) {
+        Page<Role> rolePage = new Page<>(roleDto.getPageNum(), roleDto.getPageSize());
+
+        Page<Role>  rolePage1 = roleService.lambdaQuery().like(StringUtils.hasText(roleDto.getRoleName()),Role::getRoleName,roleDto.getRoleName()).page(rolePage);
+        for(Role role:rolePage1.getRecords())
+            role.setRoleMenuList(roleMenuService.lambdaQuery().eq(RoleMenu::getRoleId,role.getId()).list());
+
+        return rolePage1;
     }
 
 

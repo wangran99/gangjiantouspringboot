@@ -16,6 +16,7 @@ import com.github.wangran99.welink.api.client.openapi.model.SendOfficialAccountM
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/apply")
 public class ApplyController {
 
-    private String url = "";
+    @Value("${approval.url}")
+    private String url;
+
+
+    @Value("${welink.openapi.client-id}")
+    private String mobileUrl;
     @Autowired
     IUserService userService;
     @Autowired
@@ -491,7 +497,9 @@ public class ApplyController {
         todoTaskService.save(todoTask);
 
         AddTodoTaskReq addTodoTaskReq = AddTodoTaskReq.builder().taskId(taskId).taskTitle("待审批文件")
-                .userId(apply.getCurrentApproverId()).userNameCn(apply.getCurrentApprover()).detailsUrl(url + "#/approval?id=" + apply.getId())
+                .userId(apply.getCurrentApproverId()).userNameCn(apply.getCurrentApprover())
+//                .detailsUrlPc(url + "#/approval?id=" + apply.getId()).detailsUrl("h5://"+mobileUrl+"")
+                .detailsUrlPc("http://139.9.115.153:8013/gjtweb#approval?applyid="+apply.getId()).detailsUrl("h5://"+mobileUrl+"/html/index.html?applyid="+apply.getId())
                 .appName("待审批文件").applicantUserId(apply.getApplicantId())
                 .applicantUserNameCn(apply.getApplicant())
                 .isMsg(1).isShowApplicantUserName(true).applicantId(taskId).build();

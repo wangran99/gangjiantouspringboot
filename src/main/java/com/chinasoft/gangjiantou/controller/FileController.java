@@ -127,10 +127,11 @@ public class FileController {
     @Transactional
     public boolean save(@RequestBody SaveDocDto saveDocDto, @RequestHeader("authCode") String authCode) {
         UserBasicInfoRes user = redisService.getUserInfo(authCode);
+        log.error("savedto:"+saveDocDto.toString());
         Apply apply = applyService.getById(saveDocDto.getApplyId());
         if (!apply.getCurrentApproverId().equals(user.getUserId()))
-            throw new CommonException("目前您无权编辑保存文档");
-        com.chinasoft.gangjiantou.entity.File file = fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getSource, saveDocDto.getSourceFileId()).one();
+            throw new CommonException("您当前无权编辑保存文档");
+        com.chinasoft.gangjiantou.entity.File file = fileService.getById(saveDocDto.getSourceFileId());
         ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, file.getApplyId())
                 .eq(ApplyApprover::getApproverId, user.getUserId()).one();
         if (file == null) {

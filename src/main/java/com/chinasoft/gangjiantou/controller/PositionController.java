@@ -104,7 +104,7 @@ public class PositionController {
     @PostMapping("query")
     public Page<Position> query(@RequestBody PositionDto positionDto) {
         Page<Position> positionPage = new Page<>(positionDto.getPageNum(), positionDto.getPageSize());
-        return positionService.lambdaQuery().eq(StringUtils.hasText(positionDto.getCode()), Position::getPositionCode, positionDto.getCode())
+        return positionService.lambdaQuery().like(StringUtils.hasText(positionDto.getCode()), Position::getPositionCode, positionDto.getCode())
                 .like(StringUtils.hasText(positionDto.getName()), Position::getPositionName, positionDto.getName())
                 .eq(positionDto.getStatus() != null, Position::getStatus, positionDto.getStatus()).page(positionPage);
     }

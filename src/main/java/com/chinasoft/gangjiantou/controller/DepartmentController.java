@@ -46,7 +46,7 @@ public class DepartmentController {
     @GetMapping("subDept")
     public List<Department> subDept(String deptCode){
         List<Department>  list=departmentService.lambdaQuery().eq(Department::getParentCode,deptCode)
-                .orderByDesc(Department::getOrderNo).list();
+                .orderByAsc(Department::getOrderNo).list();
         list.forEach(e->{
             Department department=departmentService.getById(e.getParentCode());
             e.setParentName(department.getDeptNameCn());

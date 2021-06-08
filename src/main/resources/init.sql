@@ -3,7 +3,7 @@ CREATE TABLE `department`
     `dept_code`      VARCHAR(20)  NOT NULL COMMENT '部门id',
     `parent_code`    VARCHAR(20)  NOT NULL COMMENT '父部门id',
     `dept_name_cn`   VARCHAR(100) NOT NULL COMMENT '部门名称',
-    `order_no`       INT          DEFAULT 10000 COMMENT '部门排序',
+    `order_no`       INT          DEFAULT NULL COMMENT '部门排序',
     `dept_level`     INT          DEFAULT NULL COMMENT '部门层次',
     `manager_id`     VARCHAR(100) DEFAULT NULL COMMENT '部门管理人员列表',
     `has_child_dept` TINYINT      NOT NULL COMMENT '是否有子部门',
