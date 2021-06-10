@@ -3,6 +3,7 @@ package com.chinasoft.gangjiantou.dto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class ApplyPendingDto {
@@ -25,9 +26,9 @@ public class ApplyPendingDto {
 
     /**
      *
-     * 状态（0：待审核 1：审批通过 2：已拒绝 3：转移审批给别人)
+     * 审批人的状态列表（0：待我审核 1：我已审批通过 2：我已拒绝 3：我已转移审批给别人)
      */
-    Long status;
+    List<String> statusList;
     /**
      * 申请开始的时间段
      */

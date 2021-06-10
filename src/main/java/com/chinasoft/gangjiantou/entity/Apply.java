@@ -66,6 +66,11 @@ public class Apply implements Serializable {
     private  String flowName;
 
     /**
+     * 上传的文件能否编辑：0：不能编辑，1：可以编辑
+     */
+    private  Integer fileEditable;
+
+    /**
      * 申请备注
      */
     private String note;
@@ -86,7 +91,11 @@ public class Apply implements Serializable {
     private String currentApprover;
 
     /**
-     * 状态（0：待审核 1：已撤回 2：审批中 3：已拒绝 4：审批通过）
+     * 当前审批人的岗位
+     */
+    private String currentApproverPosition;
+    /**
+     * 整个流程状态（对申请人来讲）（0：待审核 1：已撤回 2：审批中 3：已拒绝 4：审批通过）
      */
     private Integer status;
 
@@ -106,10 +115,22 @@ public class Apply implements Serializable {
     private LocalDateTime endTime;
 
     /**
+     * 审批人当前状态：（0：待我审核 1：我已审批通过 2：我已拒绝 3：我已转移审批给别人)
+     */
+    @TableField(exist = false)
+    private  Long condition;
+
+    /**
      * 申请人上传的原始文件列表
      */
     @TableField(exist = false)
     private  List<File> fileList;
+
+    /**
+     * 最新版本的文件列表
+     */
+    @TableField(exist = false)
+    private  List<File> newFileList;
 
     /**
      * 申请对应的抄送人ID列表

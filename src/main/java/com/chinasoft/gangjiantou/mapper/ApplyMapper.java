@@ -6,6 +6,7 @@ import com.chinasoft.gangjiantou.dto.CcDto;
 import com.chinasoft.gangjiantou.entity.Apply;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public interface ApplyMapper extends BaseMapper<Apply> {
 
-  Page<Apply>  pendingApply(Page<Apply> page,String userId, ApplyPendingDto applyPendingDto);
+  Page<Apply>  pendingApply(Page<Apply> page, @Param("userId")String userId,@Param("applyPendingDto") ApplyPendingDto applyPendingDto);
 
   Page<Apply>  queryCC(Page<Apply> page,String userId, CcDto ccDto);
 

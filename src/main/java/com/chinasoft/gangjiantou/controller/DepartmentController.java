@@ -49,7 +49,8 @@ public class DepartmentController {
                 .orderByAsc(Department::getOrderNo).list();
         list.forEach(e->{
             Department department=departmentService.getById(e.getParentCode());
-            e.setParentName(department.getDeptNameCn());
+            if(department!=null)
+                e.setParentName(department.getDeptNameCn());
         });
         return list;
     }

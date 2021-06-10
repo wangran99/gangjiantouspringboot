@@ -109,6 +109,10 @@ api[3].list.push({
 });
 api[3].list.push({
     order: '4',
+    desc: 'SNS页面免登',
+});
+api[3].list.push({
+    order: '5',
     desc: '用户退出(删除token)',
 });
 api.push({

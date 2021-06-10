@@ -166,11 +166,26 @@ public class AuthorizationController {
     }
 
     /**
-     * 用户退出(删除token)
+     * SNS页面免登
      *
+     * @param code welink跳转后传过来的code
+     * @param state
      * @param request
+     * @param response
      * @return
      */
+    @GetMapping(value = "/sns")
+    public ManagerAuthRes snsAuthorization(String code, String state, HttpServletRequest request, HttpServletResponse response) {
+//        ManagerAuthRes managerAuthRes = openManagerApi.managerAuthorization(code, "authorization_code", clientId, clientSecret, redirectUri, state);
+        return  null;
+    }
+
+        /**
+         * 用户退出(删除token)
+         *
+         * @param request
+         * @return
+         */
     @GetMapping(value = "/logout")
     public boolean logout(HttpServletRequest request) {
         redisService.delUserInfo(request.getHeader(Constants.AUTH_CODE));

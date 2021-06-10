@@ -127,14 +127,19 @@ public class FileController {
     @Transactional
     public boolean save(@RequestBody SaveDocDto saveDocDto, @RequestHeader("authCode") String authCode) {
         UserBasicInfoRes user = redisService.getUserInfo(authCode);
-        log.error("savedto:"+saveDocDto.toString());
+        log.error("savedto:" + saveDocDto.toString());
+        log.error("user:" + user.toString());
         Apply apply = applyService.getById(saveDocDto.getApplyId());
+        log.error("currentapprovalid:" + apply.getCurrentApproverId());
+        log.error("userid:" + user.getUserId());
         if (!apply.getCurrentApproverId().equals(user.getUserId()))
             throw new CommonException("您当前无权编辑保存文档");
         com.chinasoft.gangjiantou.entity.File file = fileService.getById(saveDocDto.getSourceFileId());
         ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, file.getApplyId())
                 .eq(ApplyApprover::getApproverId, user.getUserId()).one();
-        if (file == null) {
+        com.chinasoft.gangjiantou.entity.File currentFile=fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getSource,saveDocDto.getSourceFileId())
+                .eq(com.chinasoft.gangjiantou.entity.File::getApprovalId,applyApprover.getId()).one();
+        if (currentFile == null) {
             LocalDateTime now = LocalDateTime.now();
             int year = now.getYear();
             int month = now.getMonthValue();
@@ -145,10 +150,10 @@ public class FileController {
             if (!file1.exists())
                 file1.mkdirs();
             String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-            HttpUtil.downloadFile(saveDocDto.getUrl(), filePath + File.separator + path + File.separator + uuid + "." + file.getType());
 
             com.chinasoft.gangjiantou.entity.File tempFile = new com.chinasoft.gangjiantou.entity.File();
             tempFile.setFileName(file.getFileName());
+            tempFile.setType(file.getType());
             tempFile.setPath(File.separator + path + File.separator + uuid + "." + file.getType());
             tempFile.setUuid(uuid);
             tempFile.setSource(saveDocDto.getSourceFileId());
@@ -157,6 +162,7 @@ public class FileController {
             tempFile.setApplyId(file.getApplyId());
             tempFile.setApprovalId(applyApprover.getId());
             fileService.save(tempFile);
+            HttpUtil.downloadFile(saveDocDto.getUrl(), filePath + File.separator + path + File.separator + uuid + "." + file.getType());
         } else {
             File file2 = new File(filePath + file.getPath());
             if (file2.exists())

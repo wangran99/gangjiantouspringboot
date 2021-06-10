@@ -3,9 +3,10 @@
 <mapper namespace="com.chinasoft.gangjiantou.mapper.ApplyMapper">
 
     <select id="pendingApply" resultType="com.chinasoft.gangjiantou.entity.Apply">
-        select apl.* from apply apl inner join apply_approver appover on apl.id=appover.apply_id
+        select apl.*,appover.status as `condition` from `apply` apl inner join apply_approver appover on apl.id=appover.apply_id
         where
         appover.approver_id = #{userId}
+        and  apl.status!=1
 
         <if test="applyPendingDto.applicant != null and applyPendingDto.applicant !='' ">
             and apl.applicant like concat('%',#{applyPendingDto.applicant,jdbcType=VARCHAR},'%')
@@ -16,14 +17,33 @@
         <if test="applyPendingDto.subject != null and applyPendingDto.subject !='' ">
             and apl.subject like concat('%', #{applyPendingDto.subject,jdbcType=VARCHAR},'%')
         </if>
-        <if test="applyPendingDto.status != null and applyPendingDto.status ==0">
-            and appover.status = 0
+        <if test="applyPendingDto.statusList.contains(&quot;0&quot;)">
+            and apl.aa=daddsds
+        </if>
+        <if test="applyPendingDto.statusList.contains(&quot;0&quot;)==false">
+            and apl.bb=bbbbbbb
+        </if>
+        <if test="applyPendingDto.statusList != null and applyPendingDto.statusList.size >0 and applyPendingDto.statusList.contains(0)">
+            AND (appover.status IN
+            <foreach item="item" index="index" collection="applyPendingDto.statusList" open="(" close=")" separator=",">
+                <if test="item == 0 ">
+                    99
+                </if>
+                <if test="item != 0 ">
+                    #{item}
+                </if>
+            </foreach>
+            or appover.status = 0
             and apl.current_approver_id= #{userId,jdbcType=VARCHAR}
+            )
         </if>
-        <if test="applyPendingDto.status != null and applyPendingDto.status !=0">
-            and appover.status = #{applyPendingDto.status,jdbcType=TINYINT}
+        <if test="applyPendingDto.statusList != null and applyPendingDto.statusList.size >0 and applyPendingDto.statusList.contains(0) == false">
+            AND appover.status IN
+            <foreach item="item" index="index" collection="applyPendingDto.statusList" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
         </if>
-        <if test="applyPendingDto.status == null ">
+        <if test="applyPendingDto.statusList == null or applyPendingDto.statusList.size == 0">
             and ( appover.status = 0
             and apl.current_approver_id= #{userId,jdbcType=VARCHAR}
             or appover.status in (1,2,3) )
