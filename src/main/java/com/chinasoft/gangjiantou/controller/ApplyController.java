@@ -189,7 +189,7 @@ public class ApplyController {
             sendOfficialAccountMsgReq.setToUserList(apply.getCcList());
             sendOfficialAccountMsgReq.setMsgTitle("文件审批");
             sendOfficialAccountMsgReq.setMsgRange("0");
-            sendOfficialAccountMsgReq.setMsgDisplayMode(1);
+//            sendOfficialAccountMsgReq.setMsgDisplayMode(1);
             openAPI.sendOfficialAccountMsg(sendOfficialAccountMsgReq);
         }
         addTodoTask(apply);
@@ -270,16 +270,12 @@ public class ApplyController {
         //获取最新编辑的文档列表
         List<File> newFileList = new ArrayList<>();
         apply.getFileList().forEach(e -> {
-            File lastFile = e;
-            while (lastFile != null) {
-                File file = fileService.lambdaQuery().eq(File::getSource, lastFile.getId()).one();
-                if (file != null) {
-                    lastFile = file;
+                File file = fileService.lambdaQuery().eq(File::getSource, e.getId()).orderByDesc(File::getUploadTime).last("limit 1").one();
+                if (file == null) {
+                    newFileList.add(e);
                 } else {
-                    newFileList.add(lastFile);
-                    return;
+                    newFileList.add(file);
                 }
-            }
         });
         apply.setNewFileList(newFileList);
 
@@ -356,7 +352,7 @@ public class ApplyController {
             sendOfficialAccountMsgReq.setToUserList(list);
             sendOfficialAccountMsgReq.setMsgTitle("文件审批");
             sendOfficialAccountMsgReq.setMsgRange("0");
-            sendOfficialAccountMsgReq.setMsgDisplayMode(1);
+//            sendOfficialAccountMsgReq.setMsgDisplayMode(1);
             openAPI.sendOfficialAccountMsg(sendOfficialAccountMsgReq);
         } else {
             apply.setCurrentApproverId(applyApprover.getNextApproverId());
@@ -381,7 +377,7 @@ public class ApplyController {
             sendOfficialAccountMsgReq.setToUserList(list);
             sendOfficialAccountMsgReq.setMsgTitle("文件审批");
             sendOfficialAccountMsgReq.setMsgRange("0");
-            sendOfficialAccountMsgReq.setMsgDisplayMode(1);
+//            sendOfficialAccountMsgReq.setMsgDisplayMode(1);
             openAPI.sendOfficialAccountMsg(sendOfficialAccountMsgReq);
         }
         return true;
@@ -448,7 +444,7 @@ public class ApplyController {
         sendOfficialAccountMsgReq.setToUserList(list);
         sendOfficialAccountMsgReq.setMsgTitle("文件审批");
         sendOfficialAccountMsgReq.setMsgRange("0");
-        sendOfficialAccountMsgReq.setMsgDisplayMode(1);
+//        sendOfficialAccountMsgReq.setMsgDisplayMode(1);
         openAPI.sendOfficialAccountMsg(sendOfficialAccountMsgReq);
         return true;
     }
@@ -528,7 +524,7 @@ public class ApplyController {
         sendOfficialAccountMsgReq.setToUserList(list);
         sendOfficialAccountMsgReq.setMsgTitle("文件审批");
         sendOfficialAccountMsgReq.setMsgRange("0");
-        sendOfficialAccountMsgReq.setMsgDisplayMode(1);
+//        sendOfficialAccountMsgReq.setMsgDisplayMode(1);
         openAPI.sendOfficialAccountMsg(sendOfficialAccountMsgReq);
         return true;
     }
@@ -571,7 +567,7 @@ public class ApplyController {
         sendOfficialAccountMsgReq.setToUserList(list);
         sendOfficialAccountMsgReq.setMsgTitle("文件审批");
         sendOfficialAccountMsgReq.setMsgRange("0");
-        sendOfficialAccountMsgReq.setMsgDisplayMode(1);
+//        sendOfficialAccountMsgReq.setMsgDisplayMode(1);
         openAPI.sendOfficialAccountMsg(sendOfficialAccountMsgReq);
         return true;
     }

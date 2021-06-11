@@ -88,11 +88,29 @@ public class UserController {
             QueryUserInfoResPage queryUserInfoResPage = openAPI.getUsersByDeptCode("0", 1, 50);
             if (!CollectionUtils.isEmpty(queryUserInfoResPage.getData())) {
                 List<String> userIdList = queryUserInfoResPage.getData().stream().map(e -> e.getUserId()).collect(Collectors.toList());
-                return userService.lambdaQuery().in(User::getUserId, userIdList).list();
+                List<User> list = userService.lambdaQuery().in(User::getUserId, userIdList).list();
+                list.forEach(e -> {
+                    List<UserPosition> userPositionList = userPositionService.lambdaQuery().in(UserPosition::getUserId, e.getUserId()).list();
+                    e.setPositionList(userPositionList);
+                    userPositionList.forEach(a -> {
+                        a.setPositionName(positionService.getById(a.getPositionId()).getPositionName());
+                    });
+
+                });
+                return list;
             } else
                 return new ArrayList<>();
         }
-        return userService.lambdaQuery().like(StringUtils.hasText(deptCode), User::getDeptCode, deptCode).list();
+        List<User> list = userService.lambdaQuery().like(StringUtils.hasText(deptCode), User::getDeptCode, deptCode).list();
+        list.forEach(e -> {
+            List<UserPosition> userPositionList = userPositionService.lambdaQuery().in(UserPosition::getUserId, e.getUserId()).list();
+            e.setPositionList(userPositionList);
+            userPositionList.forEach(a -> {
+                a.setPositionName(positionService.getById(a.getPositionId()).getPositionName());
+            });
+
+        });
+        return list;
     }
 
     /**

@@ -2,6 +2,8 @@ package com.chinasoft.gangjiantou.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class FlowQueryDto {
     /**
@@ -9,9 +11,9 @@ public class FlowQueryDto {
      */
     private String flowName;
     /**
-     * 部门id
+     * 部门id列表
      */
-    private String deptCode;
+    private List<String> deptCodeList;
 
     private Long pageNumber;
     private Long pageSize;

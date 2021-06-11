@@ -160,7 +160,7 @@ public class ApprovalFlowController {
         Page<ApprovalFlow> page = new Page<>(flowQueryDto.getPageNumber(), flowQueryDto.getPageSize());
         Page<ApprovalFlow> approvalFlowPage = approvalFlowService.lambdaQuery()
                 .like(StringUtils.hasText(flowQueryDto.getFlowName()), ApprovalFlow::getFlowName, flowQueryDto.getFlowName())
-                .eq(StringUtils.hasText(flowQueryDto.getDeptCode()), ApprovalFlow::getDeptCode, flowQueryDto.getDeptCode()).page(page);
+                .in(!CollectionUtils.isEmpty(flowQueryDto.getDeptCodeList()), ApprovalFlow::getDeptCode, flowQueryDto.getDeptCodeList()).page(page);
         approvalFlowPage.getRecords().forEach(e -> {
             e.setDeptName(departmentService.getById(e.getDeptCode()).getDeptNameCn());
         });

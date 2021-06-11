@@ -129,6 +129,8 @@ public class FileController {
         UserBasicInfoRes user = redisService.getUserInfo(authCode);
         log.error("savedto:" + saveDocDto.toString());
         log.error("user:" + user.toString());
+        if(saveDocDto.getSourceFileId()<1)
+            throw new CommonException("文件对应的上传初始文件id错误。");
         Apply apply = applyService.getById(saveDocDto.getApplyId());
         log.error("currentapprovalid:" + apply.getCurrentApproverId());
         log.error("userid:" + user.getUserId());
@@ -164,10 +166,19 @@ public class FileController {
             fileService.save(tempFile);
             HttpUtil.downloadFile(saveDocDto.getUrl(), filePath + File.separator + path + File.separator + uuid + "." + file.getType());
         } else {
-            File file2 = new File(filePath + file.getPath());
+            File file2 = new File(filePath + currentFile.getPath());
             if (file2.exists())
                 file2.delete();
-            HttpUtil.downloadFile(saveDocDto.getUrl(), filePath + file.getPath());
+            LocalDateTime now = LocalDateTime.now();
+            int year = now.getYear();
+            int month = now.getMonthValue();
+            int day = now.getDayOfMonth();
+            String path = String.format("%d-%d-%d", year, month, day);
+            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+            currentFile.setUuid(uuid);
+            currentFile.setPath(File.separator + path + File.separator + uuid + "." + file.getType());
+            fileService.updateById(currentFile);
+            HttpUtil.downloadFile(saveDocDto.getUrl(), filePath + currentFile.getPath());
         }
         return true;
     }

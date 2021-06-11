@@ -13,7 +13,7 @@ public class SaveDocDto {
      */
     String url;
     /**
-     * 当前编辑的文档id
+     * 当前编辑的文档对应的初始上传文件id
      */
     Long sourceFileId;
 }

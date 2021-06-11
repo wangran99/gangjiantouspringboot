@@ -17,13 +17,7 @@
         <if test="applyPendingDto.subject != null and applyPendingDto.subject !='' ">
             and apl.subject like concat('%', #{applyPendingDto.subject,jdbcType=VARCHAR},'%')
         </if>
-        <if test="applyPendingDto.statusList.contains(&quot;0&quot;)">
-            and apl.aa=daddsds
-        </if>
-        <if test="applyPendingDto.statusList.contains(&quot;0&quot;)==false">
-            and apl.bb=bbbbbbb
-        </if>
-        <if test="applyPendingDto.statusList != null and applyPendingDto.statusList.size >0 and applyPendingDto.statusList.contains(0)">
+        <if test="applyPendingDto.statusList != null and applyPendingDto.statusList.size >0 and applyPendingDto.statusList.contains(&quot;0&quot;)">
             AND (appover.status IN
             <foreach item="item" index="index" collection="applyPendingDto.statusList" open="(" close=")" separator=",">
                 <if test="item == 0 ">
@@ -37,7 +31,7 @@
             and apl.current_approver_id= #{userId,jdbcType=VARCHAR}
             )
         </if>
-        <if test="applyPendingDto.statusList != null and applyPendingDto.statusList.size >0 and applyPendingDto.statusList.contains(0) == false">
+        <if test="applyPendingDto.statusList != null and applyPendingDto.statusList.size >0 and applyPendingDto.statusList.contains(&quot;0&quot;) == false">
             AND appover.status IN
             <foreach item="item" index="index" collection="applyPendingDto.statusList" open="(" close=")" separator=",">
                 #{item}

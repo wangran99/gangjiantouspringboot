@@ -48,9 +48,14 @@ public class File implements Serializable {
     private String type;
 
     /**
-     * 编辑后的文件对应的源文件ID
+     * 编辑后的文件对应的原始上传文件ID
      */
     private Long source;
+
+    /**
+     * 编辑后的文件对应的上一个文件ID
+     */
+    private Long lastFileId;
 
     /**
      * 用户id

@@ -14,11 +14,12 @@ public class SyncTimer {
     SyncService syncService;
 
     //每隔1小时
-    @Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 2000)
+//    @Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 2000)
+    @Scheduled(cron = "0 0 0 * * ?")//每天晚上0点执行
     @Transactional
     public void scheduled() {
-//        syncService.delDepts();
-//        syncService.syncDepts();
-//        syncService.syncUsers();
+        syncService.delDepts();
+        syncService.syncDepts();
+        syncService.syncUsers();
     }
 }

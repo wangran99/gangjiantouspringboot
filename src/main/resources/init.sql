@@ -65,22 +65,24 @@ CREATE TABLE `user_position`
 
 CREATE TABLE `file`
 (
-    `id`          bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `file_name`   VARCHAR(200) NOT NULL COMMENT '文件名',
-    `path`        VARCHAR(200) NOT NULL COMMENT '相对路径',
-    `uuid`        VARCHAR(100) NOT NULL UNIQUE COMMENT '文件uuid',
-    `type`        VARCHAR(10)  NOT NULL COMMENT '文件名后缀',
-    `source`      bigint       NOT NULL DEFAULT -1 COMMENT '编辑后的文件对应的源文件ID',
-    `user_id`     VARCHAR(50)  NOT NULL COMMENT '用户id',
-    `user_name`   VARCHAR(20)  NOT NULL COMMENT '用户姓名',
-    `apply_id`    bigint       NOT NULL DEFAULT -1 COMMENT '申请id',
-    `approval_id` bigint       NOT NULL DEFAULT -1 COMMENT '审批环节ID',
-    `upload_time` datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
+    `id`           bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `file_name`    VARCHAR(200) NOT NULL COMMENT '文件名',
+    `path`         VARCHAR(200) NOT NULL COMMENT '相对路径',
+    `uuid`         VARCHAR(100) NOT NULL UNIQUE COMMENT '文件uuid',
+    `type`         VARCHAR(10)  NOT NULL COMMENT '文件名后缀',
+    `source`       bigint       NOT NULL DEFAULT -1 COMMENT '编辑后的文件对应的原始上传文件ID',
+#     `last_file_id` bigint       NOT NULL DEFAULT -1 COMMENT '编辑后的文件对应的上一个文件ID',
+    `user_id`      VARCHAR(50)  NOT NULL COMMENT '用户id',
+    `user_name`    VARCHAR(20)  NOT NULL COMMENT '用户姓名',
+    `apply_id`     bigint       NOT NULL DEFAULT -1 COMMENT '申请id',
+    `approval_id`  bigint       NOT NULL DEFAULT -1 COMMENT '审批环节ID',
+    `upload_time`  datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
     PRIMARY KEY (`id`),
     INDEX (`apply_id`),
     INDEX (`uuid`),
     INDEX (`source`),
-    INDEX (`approval_id`)
+    INDEX (`approval_id`),
+    INDEX (`last_file_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='上传/修订文件信息表';
 
