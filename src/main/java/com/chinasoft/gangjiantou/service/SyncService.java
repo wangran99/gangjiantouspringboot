@@ -11,9 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * 同步部门/人员服务
@@ -99,6 +97,8 @@ public class SyncService {
             userService.removeByIds(userList);
         List<Department> list = departmentService.list();
 
+        Set<UserPosition> userPositionList=new HashSet<>();
+        Set<UserRole> userRoleList=new HashSet<>();
         for (Department department : list) {
             int pageNum = 1;
             while (true) {
@@ -125,21 +125,21 @@ public class SyncService {
                         temp.setDeptCode(deptCode + "," + department.getDeptCode());
                         userService.updateById(temp);
                     }
-                  List<UserRole> userRoleList=  userRoleService.lambdaQuery().eq(UserRole::getUserId,user.getUserId()).list();
-                    if(userRoleList.isEmpty()){
+                  List<UserRole> userRoleListTemp=  userRoleService.lambdaQuery().eq(UserRole::getUserId,user.getUserId()).list();
+                    if(userRoleListTemp.isEmpty()){
                         UserRole userRole=new UserRole();
                         userRole.setUserId(user.getUserId());
                         userRole.setUserName(user.getUserNameCn());
                         userRole.setRoleId(2L);
-                        userRoleService.save(userRole);
+                        userRoleList.add(userRole);
                     }
-                    List<UserPosition> userPositionList  =userPositionService.lambdaQuery().eq(UserPosition::getUserId,user.getUserId()).list();
-                    if(userPositionList.isEmpty()){
+                    List<UserPosition> userPositionListTemp  =userPositionService.lambdaQuery().eq(UserPosition::getUserId,user.getUserId()).list();
+                    if(userPositionListTemp.isEmpty()){
                         UserPosition userPosition=new UserPosition();
                         userPosition.setUserId(user.getUserId());
                         userPosition.setUserName(user.getUserNameCn());
                         userPosition.setPositionId(1L);
-                        userPositionService.save(userPosition);
+                        userPositionList.add(userPosition);
                     }
                 }
                 if (queryUserInfoResPage.getHasMore() == 1)//最后一页
@@ -147,6 +147,8 @@ public class SyncService {
                 else pageNum++;
             }
         }
+        userPositionService.saveBatch(userPositionList);
+        userRoleService.saveBatch(userRoleList);
         log.info("=====end sync users=======");
     }
 

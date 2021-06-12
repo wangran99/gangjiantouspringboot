@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -87,6 +88,7 @@ public class FileController {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         //获取原文件名称和后缀
         String originalFilename = file.getOriginalFilename();
+        originalFilename= URLDecoder.decode(originalFilename,"UTF-8");
         // 获取文件后缀名
         String fil_extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
