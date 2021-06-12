@@ -76,6 +76,11 @@ public class Apply implements Serializable {
     private String note;
 
     /**
+     * 申请人岗位
+     */
+    private String userPositionName;
+
+    /**
      * 申请原因说明
      */
     private String reason;

@@ -53,11 +53,6 @@ public class File implements Serializable {
     private Long source;
 
     /**
-     * 编辑后的文件对应的上一个文件ID
-     */
-    private Long lastFileId;
-
-    /**
      * 用户id
      */
     private String userId;

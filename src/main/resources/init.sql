@@ -71,7 +71,6 @@ CREATE TABLE `file`
     `uuid`         VARCHAR(100) NOT NULL UNIQUE COMMENT '文件uuid',
     `type`         VARCHAR(10)  NOT NULL COMMENT '文件名后缀',
     `source`       bigint       NOT NULL DEFAULT -1 COMMENT '编辑后的文件对应的原始上传文件ID',
-#     `last_file_id` bigint       NOT NULL DEFAULT -1 COMMENT '编辑后的文件对应的上一个文件ID',
     `user_id`      VARCHAR(50)  NOT NULL COMMENT '用户id',
     `user_name`    VARCHAR(20)  NOT NULL COMMENT '用户姓名',
     `apply_id`     bigint       NOT NULL DEFAULT -1 COMMENT '申请id',
@@ -81,8 +80,7 @@ CREATE TABLE `file`
     INDEX (`apply_id`),
     INDEX (`uuid`),
     INDEX (`source`),
-    INDEX (`approval_id`),
-    INDEX (`last_file_id`)
+    INDEX (`approval_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='上传/修订文件信息表';
 
@@ -208,6 +206,7 @@ CREATE TABLE `apply`
     `file_editable`             TINYINT      NOT NULL COMMENT '上传的文件能否编辑：0：不能编辑，1：可以编辑',
     `reason`                    varchar(200) NOT NULL COMMENT '申请原因说明',
     `note`                      varchar(200) NOT NULL COMMENT '申请备注说明',
+    `user_position_name`        varchar(100) NOT NULL COMMENT '申请人岗位',
     `current_approver_id`       varchar(100) NOT NULL COMMENT '当前审批人id',
     `current_approver`          varchar(20)  NOT NULL COMMENT '当前审批人',
     `current_approver_position` varchar(50)           DEFAULT NULL COMMENT '当前审批人岗位',

@@ -132,6 +132,7 @@ public class ApplyController {
         ApprovalFlow approvalFlow = approvalFlowService.getById(apply.getFlowId());
         List<FlowApprover> flowApproverList = flowApproverService.lambdaQuery().eq(FlowApprover::getFlowId, approvalFlow.getId()).orderByAsc(FlowApprover::getId).list();
         apply.setCurrentApproverId(flowApproverList.get(0).getUserId());
+        apply.setUserPositionName(positionService.getById(approvalFlow.getPositionId()).getPositionName());
         apply.setCurrentApprover(flowApproverList.get(0).getUserName());
         Position position =positionService.getById(flowApproverList.get(0).getPositionId());
         apply.setCurrentApproverPosition(position!=null? position.getPositionName() : "");
