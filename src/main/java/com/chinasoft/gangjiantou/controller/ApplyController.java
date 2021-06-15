@@ -124,7 +124,7 @@ public class ApplyController {
         //生成流水号
         LocalDateTime localDateTime = LocalDateTime.now();
         ThreadLocalRandom threadRandom = ThreadLocalRandom.current();
-        Long randomLong = threadRandom.nextLong(0L, Integer.MAX_VALUE);
+        Long randomLong = threadRandom.nextLong(10000L, Short.MAX_VALUE);
         String serialNumber = String.format("%d%02d%02d", localDateTime.getYear(), localDateTime.getMonthValue(), localDateTime.getDayOfMonth())
                 + randomLong;
         apply.setSerialNumber(serialNumber);
@@ -134,8 +134,8 @@ public class ApplyController {
         apply.setCurrentApproverId(flowApproverList.get(0).getUserId());
         apply.setUserPositionName(positionService.getById(approvalFlow.getPositionId()).getPositionName());
         apply.setCurrentApprover(flowApproverList.get(0).getUserName());
-        Position position =positionService.getById(flowApproverList.get(0).getPositionId());
-        apply.setCurrentApproverPosition(position!=null? position.getPositionName() : "");
+        Position position = positionService.getById(flowApproverList.get(0).getPositionId());
+        apply.setCurrentApproverPosition(position != null ? position.getPositionName() : "");
         apply.setFlowName(approvalFlow.getFlowName());
         apply.setFileEditable(approvalFlow.getFileEditable());
         apply.setDeptName(departmentService.getById(approvalFlow.getDeptCode()).getDeptNameCn());
@@ -181,7 +181,7 @@ public class ApplyController {
             });
             carbonCopyService.saveBatch(carbonCopyList);
             SendOfficialAccountMsgReq sendOfficialAccountMsgReq = new SendOfficialAccountMsgReq();
-            sendOfficialAccountMsgReq.setMsgContent(apply.getApplicant() +"发起了文件审批");
+            sendOfficialAccountMsgReq.setMsgContent(apply.getApplicant() + "发起了文件审批");
             sendOfficialAccountMsgReq.setMsgOwner("文件审批者");
             sendOfficialAccountMsgReq.setUrlType("html");
             sendOfficialAccountMsgReq.setUrlPath("h5://" + mobileUrl + "/html/index.html?applyid=" + apply.getId());
@@ -228,8 +228,8 @@ public class ApplyController {
     Page<Apply> pending(@RequestHeader("authCode") String authCode, @RequestBody ApplyPendingDto applyPendingDto) {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         Page<Apply> page = new Page<>(applyPendingDto.getPageNum(), applyPendingDto.getPageSize());
-        log.error("dto:"+applyPendingDto.toString());
-        log.error("dto333:"+applyPendingDto.getStatusList().contains("0"));
+//        log.error("dto:"+applyPendingDto.toString());
+//        log.error("dto333:"+applyPendingDto.getStatusList().contains("0"));
         Page<Apply> applyPage = applyService.pendingApply(page, userBasicInfoRes.getUserId(), applyPendingDto);
         return applyPage;
     }
@@ -271,12 +271,12 @@ public class ApplyController {
         //获取最新编辑的文档列表
         List<File> newFileList = new ArrayList<>();
         apply.getFileList().forEach(e -> {
-                File file = fileService.lambdaQuery().eq(File::getSource, e.getId()).orderByDesc(File::getUploadTime).last("limit 1").one();
-                if (file == null) {
-                    newFileList.add(e);
-                } else {
-                    newFileList.add(file);
-                }
+            File file = fileService.lambdaQuery().eq(File::getSource, e.getId()).orderByDesc(File::getUploadTime).last("limit 1").one();
+            if (file == null) {
+                newFileList.add(e);
+            } else {
+                newFileList.add(file);
+            }
         });
         apply.setNewFileList(newFileList);
 
@@ -322,7 +322,7 @@ public class ApplyController {
         if (CollectionUtils.isNotEmpty(approvalDto.getCcList())) {
             List<CarbonCopy> carbonCopyList = new ArrayList<>();
             approvalDto.getCcList().forEach(e -> {
-                if(carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId,apply.getId()).eq(CarbonCopy::getUserId,e).one()!=null)
+                if (carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId, apply.getId()).eq(CarbonCopy::getUserId, e).one() != null)
                     return;
                 CarbonCopy carbonCopy = new CarbonCopy();
                 carbonCopy.setApplyId(apply.getId());
@@ -359,13 +359,13 @@ public class ApplyController {
             apply.setCurrentApproverId(applyApprover.getNextApproverId());
             apply.setCurrentApprover(applyApprover.getNextApproverName());
             apply.setStatus(2);
-            ApplyApprover applyApproverTemp=applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId,apply.getId())
-                    .eq(ApplyApprover::getApproverId,apply.getCurrentApproverId()).one();
+            ApplyApprover applyApproverTemp = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
+                    .eq(ApplyApprover::getApproverId, apply.getCurrentApproverId()).one();
             apply.setCurrentApproverPosition(applyApproverTemp.getPositionName());
             applyService.updateById(apply);
             addTodoTask(apply);
             SendOfficialAccountMsgReq sendOfficialAccountMsgReq = new SendOfficialAccountMsgReq();
-            sendOfficialAccountMsgReq.setMsgContent(apply.getApplicant() + "的文件审批待"+apply.getCurrentApprover()+"审批");
+            sendOfficialAccountMsgReq.setMsgContent(apply.getApplicant() + "的文件审批待" + apply.getCurrentApprover() + "审批");
             sendOfficialAccountMsgReq.setMsgOwner("文件审批者");
             sendOfficialAccountMsgReq.setUrlType("html");
             sendOfficialAccountMsgReq.setUrlPath("h5://" + mobileUrl + "/html/index.html?applyid=" + apply.getId());
@@ -411,7 +411,7 @@ public class ApplyController {
         if (CollectionUtils.isNotEmpty(approvalDto.getCcList())) {
             List<CarbonCopy> carbonCopyList = new ArrayList<>();
             approvalDto.getCcList().forEach(e -> {
-                if(carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId,apply.getId()).eq(CarbonCopy::getUserId,e).one()!=null)
+                if (carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId, apply.getId()).eq(CarbonCopy::getUserId, e).one() != null)
                     return;
                 CarbonCopy carbonCopy = new CarbonCopy();
                 carbonCopy.setApplyId(apply.getId());
@@ -497,7 +497,7 @@ public class ApplyController {
         if (CollectionUtils.isNotEmpty(approvalDto.getCcList())) {
             List<CarbonCopy> carbonCopyList = new ArrayList<>();
             approvalDto.getCcList().forEach(e -> {
-                if(carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId,apply.getId()).eq(CarbonCopy::getUserId,e).one()!=null)
+                if (carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId, apply.getId()).eq(CarbonCopy::getUserId, e).one() != null)
                     return;
                 CarbonCopy carbonCopy = new CarbonCopy();
                 carbonCopy.setApplyId(apply.getId());
@@ -513,7 +513,7 @@ public class ApplyController {
         addTodoTask(apply);
 
         SendOfficialAccountMsgReq sendOfficialAccountMsgReq = new SendOfficialAccountMsgReq();
-        sendOfficialAccountMsgReq.setMsgContent(apply.getApplicant() + "的文件审批转移给"+shiftUser.getUserNameCn()+",点击查看详情");
+        sendOfficialAccountMsgReq.setMsgContent(apply.getApplicant() + "的文件审批转移给" + shiftUser.getUserNameCn() + ",点击查看详情");
         sendOfficialAccountMsgReq.setMsgOwner("文件审批者");
         sendOfficialAccountMsgReq.setUrlType("html");
 //        sendOfficialAccountMsgReq.setUrlPath(url + "/#/detail?id=" + apply.getId());

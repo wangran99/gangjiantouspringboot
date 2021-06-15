@@ -19,7 +19,7 @@ public class FilterConfiguration {
     public FilterRegistrationBean commonFilter() {
         FilterRegistrationBean registration = new FilterRegistrationBean(new CommonFilter());
         registration.setName("CommonFilter");
-        registration.addUrlPatterns("/hello/*");
+        registration.addUrlPatterns("/*");
         registration.setOrder(0);//数字越小，优先级越高
         return registration;
     }

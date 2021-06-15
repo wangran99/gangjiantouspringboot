@@ -88,7 +88,7 @@ public class FileController {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         //获取原文件名称和后缀
         String originalFilename = file.getOriginalFilename();
-        originalFilename= URLDecoder.decode(originalFilename,"UTF-8");
+        originalFilename = URLDecoder.decode(originalFilename, "UTF-8");
         // 获取文件后缀名
         String fil_extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
@@ -131,7 +131,7 @@ public class FileController {
         UserBasicInfoRes user = redisService.getUserInfo(authCode);
         log.error("savedto:" + saveDocDto.toString());
         log.error("user:" + user.toString());
-        if(saveDocDto.getSourceFileId()<1)
+        if (saveDocDto.getSourceFileId() < 1)
             throw new CommonException("文件对应的上传初始文件id错误。");
         Apply apply = applyService.getById(saveDocDto.getApplyId());
         log.error("currentapprovalid:" + apply.getCurrentApproverId());
@@ -141,8 +141,8 @@ public class FileController {
         com.chinasoft.gangjiantou.entity.File file = fileService.getById(saveDocDto.getSourceFileId());
         ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, file.getApplyId())
                 .eq(ApplyApprover::getApproverId, user.getUserId()).one();
-        com.chinasoft.gangjiantou.entity.File currentFile=fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getSource,saveDocDto.getSourceFileId())
-                .eq(com.chinasoft.gangjiantou.entity.File::getApprovalId,applyApprover.getId()).one();
+        com.chinasoft.gangjiantou.entity.File currentFile = fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getSource, saveDocDto.getSourceFileId())
+                .eq(com.chinasoft.gangjiantou.entity.File::getApprovalId, applyApprover.getId()).one();
         if (currentFile == null) {
             LocalDateTime now = LocalDateTime.now();
             int year = now.getYear();
@@ -200,8 +200,15 @@ public class FileController {
         // 获得文件的长度
         response.setHeader("Content-Length", String.valueOf(file1.length()));
         response.setContentType("application/octet-stream");
-        // 下载文件能正常显示中文
-        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(file.getFileName(), "UTF-8"));
+        String fileName = URLEncoder.encode(file.getFileName(), "UTF-8");
+        if (file.getSource() == -1)
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        else {
+            int index = fileName.lastIndexOf(".");
+            // 下载文件能正常显示中文
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName.substring(0, index) +
+                    "_" + file.getUserName() + "." + file.getType());
+        }
         // 实现文件下载
         byte[] buffer = new byte[1024];
         FileInputStream fis = null;

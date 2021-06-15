@@ -2,6 +2,7 @@ package com.chinasoft.gangjiantou.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.chinasoft.gangjiantou.dto.RoleMenuDto;
 import com.chinasoft.gangjiantou.entity.Role;
 import com.chinasoft.gangjiantou.entity.RoleMenu;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,8 +108,8 @@ public class RoleMenuController {
         roleService.removeById(roleId);
         QueryWrapper<RoleMenu> wrapper = new QueryWrapper<>();
         roleMenuService.remove(wrapper.lambda().eq(RoleMenu::getRoleId, roleId));
-        QueryWrapper<UserRole> wrapper1 = new QueryWrapper<>();
-        userRoleService.remove(wrapper1.lambda().eq(UserRole::getRoleId, roleId));
+        userRoleService.lambdaUpdate().eq(UserRole::getRoleId, roleId).set(UserRole::getRoleId,2)
+                .set(UserRole::getCreateTime, LocalDateTime.now()).set(UserRole::getRoleName,"普通用户").update();
         return true;
     }
 }

@@ -124,7 +124,7 @@ public class UserController {
         String deptCode = user.getDeptList() != null && user.getDeptList().size() >= 1 ? user.getDeptList().get(0) : "";
         Page<User> userPage = new Page<>(user.getPageNum(), user.getPageSize());
         Page<User> list = userService.lambdaQuery().eq(StringUtils.hasText(user.getSex()), User::getSex, user.getSex()).
-                like(User::getDeptCode, deptCode)
+                eq(StringUtils.hasText(deptCode), User::getDeptCode, deptCode)
                 .like(StringUtils.hasText(user.getName()), User::getUserNameCn, user.getName()).page(userPage);
 
         for (User temp : list.getRecords()) {
@@ -140,7 +140,15 @@ public class UserController {
      */
     @PostMapping("search")
     public List<User> search(@RequestBody UserSearchDto userSearchDto) {
-        List<User> list1 = userService.lambdaQuery().like(StringUtils.hasText(userSearchDto.getDeptCode()), User::getDeptCode, userSearchDto.getDeptCode()).list();
+        List<User> list1 = new ArrayList<>();
+        if ("0".equals(userSearchDto.getDeptCode())) {
+            QueryUserInfoResPage queryUserInfoResPage = openAPI.getUsersByDeptCode("0", 1, 50);
+            if (!CollectionUtils.isEmpty(queryUserInfoResPage.getData())) {
+                List<String> userIdList = queryUserInfoResPage.getData().stream().map(e -> e.getUserId()).collect(Collectors.toList());
+                list1 = userService.lambdaQuery().in(User::getUserId, userIdList).list();
+            }
+        } else
+            list1 = userService.lambdaQuery().like(StringUtils.hasText(userSearchDto.getDeptCode()), User::getDeptCode, userSearchDto.getDeptCode()).list();
         List<UserPosition> list2 = userPositionService.lambdaQuery().eq(userSearchDto.getPositionId() != null, UserPosition::getPositionId, userSearchDto.getPositionId()).list();
         List<User> list = new ArrayList<>();
 

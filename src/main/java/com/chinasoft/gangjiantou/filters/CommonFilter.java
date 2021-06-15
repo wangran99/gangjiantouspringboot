@@ -26,7 +26,7 @@ import java.util.Set;
 @Slf4j
 public class CommonFilter implements Filter {
     private final static Set<String> excludeUri = new HashSet<>(
-            Arrays.asList("/authorization/*", "/druid/*", "/test/*"));
+            Arrays.asList("/authorization/*", "/file/*", "/test/*","/static/*"));
     final AntPathMatcher matcher = new AntPathMatcher();
     @Autowired
     private OpenAPI openAPI;
@@ -55,6 +55,7 @@ public class CommonFilter implements Filter {
         if (openAPI == null) { //获取spring bean
             BeanFactory factory = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
             openAPI = factory.getBean(OpenAPI.class);
+            redisService= factory.getBean(RedisService.class);
             resolver = (HandlerExceptionResolver) factory.getBean("handlerExceptionResolver");
         }
 
