@@ -81,11 +81,6 @@ public class Apply implements Serializable {
     private String userPositionName;
 
     /**
-     * 申请原因说明
-     */
-    private String reason;
-
-    /**
      * 当前审批人id
      */
     private String currentApproverId;
@@ -96,13 +91,14 @@ public class Apply implements Serializable {
     private String currentApprover;
 
     /**
-     * 当前审批人的岗位
-     */
-    private String currentApproverPosition;
-    /**
      * 整个流程状态（对申请人来讲）（0：待审核 1：已撤回 2：审批中 3：已拒绝 4：审批通过）
      */
     private Integer status;
+
+    /**
+     * 转交处理状态（0：待审核 1：已审批）
+     */
+    private Integer shiftStatus;
 
     /**
      * 创建时间

@@ -109,7 +109,7 @@ public class RoleMenuController {
         QueryWrapper<RoleMenu> wrapper = new QueryWrapper<>();
         roleMenuService.remove(wrapper.lambda().eq(RoleMenu::getRoleId, roleId));
         userRoleService.lambdaUpdate().eq(UserRole::getRoleId, roleId).set(UserRole::getRoleId,2)
-                .set(UserRole::getCreateTime, LocalDateTime.now()).set(UserRole::getRoleName,"普通用户").update();
+                .set(UserRole::getCreateTime, LocalDateTime.now()).update();
         return true;
     }
 }

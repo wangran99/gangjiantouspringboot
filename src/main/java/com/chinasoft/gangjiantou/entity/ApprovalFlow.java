@@ -52,6 +52,11 @@ public class ApprovalFlow implements Serializable {
     private Integer fileEditable;
 
     /**
+     * 发文事由：0：不必填，1：必填
+     */
+    private Integer reason;
+
+    /**
      * 流程定义状态：0：不生效，1：生效
      */
     private Integer status;

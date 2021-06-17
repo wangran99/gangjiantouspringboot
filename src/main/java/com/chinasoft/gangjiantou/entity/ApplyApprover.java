@@ -51,19 +51,19 @@ public class ApplyApprover implements Serializable {
     private String positionName;
 
     /**
-     * 下一个审批人id
+     * 下一个审批环节id
      */
-    private String nextApproverId;
-
-    /**
-     * 下一个审批人姓名
-     */
-    private String nextApproverName;
+    private Long nextApplyApprover;
 
     /**
      * 状态（0：待审核 1：审批通过 2：已拒绝 3：转移审批给别人）
      */
     private Integer status;
+
+    /**
+     * 转交标志（0：不是转交的环节 1：转交的审批环节）
+     */
+    private Integer shiftFlag;
 
     /**
      * 审批意见

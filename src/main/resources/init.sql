@@ -137,7 +137,8 @@ values (1000, "组织管理", null, null, 1000),
        (2100, "自定义审批流程", 2000, "/process", 1000),
        (2200, "我的申请", 2000, "/myPending", 1000),
        (2300, "我的审批", 2000, "/myApproval", 1000),
-       (2400, "抄送我的", 2000, "/sendMe", 1000);
+       (2400, "抄送我的", 2000, "/sendMe", 1000),
+       (2500, "转交我的", 2000, "/recallList", 1000);
 
 CREATE TABLE `role_menu`
 (
@@ -160,10 +161,12 @@ values (1, 1000),
        (1, 2200),
        (1, 2300),
        (1, 2400),
+       (1, 2500),
        (2, 2000),
        (2, 2200),
        (2, 2300),
-       (2, 2400);
+       (2, 2400),
+       (2, 2500);
 
 CREATE TABLE `approval_flow`
 (
@@ -173,6 +176,7 @@ CREATE TABLE `approval_flow`
     `position_id`   bigint       NOT NULL COMMENT '适用申请的岗位id',
     `max_file`      INT          NOT NULL COMMENT '最大文件数',
     `file_editable` TINYINT      NOT NULL COMMENT '上传的文件能否编辑：0：不能编辑，1：可以编辑',
+    `reason`        TINYINT      NOT NULL DEFAULT 1 COMMENT '发文事由：0：不必填，1：必填',
     `status`        TINYINT      NOT NULL COMMENT '流程定义状态：0：不生效，1：生效',
     PRIMARY KEY (`id`),
     UNIQUE (`flow_name`, `dept_code`),
@@ -204,13 +208,12 @@ CREATE TABLE `apply`
     `flow_id`                   bigint       NOT NULL COMMENT '流程定义id',
     `flow_name`                 varchar(100) NOT NULL COMMENT '流程模型名称',
     `file_editable`             TINYINT      NOT NULL COMMENT '上传的文件能否编辑：0：不能编辑，1：可以编辑',
-    `reason`                    varchar(200) NOT NULL COMMENT '申请原因说明',
     `note`                      varchar(200) NOT NULL COMMENT '申请备注说明',
     `user_position_name`        varchar(100) NOT NULL COMMENT '申请人岗位',
     `current_approver_id`       varchar(100) NOT NULL COMMENT '当前审批人id',
     `current_approver`          varchar(20)  NOT NULL COMMENT '当前审批人',
-    `current_approver_position` varchar(50)           DEFAULT NULL COMMENT '当前审批人岗位',
-    `status`                    TINYINT      NOT NULL DEFAULT 0 COMMENT '状态（0：待审核 1：已撤回 2：审批中 3：已拒绝 4：审批通过）',
+    `status`                    TINYINT      NOT NULL DEFAULT 0 COMMENT '整个流程状态（对申请人来讲）（0：待审核 1：已撤回 2：审批中 3：已拒绝 4：审批通过 5:已转交）',
+    `shift_status`              TINYINT      NOT NULL DEFAULT 0 COMMENT '转交处理状态（0：待审核 1：已审批）',
     `apply_time`                datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `recall_time`               datetime(0)           DEFAULT NULL COMMENT '撤回时间',
     `end_time`                  datetime(0)           DEFAULT NULL COMMENT '审批完成时间',
@@ -227,14 +230,13 @@ CREATE TABLE `apply_approver`
     `approver_id`        VARCHAR(50) NOT NULL COMMENT '审批人id',
     `approver_name`      VARCHAR(20) NOT NULL COMMENT '审批人姓名',
     `position_name`      VARCHAR(40) NOT NULL COMMENT '审批人岗位',
-    `next_approver_id`   VARCHAR(50)          DEFAULT NULL COMMENT '下一个审批人id',
-    `next_approver_name` VARCHAR(20)          DEFAULT NULL COMMENT '下一个审批人姓名',
+    `next_apply_approver`   bigint          DEFAULT NULL COMMENT '下一个审批环节id',
     `status`             TINYINT     NOT NULL DEFAULT 0 COMMENT '状态（0：待审核 1：审批通过 2：已拒绝 3：转移审批给别人）',
+    `shift_flag`             TINYINT     NOT NULL DEFAULT 0 COMMENT '转交标志（0：不是转交的环节 1：转交的审批环节）',
     `comment`            VARCHAR(200)         DEFAULT NULL COMMENT '审批意见',
     `file_comment`       VARCHAR(200)         DEFAULT NULL COMMENT '文件修改意见',
     `approval_time`      datetime(0)          DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '审批时间',
     PRIMARY KEY (`id`),
-    UNIQUE (`apply_id`, `approver_id`),
     INDEX (`apply_id`),
     INDEX (`approver_id`)
 ) ENGINE = InnoDB
@@ -244,7 +246,7 @@ CREATE TABLE `apply_approver`
 CREATE TABLE `todo_task`
 (
     `id`        bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `apply_id`  bigint(20)  NOT NULL COMMENT '申请id',
+    `apply_id`  bigint  NOT NULL COMMENT '申请id',
     `task_id`   VARCHAR(50) NOT NULL COMMENT '关联的待办事件ID',
     `user_id`   VARCHAR(50) NOT NULL COMMENT '收到待办消息的用户id',
     `user_name` VARCHAR(20) NOT NULL COMMENT '收到待办消息的用户姓名',

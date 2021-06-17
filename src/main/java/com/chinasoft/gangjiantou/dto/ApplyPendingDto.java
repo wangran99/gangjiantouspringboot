@@ -25,6 +25,11 @@ public class ApplyPendingDto {
     private String applicant;
 
     /**
+     * 申请文件的名称
+     */
+    private String fileName;
+
+    /**
      *
      * 审批人的状态列表（0：待我审核 1：我已审批通过 2：我已拒绝 3：我已转移审批给别人)
      */

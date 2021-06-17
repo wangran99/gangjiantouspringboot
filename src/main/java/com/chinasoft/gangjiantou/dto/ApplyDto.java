@@ -13,7 +13,7 @@ public class ApplyDto {
      */
     Apply apply;
     /**
-     * 每隔审批人的审批详情
+     * 每个审批人的审批详情
      */
     List<ApplyApprover> applyApproverList;
 }

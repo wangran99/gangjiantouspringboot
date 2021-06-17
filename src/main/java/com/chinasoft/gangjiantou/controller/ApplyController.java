@@ -134,14 +134,12 @@ public class ApplyController {
         apply.setCurrentApproverId(flowApproverList.get(0).getUserId());
         apply.setUserPositionName(positionService.getById(approvalFlow.getPositionId()).getPositionName());
         apply.setCurrentApprover(flowApproverList.get(0).getUserName());
-        Position position = positionService.getById(flowApproverList.get(0).getPositionId());
-        apply.setCurrentApproverPosition(position != null ? position.getPositionName() : "");
         apply.setFlowName(approvalFlow.getFlowName());
         apply.setFileEditable(approvalFlow.getFileEditable());
         apply.setDeptName(departmentService.getById(approvalFlow.getDeptCode()).getDeptNameCn());
 
         applyService.save(apply);
-
+        //插入审批人
         List<ApplyApprover> applyApproverList = new ArrayList<>();
         flowApproverList.forEach(e -> {
             ApplyApprover applyApprover = new ApplyApprover();
@@ -152,18 +150,19 @@ public class ApplyController {
             applyApprover.setPositionName(positionTemp != null ? positionTemp.getPositionName() : "");
             applyApproverList.add(applyApprover);
         });
-        //插入审批人
+        applyApproverService.saveBatch(applyApproverList);
+
         for (int i = 0; i < applyApproverList.size(); i++) {
             ApplyApprover approver = applyApproverList.get(i);
             approver.setApplyId(apply.getId());
             if ((i + 1) < applyApproverList.size()) {
                 ApplyApprover next = applyApproverList.get(i + 1);
-                approver.setNextApproverId(next.getApproverId());
-                approver.setNextApproverName(next.getApproverName());
+                approver.setNextApplyApprover(next.getId());
+
             }
         }
-//        log.error(" approverlist:" + applyApproverList.toString());
-        applyApproverService.saveBatch(applyApproverList);
+        applyApproverService.updateBatchById(applyApproverList);
+
         if (CollectionUtils.isNotEmpty(apply.getFileList()))
             fileService.lambdaUpdate().in(File::getId, apply.getFileList().stream().map(e -> e.getId()).collect(Collectors.toList()))
                     .set(File::getApplyId, apply.getId()).update();
@@ -245,19 +244,8 @@ public class ApplyController {
     ApplyDto detail(@RequestHeader("authCode") String authCode, @PathVariable("id") Long id) {
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         Apply apply = applyService.getById(id);
-        List<ApplyApprover> applyApproverUnsortedList = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
+        List<ApplyApprover> applyApproverList = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
                 .orderByAsc(ApplyApprover::getId).list();
-
-        List<ApplyApprover> applyApproverList = new ArrayList<>();
-        ApplyApprover applyApprover = applyApproverUnsortedList.get(0);
-        applyApproverList.add(applyApprover);
-        while (applyApprover.getNextApproverId() != null) {
-            ApplyApprover finalApplyApprover = applyApprover;
-            List<ApplyApprover> tempList = applyApproverUnsortedList.stream()
-                    .filter(e -> e.getApproverId().equals(finalApplyApprover.getNextApproverId())).collect(Collectors.toList());
-            applyApprover = tempList.get(0);
-            applyApproverList.add(applyApprover);
-        }
         List<CarbonCopy> carbonCopyList = carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId, id).list();
         List<String> aviableUserIdList = new ArrayList<>();
         aviableUserIdList.add(apply.getApplicantId());
@@ -307,13 +295,12 @@ public class ApplyController {
             throw new CommonException("该审批不存在");
         if (apply.getStatus() == 1)
             throw new CommonException("该审批已经撤回");
-        if (!apply.getCurrentApproverId().equals(user.getUserId()))
-            throw new CommonException("当前审批人未审核结束");
         if (apply.getEndTime() != null)
             throw new CommonException("当前审批已经结束");
+        ApplyApprover applyApprover = getActualApprove(apply);
+        if (!user.getUserId().equals(applyApprover.getApproverId()))
+            throw new CommonException("当前审批人未审核结束,请等待");
 
-        ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
-                .eq(ApplyApprover::getApproverId, user.getUserId()).one();
         applyApprover.setStatus(1);
         applyApprover.setComment(approvalDto.getComment());
         applyApprover.setFileComment(approvalDto.getFileComment());
@@ -335,7 +322,8 @@ public class ApplyController {
             carbonCopyService.saveBatch(carbonCopyList);
         }
         delTodoTaskByApplyId(apply.getId());
-        if (applyApprover.getNextApproverId() == null) {
+        Long nextApplyApproverId = applyApprover.getNextApplyApprover();
+        if (nextApplyApproverId == null) {//审批结束
             apply.setStatus(4);
             apply.setEndTime(LocalDateTime.now());
             applyService.updateById(apply);
@@ -356,12 +344,10 @@ public class ApplyController {
 //            sendOfficialAccountMsgReq.setMsgDisplayMode(1);
             openAPI.sendOfficialAccountMsg(sendOfficialAccountMsgReq);
         } else {
-            apply.setCurrentApproverId(applyApprover.getNextApproverId());
-            apply.setCurrentApprover(applyApprover.getNextApproverName());
+            ApplyApprover nextApplyApprover = applyApproverService.getById(nextApplyApproverId);
+            apply.setCurrentApproverId(nextApplyApprover.getApproverId());
+            apply.setCurrentApprover(nextApplyApprover.getApproverName());
             apply.setStatus(2);
-            ApplyApprover applyApproverTemp = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
-                    .eq(ApplyApprover::getApproverId, apply.getCurrentApproverId()).one();
-            apply.setCurrentApproverPosition(applyApproverTemp.getPositionName());
             applyService.updateById(apply);
             addTodoTask(apply);
             SendOfficialAccountMsgReq sendOfficialAccountMsgReq = new SendOfficialAccountMsgReq();
@@ -400,10 +386,12 @@ public class ApplyController {
             throw new CommonException("该审批不存在");
         if (apply.getStatus() == 1)
             throw new CommonException("该审批已经撤回");
-        if (!apply.getCurrentApproverId().equals(user.getUserId()))
-            throw new CommonException("当前审批人未审核结束");
         if (apply.getEndTime() != null)
             throw new CommonException("当前审批已经结束");
+        ApplyApprover applyApprover = getActualApprove(apply);
+        if (!user.getUserId().equals(applyApprover.getApproverId()))
+            throw new CommonException("当前审批人未审核结束,请等待");
+
         apply.setStatus(3);
         apply.setEndTime(LocalDateTime.now());
         applyService.updateById(apply);
@@ -424,8 +412,6 @@ public class ApplyController {
             carbonCopyService.saveBatch(carbonCopyList);
         }
 
-        ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
-                .eq(ApplyApprover::getApproverId, user.getUserId()).one();
         applyApprover.setStatus(2);
         applyApprover.setComment(approvalDto.getComment());
         applyApprover.setFileComment(approvalDto.getFileComment());
@@ -466,33 +452,58 @@ public class ApplyController {
             throw new CommonException("审批不存在");
         if (apply.getStatus() == 1)
             throw new CommonException("该审批已经撤回");
-        if (!apply.getCurrentApproverId().equals(user.getUserId()))
-            throw new CommonException("当前审批人未审核结束");
         if (apply.getEndTime() != null)
             throw new CommonException("当前审批已经结束");
+        ApplyApprover applyApprover = getActualApprove(apply);
+        if (!user.getUserId().equals(applyApprover.getApproverId()))
+            throw new CommonException("当前审批人未审核结束,请等待");
+        if (!user.getUserId().equals(apply.getCurrentApproverId()))
+            throw new CommonException("当前审批人未审核结束,请等待");
+
         User shiftUser = userService.getById(approvalDto.getShiftUserId());
-        ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
-                .eq(ApplyApprover::getApproverId, user.getUserId()).one();
         applyApprover.setStatus(3);
         applyApprover.setComment(approvalDto.getComment());
         applyApprover.setFileComment(approvalDto.getFileComment());
+        applyApproverService.updateById(applyApprover);
 
+        //插入被转交环节
         ApplyApprover newApplyApprover = new ApplyApprover();
         newApplyApprover.setApplyId(approvalDto.getApplyId());
         newApplyApprover.setApproverId(shiftUser.getUserId());
         newApplyApprover.setPositionName("");
+        newApplyApprover.setShiftFlag(1);
+        newApplyApprover.setStatus(0);
         newApplyApprover.setApproverName(shiftUser.getUserNameCn());
-        newApplyApprover.setNextApproverId(applyApprover.getNextApproverId());
-        newApplyApprover.setNextApproverName(applyApprover.getNextApproverName());
         applyApproverService.save(newApplyApprover);
 
-        applyApprover.setNextApproverId(shiftUser.getUserId());
-        applyApprover.setNextApproverName(shiftUser.getUserNameCn());
-        applyApproverService.updateById(applyApprover);
+        //转交后的审批环节先删除、再保存
+        List<ApplyApprover> list = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
+                .lt(ApplyApprover::getId, newApplyApprover.getId()).gt(ApplyApprover::getId, applyApprover.getId())
+                .orderByAsc(ApplyApprover::getId).list();
+        applyApproverService.removeByIds(list.stream().map(e -> e.getId()).collect(Collectors.toList()));
+        //创建新的转移审批人环节
+        ApplyApprover applyApproverTemp = new ApplyApprover();
+        applyApproverTemp.setApplyId(applyApprover.getApplyId());
+        applyApproverTemp.setApproverId(applyApprover.getApproverId());
+        applyApproverTemp.setPositionName(applyApprover.getPositionName());
+        applyApproverTemp.setApproverName(applyApprover.getApproverName());
+        list.add(0, applyApproverTemp);
+        list.forEach(e -> e.setId(null));
+        applyApproverService.saveBatch(list);
+        for (int i = 0; i < list.size(); i++) {
+            ApplyApprover approver = list.get(i);
+            approver.setApplyId(apply.getId());
+            if ((i + 1) < list.size()) {
+                ApplyApprover next = list.get(i + 1);
+                approver.setNextApplyApprover(next.getId());
+            }
+        }
+        applyApproverService.updateBatchById(list);
+        newApplyApprover.setNextApplyApprover(list.get(0).getId());
+        applyApproverService.updateById(newApplyApprover);
 
-        apply.setCurrentApprover(shiftUser.getUserNameCn());
-        apply.setCurrentApproverId(shiftUser.getUserId());
-        applyService.updateById(apply);
+//        apply.setStatus(2);
+//        applyService.updateById(apply);
 
         if (CollectionUtils.isNotEmpty(approvalDto.getCcList())) {
             List<CarbonCopy> carbonCopyList = new ArrayList<>();
@@ -509,20 +520,19 @@ public class ApplyController {
             });
             carbonCopyService.saveBatch(carbonCopyList);
         }
-        delTodoTaskByApplyId(apply.getId());
-        addTodoTask(apply);
 
+        addTodoTask(apply);
         SendOfficialAccountMsgReq sendOfficialAccountMsgReq = new SendOfficialAccountMsgReq();
         sendOfficialAccountMsgReq.setMsgContent(apply.getApplicant() + "的文件审批转移给" + shiftUser.getUserNameCn() + ",点击查看详情");
         sendOfficialAccountMsgReq.setMsgOwner("文件审批者");
         sendOfficialAccountMsgReq.setUrlType("html");
 //        sendOfficialAccountMsgReq.setUrlPath(url + "/#/detail?id=" + apply.getId());
         sendOfficialAccountMsgReq.setUrlPath("h5://" + mobileUrl + "/html/index.html?applyid=" + apply.getId());
-        List<String> list = new ArrayList<>();
-        list.add(apply.getApplicantId());
-        list.addAll(carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId, apply.getId()).list()
+        List<String> list1 = new ArrayList<>();
+        list1.add(apply.getApplicantId());
+        list1.addAll(carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId, apply.getId()).list()
                 .stream().map(e -> e.getUserId()).collect(Collectors.toList()));
-        sendOfficialAccountMsgReq.setToUserList(list);
+        sendOfficialAccountMsgReq.setToUserList(list1);
         sendOfficialAccountMsgReq.setMsgTitle("文件审批");
         sendOfficialAccountMsgReq.setMsgRange("0");
 //        sendOfficialAccountMsgReq.setMsgDisplayMode(1);
@@ -587,6 +597,17 @@ public class ApplyController {
         return applyPage;
     }
 
+    private ApplyApprover getActualApprove(Apply apply) {
+        if (apply.getEndTime() != null)
+            return null;
+        List<ApplyApprover> applyApproverList = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
+                .orderByAsc(ApplyApprover::getId).list();
+        for (ApplyApprover applyApprover : applyApproverList)
+            if (applyApprover.getStatus() == 0)
+                return applyApprover;
+        return null;
+    }
+
     private void delTodoTaskByApplyId(Long applyId) {
         List<TodoTask> list = todoTaskService.lambdaQuery().eq(TodoTask::getApplyId, applyId).list();
         for (TodoTask todoTask : list)
@@ -596,6 +617,7 @@ public class ApplyController {
 
     //发送welink审批待办消息提醒
     private void addTodoTask(Apply apply) {
+        ApplyApprover applyApprover = getActualApprove(apply);
         TodoTask todoTask = new TodoTask();
         //发送待办任务提醒
         String taskId = UUID.randomUUID().toString().replaceAll("-", "");
@@ -606,11 +628,11 @@ public class ApplyController {
         todoTaskService.save(todoTask);
 
         AddTodoTaskReq addTodoTaskReq = AddTodoTaskReq.builder().taskId(taskId).taskTitle("待审批文件")
-                .userId(apply.getCurrentApproverId()).userNameCn(apply.getCurrentApprover())
+                .userId(applyApprover.getApproverId()).userNameCn(applyApprover.getApproverName())
 //                .detailsUrlPc(url + "#/approval?id=" + apply.getId()).detailsUrl("h5://"+mobileUrl+"")
                 .detailsUrlPc("http://139.9.115.153:8013/gjtweb#approval?applyid=" + apply.getId()).detailsUrl("h5://" + mobileUrl + "/html/index.html?applyid=" + apply.getId())
-                .appName("待审批文件").applicantUserId(apply.getApplicantId())
-                .applicantUserNameCn(apply.getApplicant())
+                .appName("待审批文件").applicantUserId(applyApprover.getApproverId())
+                .applicantUserNameCn(applyApprover.getApproverName())
                 .isMsg(1).isShowApplicantUserName(true).applicantId(taskId).build();
 
         openAPI.addTodoTaskV3(addTodoTaskReq);
