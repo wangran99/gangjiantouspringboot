@@ -1,5 +1,7 @@
 package com.chinasoft.gangjiantou.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chinasoft.gangjiantou.dto.UserDto;
 import com.chinasoft.gangjiantou.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +15,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserService extends IService<User> {
 
+    Page<User> queryUser(Page<User> page, UserDto userDto);
 }

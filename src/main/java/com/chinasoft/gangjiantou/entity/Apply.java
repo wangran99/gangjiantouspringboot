@@ -96,7 +96,7 @@ public class Apply implements Serializable {
     private Integer status;
 
     /**
-     * 转交处理状态（0：待审核 1：已审批）
+     * 转交处理状态（0：未转交 1：待转交审核 2:已转交审批完毕）
      */
     private Integer shiftStatus;
 
@@ -119,7 +119,7 @@ public class Apply implements Serializable {
      * 审批人当前状态：（0：待我审核 1：我已审批通过 2：我已拒绝 3：我已转移审批给别人)
      */
     @TableField(exist = false)
-    private  Long condition;
+    private  Integer condition;
 
     /**
      * 申请人上传的原始文件列表

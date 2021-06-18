@@ -3,12 +3,12 @@
 <mapper namespace="com.chinasoft.gangjiantou.mapper.ApplyMapper">
 
     <select id="pendingApply" resultType="com.chinasoft.gangjiantou.entity.Apply">
-        select distinct apl.*,appover.status as `condition` from (`apply` apl inner join apply_approver appover on apl.id=appover.apply_id)
+        select distinct apl.* from (`apply` apl inner join apply_approver appover on apl.id=appover.apply_id)
         <if test="applyPendingDto.fileName != null and applyPendingDto.fileName !='' ">
             inner join `file` on `file`.apply_id=apl.id
         </if>
         where
-        appover.approver_id = #{userId}
+        appover.approver_id = #{userId} and apl.current_approver_id= #{userId}
         and  apl.status!=1
 
         <if test="applyPendingDto.applicant != null and applyPendingDto.applicant !='' ">

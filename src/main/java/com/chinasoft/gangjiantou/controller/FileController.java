@@ -134,13 +134,10 @@ public class FileController {
         if (saveDocDto.getSourceFileId() < 1)
             throw new CommonException("文件对应的上传初始文件id错误。");
         Apply apply = applyService.getById(saveDocDto.getApplyId());
-        log.error("currentapprovalid:" + apply.getCurrentApproverId());
-        log.error("userid:" + user.getUserId());
-        if (!apply.getCurrentApproverId().equals(user.getUserId()))
+        ApplyApprover applyApprover =getActualApprove(apply);
+        if (!applyApprover.getApproverId().equals(user.getUserId()))
             throw new CommonException("您当前无权编辑保存文档");
         com.chinasoft.gangjiantou.entity.File file = fileService.getById(saveDocDto.getSourceFileId());
-        ApplyApprover applyApprover = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, file.getApplyId())
-                .eq(ApplyApprover::getApproverId, user.getUserId()).one();
         com.chinasoft.gangjiantou.entity.File currentFile = fileService.lambdaQuery().eq(com.chinasoft.gangjiantou.entity.File::getSource, saveDocDto.getSourceFileId())
                 .eq(com.chinasoft.gangjiantou.entity.File::getApprovalId, applyApprover.getId()).one();
         if (currentFile == null) {
@@ -242,6 +239,16 @@ public class FileController {
             }
         }
 
+    }
+    private ApplyApprover getActualApprove(Apply apply) {
+        if (apply.getEndTime() != null)
+            return null;
+        List<ApplyApprover> applyApproverList = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
+                .orderByAsc(ApplyApprover::getId).list();
+        for (ApplyApprover applyApprover : applyApproverList)
+            if (applyApprover.getStatus() == 0)
+                return applyApprover;
+        return null;
     }
 
 }

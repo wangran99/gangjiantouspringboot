@@ -79,19 +79,6 @@ public class ApplyController {
     @Autowired
     OpenAPI openAPI;
 
-//    @GetMapping("test")
-//    @Transactional
-//    public void test(){
-//        for(int i=0;i<10;i++){
-//        Role role=new Role();
-//        role.setRoleName("qqqq");
-//        role.setNote("aaaaa");
-//        role.setStatus(0);
-//        roleService.save(role);}
-//
-//    }
-
-
     /**
      * 获取我能发起申请的列表
      *
@@ -179,6 +166,7 @@ public class ApplyController {
                 carbonCopyList.add(carbonCopy);
             });
             carbonCopyService.saveBatch(carbonCopyList);
+
             SendOfficialAccountMsgReq sendOfficialAccountMsgReq = new SendOfficialAccountMsgReq();
             sendOfficialAccountMsgReq.setMsgContent(apply.getApplicant() + "发起了文件审批");
             sendOfficialAccountMsgReq.setMsgOwner("文件审批者");
@@ -230,6 +218,11 @@ public class ApplyController {
 //        log.error("dto:"+applyPendingDto.toString());
 //        log.error("dto333:"+applyPendingDto.getStatusList().contains("0"));
         Page<Apply> applyPage = applyService.pendingApply(page, userBasicInfoRes.getUserId(), applyPendingDto);
+        applyPage.getRecords().forEach(e->{
+           ApplyApprover applyApprover= applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId,e.getId()).eq(ApplyApprover::getApproverId,userBasicInfoRes.getUserId())
+                    .last("limit 1").one();
+           e.setCondition(applyApprover.getStatus());
+        });
         return applyPage;
     }
 
@@ -300,7 +293,10 @@ public class ApplyController {
         ApplyApprover applyApprover = getActualApprove(apply);
         if (!user.getUserId().equals(applyApprover.getApproverId()))
             throw new CommonException("当前审批人未审核结束,请等待");
-
+        if(applyApprover.getShiftFlag()==1){
+            apply.setShiftStatus(2);
+            applyService.updateById(apply);
+        }
         applyApprover.setStatus(1);
         applyApprover.setComment(approvalDto.getComment());
         applyApprover.setFileComment(approvalDto.getFileComment());
@@ -325,6 +321,7 @@ public class ApplyController {
         Long nextApplyApproverId = applyApprover.getNextApplyApprover();
         if (nextApplyApproverId == null) {//审批结束
             apply.setStatus(4);
+            apply.setShiftStatus(0);
             apply.setEndTime(LocalDateTime.now());
             applyService.updateById(apply);
             SendOfficialAccountMsgReq sendOfficialAccountMsgReq = new SendOfficialAccountMsgReq();
@@ -459,6 +456,8 @@ public class ApplyController {
             throw new CommonException("当前审批人未审核结束,请等待");
         if (!user.getUserId().equals(apply.getCurrentApproverId()))
             throw new CommonException("当前审批人未审核结束,请等待");
+        apply.setShiftStatus(1);
+        applyService.updateById(apply);
 
         User shiftUser = userService.getById(approvalDto.getShiftUserId());
         applyApprover.setStatus(3);
@@ -475,7 +474,8 @@ public class ApplyController {
         newApplyApprover.setStatus(0);
         newApplyApprover.setApproverName(shiftUser.getUserNameCn());
         applyApproverService.save(newApplyApprover);
-
+        applyApprover.setNextApplyApprover(newApplyApprover.getId());
+        applyApproverService.updateById(applyApprover);
         //转交后的审批环节先删除、再保存
         List<ApplyApprover> list = applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, apply.getId())
                 .lt(ApplyApprover::getId, newApplyApprover.getId()).gt(ApplyApprover::getId, applyApprover.getId())
@@ -645,8 +645,8 @@ public class ApplyController {
                 .userId(applyApprover.getApproverId()).userNameCn(applyApprover.getApproverName())
 //                .detailsUrlPc(url + "#/approval?id=" + apply.getId()).detailsUrl("h5://"+mobileUrl+"")
                 .detailsUrlPc("http://139.9.115.153:8013/gjtweb#approval?applyid=" + apply.getId()).detailsUrl("h5://" + mobileUrl + "/html/index.html?applyid=" + apply.getId())
-                .appName("待审批文件").applicantUserId(applyApprover.getApproverId())
-                .applicantUserNameCn(applyApprover.getApproverName())
+                .appName("待审批文件").applicantUserId(apply.getApplicantId())
+                .applicantUserNameCn(apply.getApplicant())
                 .isMsg(1).isShowApplicantUserName(true).applicantId(taskId).build();
 
         openAPI.addTodoTaskV3(addTodoTaskReq);

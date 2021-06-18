@@ -7,10 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chinasoft.gangjiantou.dto.BindDto;
 import com.chinasoft.gangjiantou.dto.UserDto;
 import com.chinasoft.gangjiantou.dto.UserSearchDto;
-import com.chinasoft.gangjiantou.entity.Role;
-import com.chinasoft.gangjiantou.entity.User;
-import com.chinasoft.gangjiantou.entity.UserPosition;
-import com.chinasoft.gangjiantou.entity.UserRole;
+import com.chinasoft.gangjiantou.entity.*;
 import com.chinasoft.gangjiantou.redis.RedisService;
 import com.chinasoft.gangjiantou.service.*;
 import com.github.wangran99.welink.api.client.openapi.OpenAPI;
@@ -44,6 +41,8 @@ public class UserController {
 
     @Autowired
     IUserService userService;
+    @Autowired
+    IUserDepartmentService userDepartmentService;
     @Autowired
     IRoleService roleService;
     @Autowired
@@ -84,31 +83,18 @@ public class UserController {
      */
     @GetMapping("dept")
     List<User> getUserByDept(String deptCode) {
-        if ("0".equals(deptCode)) {
-            QueryUserInfoResPage queryUserInfoResPage = openAPI.getUsersByDeptCode("0", 1, 50);
-            if (!CollectionUtils.isEmpty(queryUserInfoResPage.getData())) {
-                List<String> userIdList = queryUserInfoResPage.getData().stream().map(e -> e.getUserId()).collect(Collectors.toList());
-                List<User> list = userService.lambdaQuery().in(User::getUserId, userIdList).list();
-                list.forEach(e -> {
-                    List<UserPosition> userPositionList = userPositionService.lambdaQuery().in(UserPosition::getUserId, e.getUserId()).list();
-                    e.setPositionList(userPositionList);
-                    userPositionList.forEach(a -> {
-                        a.setPositionName(positionService.getById(a.getPositionId()).getPositionName());
-                    });
+        List<UserDepartment> userDepartmentList=userDepartmentService.lambdaQuery().eq(UserDepartment::getDeptCode,deptCode).list();
+        if(CollectionUtils.isEmpty(userDepartmentList))
+            return null;
+        List<User> list = userService.lambdaQuery().in(User::getUserId,
+                userDepartmentList.stream().map(e->e.getUserId()).collect(Collectors.toList())).list();
 
-                });
-                return list;
-            } else
-                return new ArrayList<>();
-        }
-        List<User> list = userService.lambdaQuery().like(StringUtils.hasText(deptCode), User::getDeptCode, deptCode).list();
         list.forEach(e -> {
             List<UserPosition> userPositionList = userPositionService.lambdaQuery().in(UserPosition::getUserId, e.getUserId()).list();
             e.setPositionList(userPositionList);
             userPositionList.forEach(a -> {
                 a.setPositionName(positionService.getById(a.getPositionId()).getPositionName());
             });
-
         });
         return list;
     }
@@ -121,11 +107,8 @@ public class UserController {
      */
     @PostMapping("query")
     public Page<User> query(@RequestBody UserDto user) {
-        String deptCode = user.getDeptList() != null && user.getDeptList().size() >= 1 ? user.getDeptList().get(0) : "";
         Page<User> userPage = new Page<>(user.getPageNum(), user.getPageSize());
-        Page<User> list = userService.lambdaQuery().eq(StringUtils.hasText(user.getSex()), User::getSex, user.getSex()).
-                eq(StringUtils.hasText(deptCode), User::getDeptCode, deptCode)
-                .like(StringUtils.hasText(user.getName()), User::getUserNameCn, user.getName()).page(userPage);
+        Page<User> list = userService.queryUser(userPage,user);
 
         for (User temp : list.getRecords()) {
             getDetails(temp);

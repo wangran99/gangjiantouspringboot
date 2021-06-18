@@ -2,4 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.chinasoft.gangjiantou.mapper.UserMapper">
 
+    <select id="queryUser" resultType="com.chinasoft.gangjiantou.entity.User">
+        select  user.* from user inner join user_department ud on user.user_id=ud.user_id
+        where 1=1
+        <if test="userDto.sex != null and userDto.sex !='' ">
+            and user.sex = #{userDto.sex}
+        </if>
+        <if test="userDto.name != null and userDto.name !='' ">
+            and user.user_name_cn like   concat('%',#{userDto.name,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="userDto.deptList != null and userDto.deptList.size >0">
+            AND ud.dept_code IN
+            <foreach item="item" index="index" collection="userDto.deptList" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 </mapper>
