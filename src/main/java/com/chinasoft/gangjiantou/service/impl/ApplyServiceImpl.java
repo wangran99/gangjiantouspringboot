@@ -3,6 +3,7 @@ package com.chinasoft.gangjiantou.service.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chinasoft.gangjiantou.dto.ApplyPendingDto;
 import com.chinasoft.gangjiantou.dto.CcDto;
+import com.chinasoft.gangjiantou.dto.ShiftDto;
 import com.chinasoft.gangjiantou.entity.Apply;
 import com.chinasoft.gangjiantou.mapper.ApplyMapper;
 import com.chinasoft.gangjiantou.service.IApplyService;
@@ -30,5 +31,10 @@ public class ApplyServiceImpl extends ServiceImpl<ApplyMapper, Apply> implements
     @Override
     public Page<Apply> queryCC(Page<Apply> page, String userId, CcDto ccDto) {
         return getBaseMapper().queryCC(page,userId,ccDto);
+    }
+
+    @Override
+    public Page<Apply> queryShift(Page<Apply> page, String userId, ShiftDto shiftDto) {
+        return getBaseMapper().queryShift(page,userId,shiftDto);
     }
 }

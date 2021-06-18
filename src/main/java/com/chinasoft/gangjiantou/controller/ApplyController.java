@@ -597,6 +597,20 @@ public class ApplyController {
         return applyPage;
     }
 
+    /**
+     * 分页查询转交我的审批
+     * @param authCode
+     * @param shiftDto
+     * @return
+     */
+    @PostMapping("queryshift")
+    Page<Apply> queryshift(@RequestHeader("authCode") String authCode, @RequestBody ShiftDto shiftDto) {
+        UserBasicInfoRes user = redisService.getUserInfo(authCode);
+        Page<Apply> page = new Page<>(shiftDto.getPageNum(), shiftDto.getPageSize());
+        Page<Apply> applyPage = applyService.queryShift(page, user.getUserId(), shiftDto);
+        return applyPage;
+    }
+
     private ApplyApprover getActualApprove(Apply apply) {
         if (apply.getEndTime() != null)
             return null;

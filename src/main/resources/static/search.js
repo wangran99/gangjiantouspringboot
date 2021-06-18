@@ -46,6 +46,10 @@ api[0].list.push({
     order: '10',
     desc: '分页查询抄送我的审批',
 });
+api[0].list.push({
+    order: '11',
+    desc: '分页查询转交我的审批',
+});
 api.push({
     alias: 'ApprovalFlowController',
     order: '2',
