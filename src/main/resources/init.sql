@@ -28,6 +28,17 @@ CREATE TABLE `user`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户表';
 
+CREATE TABLE `user_department`
+(
+    `id`            bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `user_id`        VARCHAR(50)  NOT NULL COMMENT '用户id',
+    `dept_code`      VARCHAR(100) NOT NULL COMMENT '所在部门',
+    PRIMARY KEY (`id`),
+    INDEX (`dept_code`),
+    INDEX (`user_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='用户部门对应表';
+
 
 CREATE TABLE `position`
 (
