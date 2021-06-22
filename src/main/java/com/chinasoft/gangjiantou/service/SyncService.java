@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 同步部门/人员服务
@@ -30,6 +31,9 @@ public class SyncService {
 
     @Autowired
     IUserService userService;
+
+    @Autowired
+    IUserDepartmentService userDepartmentService;
 
     @Autowired
     IUserRoleService userRoleService;
@@ -85,6 +89,8 @@ public class SyncService {
         departmentService.query().list().stream().forEach(e -> list.add(e.getDeptCode()));
 //        if (!list.isEmpty())
             departmentService.removeByIds(list);
+         List<UserDepartment>  userDepartmentList =  userDepartmentService.query().list();
+        userDepartmentService.removeByIds(userDepartmentList.stream().map(a->a.getId()).collect(Collectors.toList()));
         log.info("=====end del depts=======");
     }
 
@@ -99,6 +105,7 @@ public class SyncService {
 
         Set<UserPosition> userPositionList=new HashSet<>();
         Set<UserRole> userRoleList=new HashSet<>();
+        Set<UserDepartment> userDepartmentHashSet=new HashSet<>();
         for (Department department : list) {
             int pageNum = 1;
             while (true) {
@@ -116,6 +123,11 @@ public class SyncService {
                     user.setUserEmail(userBasicInfoRes.getUserEmail());
                     user.setPosition(userBasicInfoRes.getPosition());
                     user.setIsAdmin(userBasicInfoRes.getIsAdmin());
+
+                    UserDepartment userDepartment=new UserDepartment();
+                    userDepartment.setUserId(user.getUserId());
+                    userDepartment.setDeptCode(department.getDeptCode());
+                    userDepartmentHashSet.add(userDepartment);
 
                     User temp = userService.getById(user.getUserId());
                     if (temp == null)
@@ -147,6 +159,7 @@ public class SyncService {
                 else pageNum++;
             }
         }
+        userDepartmentService.saveBatch(userDepartmentHashSet);
         userPositionService.saveBatch(userPositionList);
         userRoleService.saveBatch(userRoleList);
         log.info("=====end sync users=======");

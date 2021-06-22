@@ -1,5 +1,7 @@
 package com.chinasoft.gangjiantou.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chinasoft.gangjiantou.dto.UserDto;
 import com.chinasoft.gangjiantou.entity.User;
 import com.chinasoft.gangjiantou.mapper.UserMapper;
 import com.chinasoft.gangjiantou.service.IUserService;
@@ -17,4 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
+    @Override
+    public Page<User> queryUser(Page<User> page, UserDto userDto) {
+        return getBaseMapper().queryUser(page,userDto);
+    }
 }

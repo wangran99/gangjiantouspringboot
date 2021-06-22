@@ -32,7 +32,7 @@ CREATE TABLE `user_department`
 (
     `id`            bigint      NOT NULL AUTO_INCREMENT COMMENT 'id',
     `user_id`        VARCHAR(50)  NOT NULL COMMENT '用户id',
-    `dept_code`      VARCHAR(100) NOT NULL COMMENT '所在部门',
+    `dept_code`      VARCHAR(50) NOT NULL COMMENT '所在部门',
     PRIMARY KEY (`id`),
     INDEX (`dept_code`),
     INDEX (`user_id`)
@@ -224,7 +224,7 @@ CREATE TABLE `apply`
     `current_approver_id`       varchar(100) NOT NULL COMMENT '当前审批人id',
     `current_approver`          varchar(20)  NOT NULL COMMENT '当前审批人',
     `status`                    TINYINT      NOT NULL DEFAULT 0 COMMENT '整个流程状态（对申请人来讲）（0：待审核 1：已撤回 2：审批中 3：已拒绝 4：审批通过 5:已转交）',
-    `shift_status`              TINYINT      NOT NULL DEFAULT 0 COMMENT '转交处理状态（0：待审核 1：已审批）',
+    `shift_status`              TINYINT      NOT NULL DEFAULT 0 COMMENT '转交处理状态（0：未转交 1：待审核 2:已转交审批完毕）',
     `apply_time`                datetime(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `recall_time`               datetime(0)           DEFAULT NULL COMMENT '撤回时间',
     `end_time`                  datetime(0)           DEFAULT NULL COMMENT '审批完成时间',
