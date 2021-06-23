@@ -3,7 +3,7 @@
 <mapper namespace="com.chinasoft.gangjiantou.mapper.UserMapper">
 
     <select id="queryUser" resultType="com.chinasoft.gangjiantou.entity.User">
-        select  user.* from user inner join user_department ud on user.user_id=ud.user_id
+        select distinct user.* from user inner join user_department ud on user.user_id=ud.user_id
         where 1=1
         <if test="userDto.sex != null and userDto.sex !='' ">
             and user.sex = #{userDto.sex}

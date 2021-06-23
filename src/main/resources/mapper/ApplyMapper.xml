@@ -3,12 +3,12 @@
 <mapper namespace="com.chinasoft.gangjiantou.mapper.ApplyMapper">
 
     <select id="pendingApply" resultType="com.chinasoft.gangjiantou.entity.Apply">
-        select distinct apl.* from (`apply` apl inner join apply_approver appover on apl.id=appover.apply_id)
+        select distinct apl.*  from (`apply` apl inner join apply_approver appover on apl.id=appover.apply_id)
         <if test="applyPendingDto.fileName != null and applyPendingDto.fileName !='' ">
             inner join `file` on `file`.apply_id=apl.id
         </if>
         where
-        appover.approver_id = #{userId} and apl.current_approver_id= #{userId}
+        appover.approver_id = #{userId} and appover.status !=-1
         and  apl.status!=1
 
         <if test="applyPendingDto.applicant != null and applyPendingDto.applicant !='' ">
@@ -23,30 +23,12 @@
         <if test="applyPendingDto.fileName != null and applyPendingDto.fileName !='' ">
             and file.file_name like concat('%', #{applyPendingDto.fileName,jdbcType=VARCHAR},'%') and file.source=-1
         </if>
-        <if test="applyPendingDto.statusList != null and applyPendingDto.statusList.size >0 and applyPendingDto.statusList.contains(&quot;0&quot;)">
-            AND (appover.status IN
-            <foreach item="item" index="index" collection="applyPendingDto.statusList" open="(" close=")" separator=",">
-                <if test="item == 0 ">
-                    99
-                </if>
-                <if test="item != 0 ">
-                    #{item}
-                </if>
-            </foreach>
-            or appover.status = 0
-            and apl.current_approver_id= #{userId,jdbcType=VARCHAR}
-            )
+        <if test="applyPendingDto.status != null and applyPendingDto.status==0 ">
+            AND apl.status in (0,2) and appover.status =0
+            OR apl.status in (0,2) and appover.status =3 and apl.current_approver_id= #{userId,jdbcType=VARCHAR}
         </if>
-        <if test="applyPendingDto.statusList != null and applyPendingDto.statusList.size >0 and applyPendingDto.statusList.contains(&quot;0&quot;) == false">
-            AND appover.status IN
-            <foreach item="item" index="index" collection="applyPendingDto.statusList" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-        <if test="applyPendingDto.statusList == null or applyPendingDto.statusList.size == 0">
-            and ( appover.status = 0
-            and apl.current_approver_id= #{userId,jdbcType=VARCHAR}
-            or appover.status in (1,2,3) )
+        <if test="applyPendingDto.status != null and applyPendingDto.status==1">
+            and appover.status IN (1,2)
         </if>
         <if test="applyPendingDto.startTime != null ">
             <![CDATA[
@@ -92,12 +74,12 @@
     </select>
 
     <select id="queryShift" resultType="com.chinasoft.gangjiantou.entity.Apply">
-        select distinct apl.*,appover.status as `condition` from (`apply` apl inner join apply_approver appover on apl.id=appover.apply_id)
+        select distinct apl.* from (`apply` apl inner join apply_approver appover on apl.id=appover.apply_id)
         <if test="shiftDto.fileName != null and shiftDto.fileName !='' ">
             inner join `file` on `file`.apply_id=apl.id
         </if>
         where
-        appover.approver_id = #{userId} and appover.shift_flag=1
+        appover.approver_id = #{userId} and appover.shift_flag =1
         and  apl.status!=1
 
         <if test="shiftDto.applicant != null and shiftDto.applicant !='' ">

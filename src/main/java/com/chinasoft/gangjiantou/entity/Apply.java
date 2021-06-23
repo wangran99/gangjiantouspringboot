@@ -96,7 +96,7 @@ public class Apply implements Serializable {
     private Integer status;
 
     /**
-     * 转交处理状态（0：未转交 1：待转交审核 2:已转交审批完毕）
+     * 当前转交处理状态（0：未转交 1：待转交审核 2:已转交审批完毕）
      */
     private Integer shiftStatus;
 
@@ -137,5 +137,5 @@ public class Apply implements Serializable {
      * 申请对应的抄送人ID列表
      */
     @TableField(exist = false)
-    private  List<String> ccList;
+    private  List<CarbonCopy> ccList;
 }

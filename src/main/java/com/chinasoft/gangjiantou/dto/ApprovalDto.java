@@ -1,5 +1,6 @@
 package com.chinasoft.gangjiantou.dto;
 
+import com.chinasoft.gangjiantou.entity.CarbonCopy;
 import lombok.Data;
 
 import java.util.List;
@@ -19,9 +20,20 @@ public class ApprovalDto {
      * 转移审批人的用户id（仅转移审批时用到这个字段）
      */
     String shiftUserId;
+
     /**
-     * 抄送用户id列表
+     * 转移审批人的用户岗位id
      */
-    List<String> ccList;
+    String shiftUserPositionId;
+
+    /**
+     * 转移审批人的用户岗位名称
+     */
+    String shiftUserPositionName;
+
+    /**
+     * 抄送用户列表
+     */
+    List<CarbonCopy> ccList;
 
 }

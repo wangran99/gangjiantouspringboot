@@ -12,15 +12,15 @@ api[0].list.push({
 });
 api[0].list.push({
     order: '2',
-    desc: '新增申请',
+    desc: '获取抄送我的申请流程的列表',
 });
 api[0].list.push({
     order: '3',
-    desc: '分页查询我的申请',
+    desc: '新增申请',
 });
 api[0].list.push({
     order: '4',
-    desc: '分页查询待我审批的申请',
+    desc: '分页查询我的申请',
 });
 api[0].list.push({
     order: '5',
@@ -44,10 +44,14 @@ api[0].list.push({
 });
 api[0].list.push({
     order: '10',
-    desc: '分页查询抄送我的审批',
+    desc: '分页查询待我审批的申请',
 });
 api[0].list.push({
     order: '11',
+    desc: '分页查询抄送我的审批',
+});
+api[0].list.push({
+    order: '12',
     desc: '分页查询转交我的审批',
 });
 api.push({

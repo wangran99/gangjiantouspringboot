@@ -31,9 +31,9 @@ public class ApplyPendingDto {
 
     /**
      *
-     * 审批人的状态列表（0：待我审核 1：我已审批通过 2：我已拒绝 3：我已转移审批给别人)
+     * 审批人的审批状态列表（0：待我办理 1：我已办理)
      */
-    List<String> statusList;
+    Integer status;
     /**
      * 申请开始的时间段
      */
