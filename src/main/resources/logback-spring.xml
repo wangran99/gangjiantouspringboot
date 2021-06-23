@@ -11,7 +11,7 @@
     <springProfile name="dev">
         <property name="log.path" value="gjt-log"/>
     </springProfile>
-    <springProfile name="pro">
+    <springProfile name="test">
         <property name="log.path" value="gjt-log"/>
     </springProfile>
 
@@ -181,7 +181,7 @@
         <appender-ref ref="INFO_FILE"/>
     </logger>
 
-    <springProfile name="dev,uat">
+    <springProfile name="dev,test">
         <root level="info">
             <appender-ref ref="CONSOLE"/>
             <!--            <appender-ref ref="DEBUG_FILE"/>-->

@@ -8,7 +8,7 @@
             inner join `file` on `file`.apply_id=apl.id
         </if>
         where
-        appover.approver_id = #{userId} and appover.status !=-1
+        appover.approver_id = #{userId} and appover.status !=-1 and appover.shift_flag=0
         and  apl.status!=1
 
         <if test="applyPendingDto.applicant != null and applyPendingDto.applicant !='' ">
@@ -99,12 +99,12 @@
         </if>
         <if test="shiftDto.startTime != null ">
             <![CDATA[
-            and apl.apply_time >= #{applyPendingDto.startTime,jdbcType=TIMESTAMP}
+            and apl.apply_time >= #{shiftDto.startTime,jdbcType=TIMESTAMP}
                ]]>
         </if>
         <if test="shiftDto.endTime != null ">
             <![CDATA[
-            and apl.apply_time <= #{applyPendingDto.endTime,jdbcType=TIMESTAMP}
+            and apl.apply_time <= #{shiftDto.endTime,jdbcType=TIMESTAMP}
             ]]>
         </if>
         order by apl.apply_time desc
