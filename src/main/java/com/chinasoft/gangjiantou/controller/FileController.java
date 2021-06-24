@@ -134,7 +134,7 @@ public class FileController {
         if (saveDocDto.getSourceFileId() < 1)
             throw new CommonException("文件对应的上传初始文件id错误。");
         Apply apply = applyService.getById(saveDocDto.getApplyId());
-        ApplyApprover applyApprover =getActualApprove(apply);
+        ApplyApprover applyApprover = getActualApprove(apply);
         if (!applyApprover.getApproverId().equals(user.getUserId()))
             throw new CommonException("您当前无权编辑保存文档");
         com.chinasoft.gangjiantou.entity.File file = fileService.getById(saveDocDto.getSourceFileId());
@@ -201,10 +201,10 @@ public class FileController {
         if (file.getSource() == -1)
             response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
         else {
-            int index = fileName.lastIndexOf(".");
+            int index = file.getFileName().lastIndexOf(".");
+            fileName = file.getFileName().substring(0, index) + "_" + file.getUserName();
             // 下载文件能正常显示中文
-            response.setHeader("Content-Disposition", "attachment;filename=" + fileName.substring(0, index) +
-                    "_" + file.getUserName() + "." + file.getType());
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8") + "." + file.getType());
         }
         // 实现文件下载
         byte[] buffer = new byte[1024];
@@ -240,6 +240,7 @@ public class FileController {
         }
 
     }
+
     private ApplyApprover getActualApprove(Apply apply) {
         if (apply.getEndTime() != null)
             return null;

@@ -56,12 +56,12 @@ public class ApplyApprover implements Serializable {
     private Long nextApplyApprover;
 
     /**
-     * 状态（0：待审核 1：审批通过 2：已拒绝 3：转移审批给别人）
+     * 状态（-1：未轮到审核 0：待审核 1：审批通过 2：已拒绝 3：转移审批给别人）
      */
     private Integer status;
 
     /**
-     * 转交标志（0：不是转交的环节 1：转交的审批环节）
+     * 当前审批环节是否是转交后的审批环节（0：不是转交的环节 1：转交的审批环节）
      */
     private Integer shiftFlag;
 
