@@ -24,8 +24,9 @@
             and file.file_name like concat('%', #{applyPendingDto.fileName,jdbcType=VARCHAR},'%') and file.source=-1
         </if>
         <if test="applyPendingDto.status != null and applyPendingDto.status==0 ">
-            AND apl.status in (0,2) and appover.status =0
+            AND( apl.status in (0,2) and appover.status =0
             OR apl.status in (0,2) and appover.status =3 and apl.current_approver_id= #{userId,jdbcType=VARCHAR}
+            )
         </if>
         <if test="applyPendingDto.status != null and applyPendingDto.status==1">
             and appover.status IN (1,2)

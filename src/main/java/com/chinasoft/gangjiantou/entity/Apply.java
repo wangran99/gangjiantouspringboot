@@ -122,6 +122,12 @@ public class Apply implements Serializable {
     private  Integer condition;
 
     /**
+     * 审批环节列表
+     */
+    @TableField(exist = false)
+    private  List<ApplyApprover> applyApproverList;
+
+    /**
      * 申请人上传的原始文件列表
      */
     @TableField(exist = false)

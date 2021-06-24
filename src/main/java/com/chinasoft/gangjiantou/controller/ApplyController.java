@@ -293,7 +293,7 @@ public class ApplyController {
         if (applyApprover.getShiftFlag() == 1) {
             apply.setShiftStatus(2);
             applyService.updateById(apply);
-        }else{
+        } else {
             apply.setShiftStatus(0);
             applyService.updateById(apply);
         }
@@ -605,6 +605,10 @@ public class ApplyController {
                     .orderByDesc(ApplyApprover::getId).last("limit 1").one();
             e.setCondition(applyApprover.getStatus());
         });
+        applyPage.getRecords().forEach(e -> {
+            e.setApplyApproverList(applyApproverService.lambdaQuery().eq(ApplyApprover::getApplyId, e.getId())
+                    .orderByAsc(ApplyApprover::getId).list());
+        });
         return applyPage;
     }
 
@@ -658,7 +662,7 @@ public class ApplyController {
         List<TodoTask> list = todoTaskService.lambdaQuery().eq(TodoTask::getApplyId, applyId).list();
         for (TodoTask todoTask : list)
             openAPI.delTodoTask(todoTask.getTaskId());
-        todoTaskService.remove(Wrappers.<TodoTask>lambdaQuery().eq(TodoTask::getApplyId, applyId));
+        todoTaskService.removeByIds(list.stream().map(e->e.getId()).collect(Collectors.toList()));
     }
 
     //发送welink审批待办消息提醒
@@ -676,7 +680,7 @@ public class ApplyController {
         AddTodoTaskReq addTodoTaskReq = AddTodoTaskReq.builder().taskId(taskId).taskTitle("待审批文件")
                 .userId(applyApprover.getApproverId()).userNameCn(applyApprover.getApproverName())
 //                .detailsUrlPc(url + "#/approval?id=" + apply.getId()).detailsUrl("h5://"+mobileUrl+"")
-                .detailsUrlPc(url+"#approval?applyid=" + apply.getId())
+                .detailsUrlPc(url + "#approval?applyid=" + apply.getId())
                 .detailsUrl("h5://" + mobileUrl + "/html/index.html?applyid=" + apply.getId())
                 .appName("待审批文件").applicantUserId(apply.getApplicantId())
                 .applicantUserNameCn(apply.getApplicant())
@@ -684,6 +688,7 @@ public class ApplyController {
 
         openAPI.addTodoTaskV3(addTodoTaskReq);
     }
+
     //发送welink审批转移审批待办消息提醒
     private void addShiftTodoTask(Apply apply) {
         ApplyApprover applyApprover = getActualApprove(apply);
@@ -696,10 +701,10 @@ public class ApplyController {
         todoTask.setUserName(apply.getCurrentApprover());
         todoTaskService.save(todoTask);
 
-        AddTodoTaskReq addTodoTaskReq = AddTodoTaskReq.builder().taskId(taskId).taskTitle(apply.getCurrentApprover()+"转交待审批文件")
+        AddTodoTaskReq addTodoTaskReq = AddTodoTaskReq.builder().taskId(taskId).taskTitle(apply.getCurrentApprover() + "转交待审批文件")
                 .userId(applyApprover.getApproverId()).userNameCn(applyApprover.getApproverName())
 //                .detailsUrlPc(url + "#/approval?id=" + apply.getId()).detailsUrl("h5://"+mobileUrl+"")
-                .detailsUrlPc(url+"#approval?applyid=" + apply.getId())
+                .detailsUrlPc(url + "#approval?applyid=" + apply.getId())
                 .detailsUrl("h5://" + mobileUrl + "/html/index.html?applyid=" + apply.getId())
                 .appName("待审批文件").applicantUserId(apply.getCurrentApproverId())
                 .applicantUserNameCn(apply.getCurrentApprover())
