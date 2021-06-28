@@ -52,6 +52,9 @@
         <if test="ccDto.applicant != null and ccDto.applicant !='' ">
             and apl.applicant like concat('%',#{ccDto.applicant,jdbcType=VARCHAR},'%')
         </if>
+        <if test="ccDto.flowId != null ">
+            and apl.flow_id =  #{ccDto.flowId,jdbcType=BIGINT}
+        </if>
         <if test="ccDto.serialNumber != null and ccDto.serialNumber !='' ">
             and apl.serial_number = #{ccDto.serialNumber,jdbcType=VARCHAR}
         </if>
