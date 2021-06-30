@@ -30,42 +30,42 @@ public class SyncTimer {
 
 
     //每隔1小时
-    @Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 2000)
-//    @Scheduled(cron = "0 0 0 * * ?")//每天晚上0点执行
+//    @Scheduled(fixedRate = 24 * 60 * 60 * 1000, initialDelay = 2000)
+    @Scheduled(cron = "0 0 0 * * ?")//每天晚上0点执行
     @Transactional
     public void scheduled() {
-//        syncService.delDepts();
-//        syncService.syncDepts();
-//        syncService.syncUsers();
+        syncService.delDepts();
+        syncService.syncDepts();
+        syncService.syncUsers();
 //        uploadFile();
     }
 
     void uploadFile(){
-        File file = new File("D:/welink-sdk-java-2.0.0.jar");
-        PreuploadReq preuploadReq=new PreuploadReq();
-        preuploadReq.setName(file.getName());
-        preuploadReq.setSize(file.length());
-        PreUploadRes preUploadRes= openAPI.getPreUpload(preuploadReq);
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        //设置请求头
-        HttpHeaders headers = new HttpHeaders();
-        MediaType type = MediaType.parseMediaType("multipart/form-data");
-        headers.setContentType(type);
-
-        //设置请求体，注意是LinkedMultiValueMap
-        FileSystemResource fileSystemResource = new FileSystemResource(file);
-        MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
-        form.add("file", fileSystemResource);
-        form.add("filename",file.getName());
-
-        //用HttpEntity封装整个请求报文
-        HttpEntity<MultiValueMap<String, Object>> files = new HttpEntity<>(form, headers);
-
-        String s = restTemplate.postForObject(preUploadRes.getUpload_url()+"?objectLength="+file.length(),
-                files, String.class);
-        System.out.println(s);
+//        File file = new File("D:/welink-sdk-java-2.0.0.jar");
+//        PreuploadReq preuploadReq=new PreuploadReq();
+//        preuploadReq.setName(file.getName());
+//        preuploadReq.setSize(file.length());
+//        PreUploadRes preUploadRes= openAPI.getPreUpload(preuploadReq);
+//
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        //设置请求头
+//        HttpHeaders headers = new HttpHeaders();
+//        MediaType type = MediaType.parseMediaType("multipart/form-data");
+//        headers.setContentType(type);
+//
+//        //设置请求体，注意是LinkedMultiValueMap
+//        FileSystemResource fileSystemResource = new FileSystemResource(file);
+//        MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
+//        form.add("file", fileSystemResource);
+//        form.add("filename",file.getName());
+//
+//        //用HttpEntity封装整个请求报文
+//        HttpEntity<MultiValueMap<String, Object>> files = new HttpEntity<>(form, headers);
+//
+//        String s = restTemplate.postForObject(preUploadRes.getUpload_url()+"?objectLength="+file.length(),
+//                files, String.class);
+//        System.out.println(s);
         PredownloadReq predownloadReq=new PredownloadReq();
         predownloadReq.setFile_sn("9547920-10105");
         openAPI.getPreDownload(predownloadReq);

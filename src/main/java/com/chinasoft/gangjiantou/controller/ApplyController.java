@@ -2,7 +2,6 @@ package com.chinasoft.gangjiantou.controller;
 
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chinasoft.gangjiantou.dto.*;
 import com.chinasoft.gangjiantou.entity.*;
@@ -11,7 +10,6 @@ import com.chinasoft.gangjiantou.redis.RedisService;
 import com.chinasoft.gangjiantou.service.*;
 import com.github.wangran99.welink.api.client.openapi.OpenAPI;
 import com.github.wangran99.welink.api.client.openapi.model.AddTodoTaskReq;
-import com.github.wangran99.welink.api.client.openapi.model.AddTodoTaskRes;
 import com.github.wangran99.welink.api.client.openapi.model.SendOfficialAccountMsgReq;
 import com.github.wangran99.welink.api.client.openapi.model.UserBasicInfoRes;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -120,8 +117,8 @@ public class ApplyController {
     @PostMapping("add")
     @Transactional
     public boolean add(@RequestHeader("authCode") String authCode, @RequestBody Apply apply) {
-       if(CollectionUtils.isEmpty(apply.getFileList()))
-           throw new CommonException("请上传文件");
+        if (CollectionUtils.isEmpty(apply.getFileList()))
+            throw new CommonException("请上传文件");
         UserBasicInfoRes userBasicInfoRes = redisService.getUserInfo(authCode);
         apply.setId(null);
         apply.setApplicantId(userBasicInfoRes.getUserId());
@@ -419,7 +416,7 @@ public class ApplyController {
         applyApprover.setApprovalTime(LocalDateTime.now());
         applyApproverService.updateById(applyApprover);
         delTodoTaskByApplyId(apply.getId());
-        if(carbonCopyList.size()<1)
+        if (carbonCopyList.size() < 1)
             return true;
         SendOfficialAccountMsgReq sendOfficialAccountMsgReq = new SendOfficialAccountMsgReq();
         sendOfficialAccountMsgReq.setMsgContent(apply.getApplicant() + "的文件审核被驳回,点击查看详情");
@@ -508,8 +505,8 @@ public class ApplyController {
         newApplyApprover.setNextApplyApprover(list.get(0).getId());
         applyApproverService.updateById(newApplyApprover);
 
+        List<CarbonCopy> carbonCopyList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(approvalDto.getCcList())) {
-            List<CarbonCopy> carbonCopyList = new ArrayList<>();
             approvalDto.getCcList().forEach(e -> {
                 if (carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId, apply.getId()).eq(CarbonCopy::getUserId, e.getUserId()).one() != null)
                     return;
@@ -525,6 +522,8 @@ public class ApplyController {
         }
 
         addShiftTodoTask(apply);
+        if (CollectionUtils.isEmpty(carbonCopyList))
+            return true;
         SendOfficialAccountMsgReq sendOfficialAccountMsgReq = new SendOfficialAccountMsgReq();
         sendOfficialAccountMsgReq.setMsgContent(apply.getApplicant() + "的文件审批转移给" + shiftUser.getUserNameCn() + ",点击查看详情");
         sendOfficialAccountMsgReq.setMsgOwner("文件审批者");
@@ -533,7 +532,7 @@ public class ApplyController {
         sendOfficialAccountMsgReq.setUrlPath("h5://" + mobileUrl + "/html/index.html?applyid=" + apply.getId());
         List<String> list1 = new ArrayList<>();
 //        list1.add(apply.getApplicantId());
-        list1.addAll(carbonCopyService.lambdaQuery().eq(CarbonCopy::getApplyId, apply.getId()).list()
+        list1.addAll(carbonCopyList
                 .stream().map(e -> e.getUserId()).collect(Collectors.toList()));
         sendOfficialAccountMsgReq.setToUserList(list1);
         sendOfficialAccountMsgReq.setMsgTitle("文件审批");
@@ -668,7 +667,7 @@ public class ApplyController {
         List<TodoTask> list = todoTaskService.lambdaQuery().eq(TodoTask::getApplyId, applyId).list();
         for (TodoTask todoTask : list)
             openAPI.delTodoTask(todoTask.getTaskId());
-        todoTaskService.removeByIds(list.stream().map(e->e.getId()).collect(Collectors.toList()));
+        todoTaskService.removeByIds(list.stream().map(e -> e.getId()).collect(Collectors.toList()));
     }
 
     //发送welink审批待办消息提醒
